@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './LoginPage.css'; // reuse login styles
+import './LoginPage.css'; // Reuse login styles
 
 function SignupPage() {
   const [name, setName] = useState('');
@@ -44,18 +44,19 @@ function SignupPage() {
         body: JSON.stringify({ name, email, password })
       });
 
-      const data = await res.json();
+      const contentType = res.headers.get('content-type');
+      const data = contentType?.includes('application/json') ? await res.json() : {};
 
       if (res.ok && data.token) {
         localStorage.setItem('token', data.token);
         navigate('/dashboard');
       } else {
-        alert(data.message || 'Signup failed');
-        console.error('Signup failed:', data);
+        console.error('Signup error:', data);
+        alert(data.message || 'Signup failed. Please try again.');
       }
     } catch (err) {
-      console.error('Signup error:', err);
-      alert('An error occurred. Please try again.');
+      console.error('Unexpected signup error:', err);
+      alert('An unexpected error occurred. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -96,7 +97,8 @@ function SignupPage() {
             type="checkbox"
             checked={showPassword}
             onChange={() => setShowPassword(prev => !prev)}
-          /> Show Password
+          />{' '}
+          Show Password
         </label>
       </div>
 
