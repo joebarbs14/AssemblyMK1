@@ -17,7 +17,7 @@ function LoginPage() {
     setLoading(true);
 
     try {
-      const res = await fetch('/auth/login', {
+      const res = await fetch('https://assemblymk1-backend.onrender.com/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
