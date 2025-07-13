@@ -44,6 +44,7 @@ function LoginPage() {
         onChange={e => setEmail(e.target.value)}
         placeholder="Email"
         autoComplete="username"
+        required
       />
 
       <input
@@ -52,11 +53,12 @@ function LoginPage() {
         onChange={e => setPassword(e.target.value)}
         placeholder="Password"
         autoComplete="current-password"
+        required
       />
 
       <button onClick={login}>Login</button>
 
-      <p style={{ marginTop: '1rem', textAlign: 'center' }}>
+      <p className="signup-redirect">
         Don’t have an account?{' '}
         <span className="link" onClick={() => navigate('/signup')}>Sign up</span>
       </p>
