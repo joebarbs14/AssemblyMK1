@@ -38,7 +38,7 @@ function SignupPage() {
     setLoading(true);
 
     try {
-      const response = await fetch('/auth/register', {
+      const response = await fetch('https://assemblymk1-backend.onrender.com/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password })
