@@ -9,31 +9,30 @@ const categories = [
 
 function DashboardPage() {
   const [processes, setProcesses] = useState({});
-  const [userName, setUserName] = useState('');
+  const [userName, setUserName] = useState('Resident');
   const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-
     if (!token) {
       navigate('/');
       return;
     }
 
-    // Decode token to extract user info
-    const base64Url = token.split('.')[1];
+    // Decode token to get user info
     try {
-      const decoded = JSON.parse(atob(base64Url));
+      const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+      const decoded = JSON.parse(atob(base64));
       setUserName(decoded.name || 'Resident');
     } catch (err) {
-      console.error('Invalid token:', err);
+      console.error('Invalid token format:', err);
       navigate('/');
       return;
     }
 
     const fetchData = async () => {
       try {
-        const res = await fetch('https://assemblymk1-backend.onrender.com/dashboard', {
+        const res = await fetch('https://assemblymk1-backend.onrender.com/dashboard/', {
           method: 'GET',
           headers: {
             'Authorization': 'Bearer ' + token,
@@ -42,13 +41,13 @@ function DashboardPage() {
         });
 
         if (!res.ok) {
-          throw new Error('Unauthorized or failed to fetch');
+          throw new Error(`Server error: ${res.status}`);
         }
 
         const data = await res.json();
-        setProcesses(data);
+        setProcesses(data || {});
       } catch (error) {
-        console.error('Dashboard fetch error:', error);
+        console.error('Dashboard fetch error:', error.message || error);
         localStorage.removeItem('token');
         navigate('/');
       }
