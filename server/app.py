@@ -14,11 +14,16 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'changeme')
 
-# ✅ Updated CORS config to allow frontend origin
-CORS(app, origins=["https://assemblymk1.onrender.com"], supports_credentials=True)
+# ✅ Configure CORS: allow local + deployed frontend
+CORS(app, resources={r"/*": {"origins": [
+    "https://assemblymk1.onrender.com",
+    "http://localhost:3000"
+]}}, supports_credentials=True)
 
+# ✅ Initialize DB
 db.init_app(app)
 
+# ✅ Register Blueprints
 app.register_blueprint(auth, url_prefix='/auth')
 app.register_blueprint(dashboard, url_prefix='/dashboard')
 app.register_blueprint(process, url_prefix='/process')
