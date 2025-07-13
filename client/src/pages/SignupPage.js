@@ -6,13 +6,36 @@ function SignupPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  const validateEmail = (email) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
   const handleSignup = async () => {
-    if (!name || !email || !password) {
+    if (!name || !email || !password || !confirmPassword) {
       alert('Please fill in all fields');
       return;
     }
+
+    if (!validateEmail(email)) {
+      alert('Please enter a valid email address');
+      return;
+    }
+
+    if (password.length < 6) {
+      alert('Password must be at least 6 characters');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      alert('Passwords do not match');
+      return;
+    }
+
+    setLoading(true);
 
     try {
       const res = await fetch('/auth/register', {
@@ -21,15 +44,11 @@ function SignupPage() {
         body: JSON.stringify({ name, email, password })
       });
 
-      let data = {};
-      const contentType = res.headers.get('content-type');
-      if (contentType && contentType.includes('application/json')) {
-        data = await res.json();
-      }
+      const data = await res.json();
 
-      if (res.ok) {
-        alert('Account created! Please log in.');
-        navigate('/');
+      if (res.ok && data.token) {
+        localStorage.setItem('token', data.token);
+        navigate('/dashboard');
       } else {
         alert(data.message || 'Signup failed');
         console.error('Signup failed:', data);
@@ -37,12 +56,15 @@ function SignupPage() {
     } catch (err) {
       console.error('Signup error:', err);
       alert('An error occurred. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="login-container">
       <h1>Sign Up</h1>
+
       <input
         type="text"
         placeholder="Name"
@@ -56,12 +78,32 @@ function SignupPage() {
         onChange={e => setEmail(e.target.value)}
       />
       <input
-        type="password"
+        type={showPassword ? 'text' : 'password'}
         placeholder="Password"
         value={password}
         onChange={e => setPassword(e.target.value)}
       />
-      <button onClick={handleSignup}>Create Account</button>
+      <input
+        type={showPassword ? 'text' : 'password'}
+        placeholder="Confirm Password"
+        value={confirmPassword}
+        onChange={e => setConfirmPassword(e.target.value)}
+      />
+
+      <div style={{ marginBottom: '1rem' }}>
+        <label>
+          <input
+            type="checkbox"
+            checked={showPassword}
+            onChange={() => setShowPassword(prev => !prev)}
+          /> Show Password
+        </label>
+      </div>
+
+      <button onClick={handleSignup} disabled={loading}>
+        {loading ? 'Creating Account...' : 'Create Account'}
+      </button>
+
       <p>
         Already have an account?{' '}
         <span className="link" onClick={() => navigate('/')}>Log in</span>
