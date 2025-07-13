@@ -1,16 +1,19 @@
 from flask import Blueprint, request, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, Resident
-import jwt, datetime, os
+import jwt
+import datetime
+import os
 
 auth = Blueprint('auth', __name__)
 SECRET = os.getenv("SECRET_KEY", "changeme")
 
-# ✅ Signup/Register Route with token return
+
+# ✅ Register (Sign Up)
 @auth.route('/auth/register', methods=['POST'])
 def register():
     try:
-        data = request.get_json(force=True)  # ⬅️ force=True ensures JSON is parsed even if headers are missing
+        data = request.get_json(force=True)
 
         if not data or not data.get('email') or not data.get('password') or not data.get('name'):
             return jsonify({"message": "Missing required fields"}), 400
@@ -19,11 +22,12 @@ def register():
             return jsonify({"message": "Email already exists"}), 409
 
         hashed = generate_password_hash(data['password'])
+
         new_user = Resident(
             name=data['name'],
             email=data['email'],
             password_hash=hashed,
-            created_at=datetime.datetime.utcnow()  # ✅ Make sure created_at is populated
+            created_at=datetime.datetime.utcnow()
         )
         db.session.add(new_user)
         db.session.commit()
@@ -33,6 +37,12 @@ def register():
             'exp': datetime.datetime.utcnow() + datetime.timedelta(days=7)
         }, SECRET, algorithm="HS256")
 
+        # Convert token to string if needed
+        if isinstance(token, bytes):
+            token = token.decode('utf-8')
+
+        print("✅ Registration successful. Token:", token)
+
         return jsonify({
             "message": "Registered successfully",
             "status": "ok",
@@ -40,14 +50,14 @@ def register():
         }), 201
 
     except Exception as e:
-        print("Error in /auth/register:", str(e))
+        print("❌ Error in /auth/register:", str(e))
         return jsonify({
             "message": "Server error occurred",
             "error": str(e)
         }), 500
 
 
-# ✅ Login Route with token
+# ✅ Login
 @auth.route('/auth/login', methods=['POST'])
 def login():
     try:
@@ -66,6 +76,11 @@ def login():
             'exp': datetime.datetime.utcnow() + datetime.timedelta(days=7)
         }, SECRET, algorithm="HS256")
 
+        if isinstance(token, bytes):
+            token = token.decode('utf-8')
+
+        print("✅ Login successful. Token:", token)
+
         return jsonify({
             "token": token,
             "message": "Login successful",
@@ -73,7 +88,7 @@ def login():
         }), 200
 
     except Exception as e:
-        print("Error in /auth/login:", str(e))
+        print("❌ Error in /auth/login:", str(e))
         return jsonify({
             "message": "Login failed",
             "error": str(e)
