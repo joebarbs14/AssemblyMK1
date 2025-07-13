@@ -27,21 +27,29 @@ def register():
         db.session.add(new_user)
         db.session.commit()
 
-        return jsonify({"message": "Registered successfully"}), 201
+        return jsonify({
+            "message": "Registered successfully",
+            "status": "ok"
+        }), 201
 
     except Exception as e:
         print("Error in /auth/register:", str(e))
-        return jsonify({"message": "Server error occurred", "error": str(e)}), 500
+        return jsonify({
+            "message": "Server error occurred",
+            "error": str(e)
+        }), 500
 
 # ✅ Login Route
 @auth.route('/auth/login', methods=['POST'])
 def login():
     try:
         data = request.get_json()
+
         if not data or not data.get('email') or not data.get('password'):
             return jsonify({"message": "Missing credentials"}), 400
 
         user = Resident.query.filter_by(email=data['email']).first()
+
         if not user or not check_password_hash(user.password_hash, data['password']):
             return jsonify({"message": "Invalid credentials"}), 401
 
@@ -50,8 +58,15 @@ def login():
             'exp': datetime.datetime.utcnow() + datetime.timedelta(days=7)
         }, SECRET, algorithm="HS256")
 
-        return jsonify({"token": token}), 200
+        return jsonify({
+            "token": token,
+            "message": "Login successful",
+            "status": "ok"
+        }), 200
 
     except Exception as e:
         print("Error in /auth/login:", str(e))
-        return jsonify({"message": "Login failed", "error": str(e)}), 500
+        return jsonify({
+            "message": "Login failed",
+            "error": str(e)
+        }), 500
