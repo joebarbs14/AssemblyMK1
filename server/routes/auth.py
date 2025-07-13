@@ -6,6 +6,23 @@ import jwt, datetime, os
 auth = Blueprint('auth', __name__)
 SECRET = os.getenv("SECRET_KEY", "changeme")
 
+# New Signup Endpoint
+@auth.route('/auth/signup', methods=['POST'])
+def signup():
+    data = request.json
+    if not data.get('email') or not data.get('password') or not data.get('name'):
+        return jsonify({"message": "Missing required fields"}), 400
+
+    if Resident.query.filter_by(email=data['email']).first():
+        return jsonify({"message": "Email already exists"}), 409
+
+    hashed = generate_password_hash(data['password'])
+    resident = Resident(name=data['name'], email=data['email'], password_hash=hashed)
+    db.session.add(resident)
+    db.session.commit()
+    return jsonify({"message": "Registered successfully"}), 201
+
+# Existing Register Route (optional — can be removed if duplicating signup)
 @auth.route('/register', methods=['POST'])
 def register():
     data = request.json
@@ -18,6 +35,7 @@ def register():
     db.session.commit()
     return jsonify({"message": "Registered successfully"})
 
+# Login Endpoint
 @auth.route('/login', methods=['POST'])
 def login():
     data = request.json
