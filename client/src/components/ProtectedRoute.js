@@ -3,10 +3,11 @@ import { Navigate } from 'react-router-dom';
 
 function ProtectedRoute({ children }) {
   const token = localStorage.getItem('token');
-  if (!token) {
-    return <Navigate to="/" replace />;
-  }
-  return children;
+
+  // You can add token format or expiry validation here later
+  const isAuthenticated = !!token;
+
+  return isAuthenticated ? children : <Navigate to="/" replace />;
 }
 
 export default ProtectedRoute;
