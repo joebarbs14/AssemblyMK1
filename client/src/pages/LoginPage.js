@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './LoginPage.css';
 
@@ -7,6 +7,11 @@ function LoginPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  // Optional: Clear old token on load
+  useEffect(() => {
+    localStorage.removeItem('token');
+  }, []);
 
   const login = async () => {
     if (!email || !password) {
@@ -28,6 +33,12 @@ function LoginPage() {
 
       if (res.ok && data.token) {
         localStorage.setItem('token', data.token);
+
+        // Optionally test if dashboard is reachable before navigating
+        // await fetch('https://assemblymk1-backend.onrender.com/dashboard', {
+        //   headers: { 'Authorization': `Bearer ${data.token}` }
+        // });
+
         navigate('/dashboard');
       } else {
         console.error('Login failed:', data);
