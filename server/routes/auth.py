@@ -27,9 +27,16 @@ def register():
         db.session.add(new_user)
         db.session.commit()
 
+        # ✅ Generate token on successful signup
+        token = jwt.encode({
+            'id': new_user.id,
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=7)
+        }, SECRET, algorithm="HS256")
+
         return jsonify({
             "message": "Registered successfully",
-            "status": "ok"
+            "status": "ok",
+            "token": token
         }), 201
 
     except Exception as e:
