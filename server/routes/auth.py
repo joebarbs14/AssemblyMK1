@@ -10,8 +10,11 @@ SECRET = os.getenv("SECRET_KEY", "changeme")
 
 
 # ✅ Register (Sign Up)
-@auth.route('/auth/register', methods=['POST'])
+@auth.route('/register', methods=['POST', 'OPTIONS'])
 def register():
+    if request.method == 'OPTIONS':
+        return '', 200  # Handle CORS preflight
+
     try:
         data = request.get_json(force=True)
 
@@ -37,7 +40,6 @@ def register():
             'exp': datetime.datetime.utcnow() + datetime.timedelta(days=7)
         }, SECRET, algorithm="HS256")
 
-        # Convert token to string if needed
         if isinstance(token, bytes):
             token = token.decode('utf-8')
 
@@ -50,7 +52,7 @@ def register():
         }), 201
 
     except Exception as e:
-        print("❌ Error in /auth/register:", str(e))
+        print("❌ Error in /register:", str(e))
         return jsonify({
             "message": "Server error occurred",
             "error": str(e)
@@ -58,8 +60,11 @@ def register():
 
 
 # ✅ Login
-@auth.route('/auth/login', methods=['POST'])
+@auth.route('/login', methods=['POST', 'OPTIONS'])
 def login():
+    if request.method == 'OPTIONS':
+        return '', 200  # Handle CORS preflight
+
     try:
         data = request.get_json(force=True)
 
@@ -88,7 +93,7 @@ def login():
         }), 200
 
     except Exception as e:
-        print("❌ Error in /auth/login:", str(e))
+        print("❌ Error in /login:", str(e))
         return jsonify({
             "message": "Login failed",
             "error": str(e)
