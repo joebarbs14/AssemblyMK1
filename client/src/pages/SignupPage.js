@@ -38,24 +38,28 @@ function SignupPage() {
     setLoading(true);
 
     try {
-      const res = await fetch('/auth/register', {
+      const response = await fetch('/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password })
       });
 
-      const contentType = res.headers.get('content-type');
-      const data = contentType?.includes('application/json') ? await res.json() : {};
+      const isJson = response.headers
+        .get('content-type')
+        ?.includes('application/json');
 
-      if (res.ok && data.token) {
+      const data = isJson ? await response.json() : {};
+
+      console.log('Register response:', data); // ✅ for debugging
+
+      if (response.ok && data.token) {
         localStorage.setItem('token', data.token);
         navigate('/dashboard');
       } else {
-        console.error('Signup error:', data);
         alert(data.message || 'Signup failed. Please try again.');
       }
-    } catch (err) {
-      console.error('Unexpected signup error:', err);
+    } catch (error) {
+      console.error('Signup error:', error);
       alert('An unexpected error occurred. Please try again.');
     } finally {
       setLoading(false);
