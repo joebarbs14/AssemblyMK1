@@ -8,38 +8,57 @@ function LoginPage() {
   const navigate = useNavigate();
 
   const login = async () => {
-    const res = await fetch('/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
-    });
-    const data = await res.json();
-    if (data.token) {
-      localStorage.setItem('token', data.token);
-      navigate('/dashboard');
-    } else {
-      alert(data.message || 'Login failed');
+    if (!email || !password) {
+      alert('Please enter both email and password');
+      return;
+    }
+
+    try {
+      const res = await fetch('/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.token) {
+        localStorage.setItem('token', data.token);
+        navigate('/dashboard');
+      } else {
+        alert(data.message || 'Login failed');
+      }
+    } catch (err) {
+      console.error('Login error:', err);
+      alert('An error occurred. Please try again.');
     }
   };
 
   return (
     <div className="login-container">
       <h1>LocalGov Login</h1>
+
       <input
         type="email"
         value={email}
         onChange={e => setEmail(e.target.value)}
         placeholder="Email"
+        autoComplete="username"
       />
+
       <input
         type="password"
         value={password}
         onChange={e => setPassword(e.target.value)}
         placeholder="Password"
+        autoComplete="current-password"
       />
+
       <button onClick={login}>Login</button>
-      <p style={{ marginTop: '1rem' }}>
-        Don't have an account? <span className="link" onClick={() => navigate('/signup')}>Sign up</span>
+
+      <p style={{ marginTop: '1rem', textAlign: 'center' }}>
+        Don’t have an account?{' '}
+        <span className="link" onClick={() => navigate('/signup')}>Sign up</span>
       </p>
     </div>
   );
