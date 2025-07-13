@@ -21,13 +21,18 @@ function SignupPage() {
         body: JSON.stringify({ name, email, password })
       });
 
-      const data = await res.json();
+      let data = {};
+      const contentType = res.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        data = await res.json();
+      }
 
       if (res.ok) {
         alert('Account created! Please log in.');
         navigate('/');
       } else {
         alert(data.message || 'Signup failed');
+        console.error('Signup failed:', data);
       }
     } catch (err) {
       console.error('Signup error:', err);
