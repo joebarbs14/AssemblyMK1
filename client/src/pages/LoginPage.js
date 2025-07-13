@@ -5,6 +5,7 @@ import './LoginPage.css';
 function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const login = async () => {
@@ -13,6 +14,8 @@ function LoginPage() {
       return;
     }
 
+    setLoading(true);
+
     try {
       const res = await fetch('/auth/login', {
         method: 'POST',
@@ -20,17 +23,21 @@ function LoginPage() {
         body: JSON.stringify({ email, password })
       });
 
-      const data = await res.json();
+      const contentType = res.headers.get('content-type');
+      const data = contentType?.includes('application/json') ? await res.json() : {};
 
       if (res.ok && data.token) {
         localStorage.setItem('token', data.token);
         navigate('/dashboard');
       } else {
-        alert(data.message || 'Login failed');
+        console.error('Login failed:', data);
+        alert(data.message || 'Login failed. Please check your credentials.');
       }
     } catch (err) {
       console.error('Login error:', err);
       alert('An error occurred. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -56,7 +63,9 @@ function LoginPage() {
         required
       />
 
-      <button onClick={login}>Login</button>
+      <button onClick={login} disabled={loading}>
+        {loading ? 'Logging in...' : 'Login'}
+      </button>
 
       <p className="signup-redirect">
         Don’t have an account?{' '}
