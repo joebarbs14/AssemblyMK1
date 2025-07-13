@@ -10,7 +10,7 @@ SECRET = os.getenv("SECRET_KEY", "changeme")
 @auth.route('/auth/register', methods=['POST'])
 def register():
     try:
-        data = request.get_json()
+        data = request.get_json(force=True)  # ⬅️ force=True ensures JSON is parsed even if headers are missing
 
         if not data or not data.get('email') or not data.get('password') or not data.get('name'):
             return jsonify({"message": "Missing required fields"}), 400
@@ -22,12 +22,12 @@ def register():
         new_user = Resident(
             name=data['name'],
             email=data['email'],
-            password_hash=hashed
+            password_hash=hashed,
+            created_at=datetime.datetime.utcnow()  # ✅ Make sure created_at is populated
         )
         db.session.add(new_user)
         db.session.commit()
 
-        # ✅ Return JWT token so frontend can auto-login
         token = jwt.encode({
             'id': new_user.id,
             'exp': datetime.datetime.utcnow() + datetime.timedelta(days=7)
@@ -46,11 +46,12 @@ def register():
             "error": str(e)
         }), 500
 
+
 # ✅ Login Route with token
 @auth.route('/auth/login', methods=['POST'])
 def login():
     try:
-        data = request.get_json()
+        data = request.get_json(force=True)
 
         if not data or not data.get('email') or not data.get('password'):
             return jsonify({"message": "Missing credentials"}), 400
