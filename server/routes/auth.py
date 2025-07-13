@@ -6,7 +6,7 @@ import jwt, datetime, os
 auth = Blueprint('auth', __name__)
 SECRET = os.getenv("SECRET_KEY", "changeme")
 
-# ✅ Combined Signup/Register Route
+# ✅ Signup/Register Route
 @auth.route('/auth/register', methods=['POST'])
 def register():
     try:
@@ -31,7 +31,7 @@ def register():
 
     except Exception as e:
         print("Error in /auth/register:", str(e))
-        return jsonify({"message": "Server error occurred"}), 500
+        return jsonify({"message": "Server error occurred", "error": str(e)}), 500
 
 # ✅ Login Route
 @auth.route('/auth/login', methods=['POST'])
@@ -50,8 +50,8 @@ def login():
             'exp': datetime.datetime.utcnow() + datetime.timedelta(days=7)
         }, SECRET, algorithm="HS256")
 
-        return jsonify({"token": token})
+        return jsonify({"token": token}), 200
 
     except Exception as e:
         print("Error in /auth/login:", str(e))
-        return jsonify({"message": "Login failed"}), 500
+        return jsonify({"message": "Login failed", "error": str(e)}), 500
