@@ -1,25 +1,37 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './LoginPage.css';
+import './LoginPage.css'; // reuse login styles
 
 function SignupPage() {
-  const [email, setEmail] = useState('');
   const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  const register = async () => {
-    const res = await fetch('/auth/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, password }),
-    });
-    const data = await res.json();
-    if (res.ok) {
-      alert("Registration successful! You can now log in.");
-      navigate('/');
-    } else {
-      alert(data.message || 'Registration failed');
+  const handleSignup = async () => {
+    if (!name || !email || !password) {
+      alert('Please fill in all fields');
+      return;
+    }
+
+    try {
+      const res = await fetch('/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert('Account created! Please log in.');
+        navigate('/');
+      } else {
+        alert(data.message || 'Signup failed');
+      }
+    } catch (err) {
+      console.error('Signup error:', err);
+      alert('An error occurred. Please try again.');
     }
   };
 
@@ -28,24 +40,24 @@ function SignupPage() {
       <h1>Sign Up</h1>
       <input
         type="text"
+        placeholder="Name"
         value={name}
-        onChange={(e) => setName(e.target.value)}
-        placeholder="Full Name"
+        onChange={e => setName(e.target.value)}
       />
       <input
         type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
         placeholder="Email"
+        value={email}
+        onChange={e => setEmail(e.target.value)}
       />
       <input
         type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
         placeholder="Password"
+        value={password}
+        onChange={e => setPassword(e.target.value)}
       />
-      <button onClick={register}>Create Account</button>
-      <p style={{ marginTop: '1rem' }}>
+      <button onClick={handleSignup}>Create Account</button>
+      <p>
         Already have an account?{' '}
         <span className="link" onClick={() => navigate('/')}>Log in</span>
       </p>
