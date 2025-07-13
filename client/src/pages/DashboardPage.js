@@ -24,7 +24,7 @@ function DashboardPage() {
     const base64Url = token.split('.')[1];
     try {
       const decoded = JSON.parse(atob(base64Url));
-      setUserName(decoded.name || 'Resident'); // fallback if name is missing
+      setUserName(decoded.name || 'Resident');
     } catch (err) {
       console.error('Invalid token:', err);
       navigate('/');
@@ -33,8 +33,12 @@ function DashboardPage() {
 
     const fetchData = async () => {
       try {
-        const res = await fetch('/dashboard', {
-          headers: { Authorization: 'Bearer ' + token }
+        const res = await fetch('https://assemblymk1-backend.onrender.com/dashboard', {
+          method: 'GET',
+          headers: {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json'
+          }
         });
 
         if (!res.ok) {
