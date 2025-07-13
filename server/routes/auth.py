@@ -6,7 +6,7 @@ import jwt, datetime, os
 auth = Blueprint('auth', __name__)
 SECRET = os.getenv("SECRET_KEY", "changeme")
 
-# ✅ Signup/Register Route
+# ✅ Signup/Register Route with token return
 @auth.route('/auth/register', methods=['POST'])
 def register():
     try:
@@ -27,7 +27,7 @@ def register():
         db.session.add(new_user)
         db.session.commit()
 
-        # ✅ Generate token on successful signup
+        # ✅ Return JWT token so frontend can auto-login
         token = jwt.encode({
             'id': new_user.id,
             'exp': datetime.datetime.utcnow() + datetime.timedelta(days=7)
@@ -46,7 +46,7 @@ def register():
             "error": str(e)
         }), 500
 
-# ✅ Login Route
+# ✅ Login Route with token
 @auth.route('/auth/login', methods=['POST'])
 def login():
     try:
