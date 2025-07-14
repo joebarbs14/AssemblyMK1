@@ -15,11 +15,11 @@ function DashboardPage() {
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
-      navigate('/');
+      navigate('/#/');
       return;
     }
 
-    // Decode JWT token to extract user info
+    // ✅ Decode JWT to extract user name
     try {
       const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
       const decoded = JSON.parse(atob(base64));
@@ -28,7 +28,8 @@ function DashboardPage() {
       }
     } catch (err) {
       console.error('Invalid token format:', err);
-      navigate('/');
+      localStorage.removeItem('token');
+      navigate('/#/');
       return;
     }
 
@@ -47,12 +48,12 @@ function DashboardPage() {
         }
 
         const data = await res.json();
-        console.log('Dashboard data received:', data); // 🔍 Helpful for debugging
+        console.log('Dashboard data received:', data);
         setProcesses(data || {});
       } catch (error) {
         console.error('Dashboard fetch error:', error.message || error);
         localStorage.removeItem('token');
-        navigate('/');
+        navigate('/#/');
       }
     };
 
