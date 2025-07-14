@@ -11,12 +11,16 @@ def get_dashboard():
         user_id = get_jwt_identity()
         print(f"[dashboard] JWT user_id: {user_id}")
 
+        if not user_id:
+            return jsonify({"error": "Missing or invalid user ID"}), 400
+
         categories = [
             "Rates", "Water", "Development", "Community",
             "Roads", "Waste", "Animals", "Public Health", "Environment"
         ]
 
         data = {}
+
         for category in categories:
             processes = Process.query.filter_by(resident_id=user_id, category=category).all()
             data[category] = [p.title for p in processes] if processes else []
@@ -24,5 +28,8 @@ def get_dashboard():
         return jsonify(data), 200
 
     except Exception as e:
-        print(f"[dashboard] Error: {e}")
-        return jsonify({"error": "Unable to load dashboard"}), 500
+        print(f"[dashboard] Error: {str(e)}")
+        return jsonify({
+            "error": "Unable to load dashboard",
+            "details": str(e)
+        }), 500
