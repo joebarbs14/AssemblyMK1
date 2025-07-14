@@ -4,8 +4,18 @@ import { Navigate } from 'react-router-dom';
 function ProtectedRoute({ children }) {
   const token = localStorage.getItem('token');
 
-  // You can add token format or expiry validation here later
+  // ✅ Basic auth check
   const isAuthenticated = !!token;
+
+  // 🔒 Optional enhancement for token expiry (future-proof):
+  // try {
+  //   const [, payload] = token.split('.');
+  //   const decoded = JSON.parse(atob(payload));
+  //   const isExpired = decoded.exp * 1000 < Date.now();
+  //   if (isExpired) return <Navigate to="/" replace />;
+  // } catch (e) {
+  //   return <Navigate to="/" replace />;
+  // }
 
   return isAuthenticated ? children : <Navigate to="/" replace />;
 }
