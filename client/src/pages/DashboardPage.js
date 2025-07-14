@@ -19,11 +19,13 @@ function DashboardPage() {
       return;
     }
 
-    // Decode token to get user info
+    // Decode JWT token to extract user info
     try {
       const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
       const decoded = JSON.parse(atob(base64));
-      setUserName(decoded.name || 'Resident');
+      if (decoded && decoded.name) {
+        setUserName(decoded.name);
+      }
     } catch (err) {
       console.error('Invalid token format:', err);
       navigate('/');
@@ -45,6 +47,7 @@ function DashboardPage() {
         }
 
         const data = await res.json();
+        console.log('Dashboard data received:', data); // 🔍 Helpful for debugging
         setProcesses(data || {});
       } catch (error) {
         console.error('Dashboard fetch error:', error.message || error);
