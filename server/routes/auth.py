@@ -1,12 +1,10 @@
 from flask import Blueprint, request, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, Resident
-import jwt
+from flask_jwt_extended import create_access_token
 import datetime
-import os
 
 auth = Blueprint('auth', __name__)
-SECRET = os.getenv("SECRET_KEY", "changeme")
 
 
 # ✅ Register (Sign Up)
@@ -35,20 +33,14 @@ def register():
         db.session.add(new_user)
         db.session.commit()
 
-        token = jwt.encode({
-            'id': new_user.id,
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=7)
-        }, SECRET, algorithm="HS256")
+        access_token = create_access_token(identity={"id": new_user.id, "name": new_user.name})
 
-        if isinstance(token, bytes):
-            token = token.decode('utf-8')
-
-        print("✅ Registration successful. Token:", token)
+        print("✅ Registration successful. Token:", access_token)
 
         return jsonify({
             "message": "Registered successfully",
             "status": "ok",
-            "token": token
+            "token": access_token
         }), 201
 
     except Exception as e:
@@ -76,18 +68,12 @@ def login():
         if not user or not check_password_hash(user.password_hash, data['password']):
             return jsonify({"message": "Invalid credentials"}), 401
 
-        token = jwt.encode({
-            'id': user.id,
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=7)
-        }, SECRET, algorithm="HS256")
+        access_token = create_access_token(identity={"id": user.id, "name": user.name})
 
-        if isinstance(token, bytes):
-            token = token.decode('utf-8')
-
-        print("✅ Login successful. Token:", token)
+        print("✅ Login successful. Token:", access_token)
 
         return jsonify({
-            "token": token,
+            "token": access_token,
             "message": "Login successful",
             "status": "ok"
         }), 200
