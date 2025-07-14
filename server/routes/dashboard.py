@@ -11,14 +11,12 @@ def get_dashboard():
         identity = get_jwt_identity()
         print(f"[dashboard] Raw JWT identity: {identity}")
 
-        # Extract user_id safely (handles both simple int or dictionary-based tokens)
-        if isinstance(identity, dict) and 'id' in identity:
-            user_id = int(identity['id'])
-        else:
-            user_id = int(identity)
+        # ✅ Extract user_id safely whether it's a dict or a raw id
+        user_id = int(identity['id']) if isinstance(identity, dict) and 'id' in identity else int(identity)
 
         print(f"[dashboard] Parsed user_id: {user_id} ({type(user_id)})")
 
+        # ✅ Consistent categories
         categories = [
             "Rates", "Water", "Development", "Community",
             "Roads", "Waste", "Animals", "Public Health", "Environment"
@@ -29,7 +27,7 @@ def get_dashboard():
         for category in categories:
             processes = Process.query.filter_by(resident_id=user_id, category=category).all()
             print(f"[dashboard] Found {len(processes)} processes for category: {category}")
-            data[category] = [p.title for p in processes] if processes else []
+            data[category] = [p.title for p in processes]
 
         return jsonify(data), 200
 
