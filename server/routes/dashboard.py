@@ -11,8 +11,12 @@ def get_dashboard():
         identity = get_jwt_identity()
         print(f"[dashboard] Raw JWT identity: {identity}")
 
-        # Extract user_id safely (whether it's int or dict)
-        user_id = int(identity.get('id')) if isinstance(identity, dict) else int(identity)
+        # Extract user_id safely (handles both simple int or dictionary-based tokens)
+        if isinstance(identity, dict) and 'id' in identity:
+            user_id = int(identity['id'])
+        else:
+            user_id = int(identity)
+
         print(f"[dashboard] Parsed user_id: {user_id} ({type(user_id)})")
 
         categories = [
