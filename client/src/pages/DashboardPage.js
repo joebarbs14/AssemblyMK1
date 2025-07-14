@@ -38,8 +38,8 @@ function DashboardPage() {
         const res = await fetch('https://assemblymk1-backend.onrender.com/dashboard/', {
           method: 'GET',
           headers: {
-            'Authorization': 'Bearer ' + token,
-            'Content-Type': 'application/json'
+            'Authorization': 'Bearer ' + token
+            // ❌ Removed 'Content-Type': 'application/json'
           }
         });
 
@@ -71,6 +71,9 @@ function DashboardPage() {
               {(processes[category] || []).map((title, idx) => (
                 <li key={idx}>{title}</li>
               ))}
+              {(!processes[category] || processes[category].length === 0) && (
+                <li className="no-items">No entries yet</li>
+              )}
             </ul>
           </div>
         ))}
