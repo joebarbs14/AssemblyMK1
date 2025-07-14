@@ -8,11 +8,12 @@ dashboard = Blueprint('dashboard', __name__)
 @jwt_required()
 def get_dashboard():
     try:
-        user_id = get_jwt_identity()
-        print(f"[dashboard] JWT user_id: {user_id}")
+        identity = get_jwt_identity()
+        print(f"[dashboard] Raw JWT identity: {identity}")
 
-        if not user_id:
-            return jsonify({"error": "Missing or invalid user ID"}), 400
+        # Extract user_id safely (whether it's int or dict)
+        user_id = int(identity.get('id')) if isinstance(identity, dict) else int(identity)
+        print(f"[dashboard] Parsed user_id: {user_id} ({type(user_id)})")
 
         categories = [
             "Rates", "Water", "Development", "Community",
@@ -23,6 +24,7 @@ def get_dashboard():
 
         for category in categories:
             processes = Process.query.filter_by(resident_id=user_id, category=category).all()
+            print(f"[dashboard] Found {len(processes)} processes for category: {category}")
             data[category] = [p.title for p in processes] if processes else []
 
         return jsonify(data), 200
