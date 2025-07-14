@@ -34,12 +34,20 @@ function LoginPage() {
       if (res.ok && data.token) {
         localStorage.setItem('token', data.token);
 
-        // Optionally test if dashboard is reachable before navigating
-        // await fetch('https://assemblymk1-backend.onrender.com/dashboard', {
-        //   headers: { 'Authorization': `Bearer ${data.token}` }
-        // });
+        // 🔍 Decode the JWT to get user's name
+        const base64Url = data.token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(c =>
+          '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+        ).join(''));
+        const decoded = JSON.parse(jsonPayload);
 
-        navigate('/dashboard');
+        if (decoded.name) {
+          localStorage.setItem('userName', decoded.name);
+        }
+
+        // ✅ Use # based routing
+        navigate('/#/dashboard');
       } else {
         console.error('Login failed:', data);
         alert(data.message || 'Login failed. Please check your credentials.');
@@ -80,7 +88,7 @@ function LoginPage() {
 
       <p className="signup-redirect">
         Don’t have an account?{' '}
-        <span className="link" onClick={() => navigate('/signup')}>Sign up</span>
+        <span className="link" onClick={() => navigate('/#/signup')}>Sign up</span>
       </p>
     </div>
   );
