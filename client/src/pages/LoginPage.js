@@ -8,7 +8,6 @@ function LoginPage() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Optional: Clear old token on load
   useEffect(() => {
     localStorage.removeItem('token');
   }, []);
@@ -34,7 +33,6 @@ function LoginPage() {
       if (res.ok && data.token) {
         localStorage.setItem('token', data.token);
 
-        // 🔍 Decode the JWT to get user's name
         const base64Url = data.token.split('.')[1];
         const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
         const jsonPayload = decodeURIComponent(atob(base64).split('').map(c =>
@@ -46,8 +44,8 @@ function LoginPage() {
           localStorage.setItem('userName', decoded.name);
         }
 
-        // ✅ Use # based routing
-        navigate('/#/dashboard');
+        // ✅ Corrected navigation (HashRouter handles the #)
+        navigate('/dashboard');
       } else {
         console.error('Login failed:', data);
         alert(data.message || 'Login failed. Please check your credentials.');
@@ -88,7 +86,7 @@ function LoginPage() {
 
       <p className="signup-redirect">
         Don’t have an account?{' '}
-        <span className="link" onClick={() => navigate('/#/signup')}>Sign up</span>
+        <span className="link" onClick={() => navigate('/signup')}>Sign up</span>
       </p>
     </div>
   );
