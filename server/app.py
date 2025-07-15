@@ -1,11 +1,13 @@
-from flask import Flask, jsonify # Keep jsonify for general use, though not used in error handlers anymore
+from flask import Flask, jsonify
 from flask_cors import CORS
-from flask_jwt_extended import JWTManager # Removed 'exceptions' import as it's no longer needed here
+from flask_jwt_extended import JWTManager
 from models import db
 from routes.auth import auth
 from routes.dashboard import dashboard
 from routes.process import process
 from routes.admin import admin
+# Import the new user blueprint
+from routes.user import user_bp # Assuming you create routes/user.py with 'user_bp'
 from dotenv import load_dotenv
 import os
 from datetime import timedelta
@@ -73,6 +75,7 @@ app.register_blueprint(auth, url_prefix='/auth')
 app.register_blueprint(dashboard, url_prefix='/dashboard')
 app.register_blueprint(process, url_prefix='/process')
 app.register_blueprint(admin, url_prefix='/admin')
+app.register_blueprint(user_bp, url_prefix='/user') # Register the new user blueprint
 
 @app.route('/')
 def index():
