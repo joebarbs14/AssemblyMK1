@@ -3,14 +3,15 @@ from flask import request, jsonify, current_app
 from datetime import datetime
 import logging
 from authlib.jose import JsonWebToken, util
+import functools # <<< ADDED THIS IMPORT
 
 # Initialize Authlib's JsonWebToken instance once with supported algorithms
-# This instance will be used for encoding (signing) and decoding (verifying) JWTs
-jwt_instance = JsonWebToken(['HS256']) # <<< FIXED THIS LINE: Added algorithms argument
+jwt_instance = JsonWebToken(['HS256'])
 
 # Custom Decorator for JWT Protection (replaces @jwt_required)
 # This decorator will manually validate the JWT from the Authorization header.
 def auth_required(f):
+    @functools.wraps(f) # <<< ADDED THIS LINE: Preserves original function metadata
     def wrapper(*args, **kwargs):
         auth_header = request.headers.get('Authorization')
         if not auth_header:
@@ -29,7 +30,6 @@ def auth_required(f):
 
         try:
             # Decode and verify the token using the secret key from current_app.config
-            # The 'claims' object will contain the decoded payload
             claims = jwt_instance.decode(token, current_app.config['JWT_SECRET_KEY'])
 
             # Check if the token has expired manually (Authlib's decode does this too, but for clarity)
@@ -38,12 +38,10 @@ def auth_required(f):
                 return jsonify({"message": "Token has expired"}), 401
 
             # Store the identity in Flask's g object for easy access in routes
-            # The 'sub' claim contains the identity (e.g., user ID)
             request.current_identity = claims.get('sub')
             logging.info(f"Authlib: Token validated. Identity: {request.current_identity}")
 
         except util.errors.JoseError as e:
-            # Catch all Authlib JWT related errors (signature, invalid claims, etc.)
             logging.error(f"Authlib: JWT validation failed: {e}", exc_info=True)
             return jsonify({"message": f"Invalid token: {e}"}), 401
         except Exception as e:
