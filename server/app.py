@@ -1,3 +1,4 @@
+import flask_jwt_extended # <<< ADDED THIS IMPORT for version check
 from flask import Flask, jsonify
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
@@ -57,6 +58,8 @@ with app.app_context():
     logging.info("Attempting to create all database tables if they don't exist...")
     db.create_all()
     logging.info("Database table creation process completed.")
+    # <<< ADDED THIS LINE TO LOG FLASK-JWT-EXTENDED VERSION >>>
+    logging.info(f"Flask-JWT-Extended version: {flask_jwt_extended.__version__}")
 
 # --- JWT Identity Loader ---
 @jwt.user_identity_loader
