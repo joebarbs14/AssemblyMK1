@@ -10,7 +10,7 @@ dashboard = Blueprint('dashboard', __name__)
 def get_dashboard():
     try:
         identity = get_jwt_identity()
-        print(f"[dashboard] Raw JWT identity: {identity} (Type: {type(identity)})")
+        print(f"[dashboard] Raw JWT identity: {identity} (Type: {type(identity)})", flush=True) # Added flush=True
 
         user_id = None
         # Attempt to extract user_id, handling potential errors during conversion
@@ -24,13 +24,13 @@ def get_dashboard():
                     user_id = int(identity['sub']['id'])
                 else:
                     # If it's a dictionary but 'id' or 'sub.id' is not found, log a warning
-                    print(f"[dashboard] WARNING: JWT identity is a dict but no 'id' or 'sub.id' found: {identity}")
+                    print(f"[dashboard] WARNING: JWT identity is a dict but no 'id' or 'sub.id' found: {identity}", flush=True) # Added flush=True
             else:
                 # If identity is not a dict, assume it's the user ID directly (int or string representation)
                 user_id = int(identity)
-            print(f"[dashboard] Parsed user_id: {user_id} (Type: {type(user_id)})")
+            print(f"[dashboard] Parsed user_id: {user_id} (Type: {type(user_id)})", flush=True) # Added flush=True
         except (ValueError, TypeError) as e:
-            print(f"[dashboard] ERROR: Could not convert JWT identity '{identity}' to an integer user_id. Error: {e}")
+            print(f"[dashboard] ERROR: Could not convert JWT identity '{identity}' to an integer user_id. Error: {e}", flush=True) # Added flush=True
             traceback.print_exc() # Print traceback for detailed error logging
             # If identity cannot be converted, it's an authentication/token issue
             return jsonify({
@@ -40,7 +40,7 @@ def get_dashboard():
 
         # Ensure user_id was successfully extracted and is a valid integer
         if user_id is None or not isinstance(user_id, int) or user_id <= 0:
-            print(f"[dashboard] ERROR: user_id is invalid or None after parsing: {user_id}.")
+            print(f"[dashboard] ERROR: user_id is invalid or None after parsing: {user_id}.", flush=True) # Added flush=True
             return jsonify({
                 "error": "Authentication required",
                 "details": "User ID could not be determined or is invalid from the provided token."
@@ -55,14 +55,14 @@ def get_dashboard():
         data = {}
 
         for category in categories:
-            print(f"[dashboard] Querying for resident_id={user_id}, category={category}")
+            print(f"[dashboard] Querying for resident_id={user_id}, category={category}", flush=True) # Added flush=True
             # Add a try-except around the database query specifically
             try:
                 processes = Process.query.filter_by(resident_id=user_id, category=category).all()
-                print(f"[dashboard] Found {len(processes)} processes for category '{category}' for user {user_id}.")
+                print(f"[dashboard] Found {len(processes)} processes for category '{category}' for user {user_id}.", flush=True) # Added flush=True
                 data[category] = [p.title for p in processes]
             except Exception as db_e:
-                print(f"[dashboard] ERROR: Database query failed for category '{category}' and user {user_id}. Error: {db_e}")
+                print(f"[dashboard] ERROR: Database query failed for category '{category}' and user {user_id}. Error: {db_e}", flush=True) # Added flush=True
                 traceback.print_exc() # Print traceback for database errors
                 # Decide if you want to fail the whole request or just skip the category
                 # For now, we'll re-raise to hit the main exception handler and return 500
@@ -73,7 +73,7 @@ def get_dashboard():
 
     except Exception as e:
         # This catches any remaining unexpected errors, including those re-raised from db_e
-        print(f"[dashboard] UNEXPECTED SERVER ERROR in get_dashboard: {str(e)}")
+        print(f"[dashboard] UNEXPECTED SERVER ERROR in get_dashboard: {str(e)}", flush=True) # Added flush=True
         traceback.print_exc() # This will print the full stack trace to your Render logs
         return jsonify({
             "error": "Unable to load dashboard due to server error",
