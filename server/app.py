@@ -63,10 +63,9 @@ def user_identity_lookup(user):
         return user['id']
     return user
 
-# --- ADD CUSTOM ERROR HANDLERS FOR JWT EXCEPTIONS (ADJUSTED FOR OLDER FLASK-JWT-EXTENDED) ---
-# We are keeping only the most fundamental ones that are likely to exist
+# --- ADD CUSTOM ERROR HANDLERS FOR JWT EXCEPTIONS (ADJUSTED FOR FLASK-JWT-EXTENDED 4.7.1) ---
 @app.errorhandler(exceptions.NoAuthorizationError)
-def handle_no_authorization_error(e): # Renamed function for clarity
+def handle_no_authorization_error(e):
     logging.error(f"No Authorization Error: {e.args[0]}", exc_info=True)
     return jsonify({"message": e.args[0]}), 401
 
@@ -75,13 +74,12 @@ def handle_invalid_header_error(e):
     logging.error(f"Invalid Header Error: {e.args[0]}", exc_info=True)
     return jsonify({"message": e.args[0]}), 422
 
-@app.errorhandler(exceptions.DecodeError)
-def handle_decode_error(e):
-    logging.error(f"Decode Error: {e.args[0]}", exc_info=True)
+@app.errorhandler(exceptions.JWTDecodeError) # <<< CHANGED THIS LINE
+def handle_jwt_decode_error(e): # <<< CHANGED FUNCTION NAME FOR CLARITY
+    logging.error(f"JWT Decode Error: {e.args[0]}", exc_info=True)
     return jsonify({"message": "Token could not be decoded"}), 422
 
-# Removed ExpiredSignatureError, InvalidTokenError, WrongTokenError, RevokedTokenError, FreshTokenRequired
-# as they seem to cause AttributeError in your current Flask-JWT-Extended version.
+# We are now only including the most fundamental error handlers based on your specific version's errors.
 # If a 422/401 still occurs, it will fall through to a generic Flask error or the default JWT response,
 # but at least the app should start.
 
