@@ -65,6 +65,8 @@ function LoginPage() {
 
       <input
         type="email"
+        id="loginEmail" // Added id
+        name="email"   // Added name
         value={email}
         onChange={e => setEmail(e.target.value)}
         placeholder="Email"
@@ -74,6 +76,8 @@ function LoginPage() {
 
       <input
         type="password"
+        id="loginPassword" // Added id
+        name="password"   // Added name
         value={password}
         onChange={e => setPassword(e.target.value)}
         placeholder="Password"
