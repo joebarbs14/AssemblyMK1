@@ -4,9 +4,9 @@ from datetime import datetime
 import logging
 from authlib.jose import JsonWebToken, util
 
-# Initialize Authlib's JsonWebToken instance once
+# Initialize Authlib's JsonWebToken instance once with supported algorithms
 # This instance will be used for encoding (signing) and decoding (verifying) JWTs
-jwt_instance = JsonWebToken()
+jwt_instance = JsonWebToken(['HS256']) # <<< FIXED THIS LINE: Added algorithms argument
 
 # Custom Decorator for JWT Protection (replaces @jwt_required)
 # This decorator will manually validate the JWT from the Authorization header.
