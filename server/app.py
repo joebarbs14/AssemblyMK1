@@ -15,6 +15,7 @@ import logging
 # REMOVED: from authlib.integrations.flask_client import OAuth # Not directly used for JWTs
 from authlib.jose import JsonWebToken, util # Keep this for JWT encoding/decoding
 from routes.decorators import auth_required, jwt_instance # Import auth_required and jwt_instance
+import authlib # <<< ADDED THIS LINE: Import the top-level Authlib module
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -48,8 +49,8 @@ with app.app_context():
     logging.info("Attempting to create all database tables if they don't exist...")
     db.create_all()
     logging.info("Database table creation process completed.")
-    # <<< FIXED THIS LINE: Access version from authlib.jose, which is already imported >>>
-    logging.info(f"Authlib version: {authlib.jose.__version__}") # Use authlib.jose.__version__
+    # <<< FIXED THIS LINE: Now 'authlib' is defined >>>
+    logging.info(f"Authlib version: {authlib.__version__}") # Use authlib.__version__
 
 # --- Register Blueprints ---
 app.register_blueprint(auth, url_prefix='/auth')
