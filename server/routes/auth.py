@@ -3,8 +3,8 @@ from models import db, Resident
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
 import logging
-from authlib.jose import JsonWebToken # Keep this for encoding method directly
-from routes.decorators import jwt_instance # <<< CHANGED THIS LINE - Import jwt_instance
+from authlib.jose import JsonWebToken
+from routes.decorators import jwt_instance
 
 auth = Blueprint('auth', __name__)
 
@@ -27,21 +27,19 @@ def register():
     db.session.add(new_resident)
     db.session.commit()
 
-    logging.info(f"User registered: {email}", flush=True)
+    logging.info(f"User registered: {email}") # <<< FIXED THIS LINE: Removed flush=True
 
-    # Manually create JWT using Authlib's jwt_instance
     payload = {
-        'sub': new_resident.id, # Subject is the user ID
-        'iat': datetime.utcnow(), # Issued at time
-        'exp': datetime.utcnow() + timedelta(hours=24), # Expiration time
-        'name': new_resident.name # Include name for frontend convenience (optional)
+        'sub': new_resident.id,
+        'iat': datetime.utcnow(),
+        'exp': datetime.utcnow() + timedelta(hours=24),
+        'name': new_resident.name
     }
-    # Use the shared jwt_instance to encode the token
     token = jwt_instance.encode(payload, current_app.config['JWT_SECRET_KEY'])
 
     return jsonify({
         "message": "Registration successful.",
-        "token": token.decode('utf-8') # Authlib returns bytes, decode to string
+        "token": token.decode('utf-8')
     }), 201
 
 @auth.route('/login', methods=['POST'])
@@ -53,22 +51,21 @@ def login():
     resident = Resident.query.filter_by(email=email).first()
 
     if not resident or not check_password_hash(resident.password_hash, password):
-        logging.warning(f"Login failed for email: {email}", flush=True)
+        logging.warning(f"Login failed for email: {email}") # <<< FIXED THIS LINE: Removed flush=True
         return jsonify({"message": "Invalid credentials"}), 401
 
-    logging.info(f"Login successful for user: {email}", flush=True)
+    logging.info(f"Login successful for user: {email}") # <<< FIXED THIS LINE: Removed flush=True
 
-    # Manually create JWT using Authlib's jwt_instance
     payload = {
-        'sub': resident.id, # Subject is the user ID
-        'iat': datetime.utcnow(), # Issued at time
-        'exp': datetime.utcnow() + timedelta(hours=24), # Expiration time
-        'name': resident.name # Include name for frontend convenience (optional)
+        'sub': resident.id,
+        'iat': datetime.utcnow(),
+        'exp': datetime.utcnow() + timedelta(hours=24),
+        'name': resident.name
     }
     token = jwt_instance.encode(payload, current_app.config['JWT_SECRET_KEY'])
 
-    print(f"✅ Login successful. Token: {token.decode('utf-8')}", flush=True) # Keep this for debugging
+    print(f"✅ Login successful. Token: {token.decode('utf-8')}") # This print is fine as it's print()
     return jsonify({
         "message": "Login successful.",
-        "token": token.decode('utf-8') # Authlib returns bytes, decode to string
+        "token": token.decode('utf-8')
     }), 200
