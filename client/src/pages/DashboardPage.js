@@ -1,85 +1,82 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './DashboardPage.css'; // Assuming you still use this for styling
+import './DashboardPage.css';
 
 const categories = [
   "Rates", "Water", "Development", "Community",
   "Roads", "Waste", "Animals", "Public Health", "Environment"
 ];
 
+function decodeToken(token) {
+  try {
+    const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+    return JSON.parse(atob(base64));
+  } catch (err) {
+    console.error('Failed to decode token:', err);
+    return null;
+  }
+}
+
 function DashboardPage() {
   const [processes, setProcesses] = useState({});
   const [userName, setUserName] = useState('Resident');
-  const [loading, setLoading] = useState(true); // Add loading state
-  const [error, setError] = useState(null); // Add error state for display
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
       console.warn('No token found, redirecting to login.');
-      navigate('/#/'); // Navigate to base path which should lead to login
+      navigate('/#/');
       return;
     }
 
-    // Decode JWT to extract user name (remains good practice)
-    try {
-      const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
-      const decoded = JSON.parse(atob(base64));
-      if (decoded && decoded.name) {
-        setUserName(decoded.name);
-      } else {
-        console.warn('Token decoded, but "name" claim is missing or invalid.');
-        setUserName('Resident'); // Default back to 'Resident' if name is missing
-      }
-    } catch (err) {
-      console.error('Invalid token format:', err);
-      localStorage.removeItem('token'); // Token is bad, remove it
-      navigate('/#/'); // Redirect to login
-      return;
+    const decoded = decodeToken(token);
+    if (decoded?.name) {
+      setUserName(decoded.name);
+    } else {
+      console.warn('Decoded token missing "name" field. Defaulting name to "Resident".');
+      setUserName('Resident');
     }
 
     const fetchData = async () => {
-      setLoading(true); // Start loading
-      setError(null); // Clear previous errors
+      setLoading(true);
+      setError(null);
+
       try {
         const res = await fetch('https://assemblymk1-backend.onrender.com/dashboard/', {
           method: 'GET',
-          headers: {
-            'Authorization': 'Bearer ' + token
-          }
+          headers: { 'Authorization': 'Bearer ' + token }
         });
 
-        if (!res.ok) {
-          // If the response is not OK (e.g., 500, 401, 403), throw an error
-          const errorData = await res.json().catch(() => ({ message: 'No error details from server.' }));
-          console.error(`Dashboard fetch failed: Status ${res.status}, Message: ${errorData.message || errorData.error || 'Unknown error'}`);
+        const contentType = res.headers.get('content-type');
+        const errorData = contentType?.includes('application/json') ? await res.json() : {};
 
-          // Specific handling for 401/403: Token might be expired or invalid for authorization
+        if (!res.ok) {
+          console.error(`Dashboard fetch failed: Status ${res.status}, Message: ${errorData.message || errorData.error || 'Unknown error'}`);
           if (res.status === 401 || res.status === 403) {
             alert('Your session has expired or is invalid. Please log in again.');
             localStorage.removeItem('token');
             navigate('/#/');
-            return; // Stop further execution
+            return;
           }
           throw new Error(errorData.error || errorData.message || `Server responded with status: ${res.status}`);
         }
 
         const data = await res.json();
         console.log('Dashboard data received:', data);
-        setProcesses(data || {});
+        setProcesses(typeof data === 'object' && data !== null ? data : {});
       } catch (error) {
         console.error('Dashboard fetch error:', error);
         setError(`Failed to load dashboard data. ${error.message || 'Please try again.'}`);
-        // Do NOT remove token and navigate unless it's a specific auth error
-        // Keeping the user on the dashboard page with an error allows for retry
       } finally {
-        setLoading(false); // End loading
+        setLoading(false);
       }
     };
 
     fetchData();
-  }, [navigate]); // Added navigate to dependency array for useEffect best practices
+  }, [navigate]);
 
   if (loading) {
     return (
@@ -95,15 +92,27 @@ function DashboardPage() {
       <div className="dashboard">
         <h1>Error Loading Dashboard</h1>
         <p className="error-message">{error}</p>
-        <button onClick={() => window.location.reload()}>Retry</button> {/* Simple retry */}
-        <p>If the problem persists, please try <span className="link" onClick={() => { localStorage.removeItem('token'); navigate('/#/'); }}>logging in again</span>.</p>
+        <button onClick={() => window.location.reload()}>Retry</button>
+        <p>
+          If the problem persists, please{' '}
+          <span className="link" onClick={() => { localStorage.removeItem('token'); navigate('/#/'); }}>
+            log in again
+          </span>.
+        </p>
       </div>
     );
   }
 
   return (
     <div className="dashboard">
-      <h1>Welcome, {userName}</h1>
+      <div className="dashboard-header">
+        <h1>Welcome, {userName}</h1>
+        <button className="logout-btn" onClick={() => {
+          localStorage.removeItem('token');
+          navigate('/#/');
+        }}>Logout</button>
+      </div>
+
       <div className="tiles">
         {categories.map(category => (
           <div key={category} className="tile">
