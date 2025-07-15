@@ -7,22 +7,6 @@ const categories = [
   "Roads", "Waste", "Animals", "Public Health", "Environment"
 ];
 
-// The decodeToken function is no longer needed for userName extraction
-// as userName will be fetched from the /user/profile endpoint.
-// However, if you use it elsewhere for other token claims, you can keep it.
-// For this specific context, it's not directly used for setting userName.
-/*
-function decodeToken(token) {
-  try {
-    const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
-    return JSON.parse(atob(base64));
-  } catch (err) {
-    console.error('Failed to decode token:', err);
-    return null;
-  }
-}
-*/
-
 function DashboardPage() {
   const [processes, setProcesses] = useState({});
   const [userName, setUserName] = useState('Resident');
@@ -30,7 +14,6 @@ function DashboardPage() {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  // Use useCallback to memoize the fetch function, preventing unnecessary re-creations
   const fetchUserProfileAndDashboardData = useCallback(async (token) => {
     setLoading(true);
     setError(null);
@@ -42,27 +25,33 @@ function DashboardPage() {
         headers: { 'Authorization': 'Bearer ' + token }
       });
 
+      // Read user profile data once
+      const userProfileContentType = userProfileRes.headers.get('content-type');
+      let userProfileData = {}; // Initialize to empty object
+
+      if (userProfileContentType?.includes('application/json')) {
+          userProfileData = await userProfileRes.json(); // Read the body once
+      }
+
       if (!userProfileRes.ok) {
-        console.error(`Failed to fetch user profile: Status ${userProfileRes.status}`);
-        // If profile fetch fails due to auth, redirect to login
+        console.error(`Failed to fetch user profile: Status ${userProfileRes.status}, Message: ${userProfileData.message || userProfileData.error || 'Unknown error'}`);
         if (userProfileRes.status === 401 || userProfileRes.status === 403) {
           alert('Your session has expired or is invalid. Please log in again.');
           localStorage.removeItem('token');
-          localStorage.removeItem('userName'); // Clear userName on logout
+          localStorage.removeItem('userName');
           navigate('/#/');
-          return; // Exit early
+          return;
         }
         throw new Error(`Server responded with status: ${userProfileRes.status} for user profile`);
       }
 
-      const userProfileData = await userProfileRes.json();
       if (userProfileData.name) {
         setUserName(userProfileData.name);
-        localStorage.setItem('userName', userProfileData.name); // Store it for future use
+        localStorage.setItem('userName', userProfileData.name);
         console.log('DashboardPage: User name fetched and set:', userProfileData.name);
       } else {
         console.warn('DashboardPage: User profile fetched, but "name" field is missing.', userProfileData);
-        setUserName('Resident'); // Default if name is missing from profile endpoint
+        setUserName('Resident');
       }
 
       // 2. Now fetch dashboard data
@@ -74,24 +63,28 @@ function DashboardPage() {
         }
       });
 
-      const contentType = dashboardRes.headers.get('content-type');
-      const dashboardErrorData = contentType?.includes('application/json') ? await dashboardRes.json() : {};
+      // Read dashboard response body ONLY ONCE
+      const dashboardContentType = dashboardRes.headers.get('content-type');
+      let dashboardResultData = {}; // Declare a variable to hold the parsed JSON
+
+      if (dashboardContentType?.includes('application/json')) {
+          dashboardResultData = await dashboardRes.json(); // Read the body once
+      }
 
       if (!dashboardRes.ok) {
-        console.error(`Dashboard fetch failed: Status ${dashboardRes.status}, Message: ${dashboardErrorData.message || dashboardErrorData.error || 'Unknown error'}`);
+        console.error(`Dashboard fetch failed: Status ${dashboardRes.status}, Message: ${dashboardResultData.message || dashboardResultData.error || 'Unknown error'}`);
         if (dashboardRes.status === 401 || dashboardRes.status === 403) {
           alert('Your session has expired or is invalid. Please log in again.');
           localStorage.removeItem('token');
-          localStorage.removeItem('userName'); // Clear userName on logout
+          localStorage.removeItem('userName');
           navigate('/#/');
-          return; // Exit early
+          return;
         }
-        throw new Error(dashboardErrorData.error || dashboardErrorData.message || `Server responded with status: ${dashboardRes.status} for dashboard data`);
+        throw new Error(dashboardResultData.error || dashboardResultData.message || `Server responded with status: ${dashboardRes.status} for dashboard data`);
       }
 
-      const dashboardData = await dashboardRes.json(); // This is the variable name
-      console.log('Dashboard data received:', dashboardData);
-      setProcesses(typeof dashboardData === 'object' && dashboardData !== null ? dashboardData : {}); // <<< FIXED THIS LINE
+      console.log('Dashboard data received:', dashboardResultData);
+      setProcesses(typeof dashboardResultData === 'object' && dashboardResultData !== null ? dashboardResultData : {});
 
     } catch (err) {
       console.error('DashboardPage: Error during data fetch:', err);
@@ -99,11 +92,10 @@ function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  }, [navigate]); // Add navigate to useCallback dependencies
+  }, [navigate]);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    // Try to get userName from localStorage first to avoid flicker
     const storedUserName = localStorage.getItem('userName');
     if (storedUserName) {
       setUserName(storedUserName);
@@ -117,10 +109,9 @@ function DashboardPage() {
       return;
     }
 
-    // Call the memoized fetch function
     fetchUserProfileAndDashboardData(token);
 
-  }, [navigate, fetchUserProfileAndDashboardData]); // Add fetchUserProfileAndDashboardData to dependencies
+  }, [navigate, fetchUserProfileAndDashboardData]);
 
   if (loading) {
     return (
@@ -153,7 +144,7 @@ function DashboardPage() {
         <h1>Welcome, {userName}</h1>
         <button className="logout-btn" onClick={() => {
           localStorage.removeItem('token');
-          localStorage.removeItem('userName'); // Clear userName on logout
+          localStorage.removeItem('userName');
           navigate('/#/');
         }}>Logout</button>
       </div>
