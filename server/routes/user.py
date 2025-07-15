@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from models import Resident
 import logging
-from routes.decorators import auth_required # <<< CHANGED THIS LINE - Import from decorators.py
+from routes.decorators import auth_required # Import the custom decorator from decorators.py
 
 user_bp = Blueprint('user_bp', __name__)
 
@@ -9,13 +9,13 @@ user_bp = Blueprint('user_bp', __name__)
 @auth_required # Use the custom authentication decorator
 def get_user_profile():
     user_id = request.current_identity
-    logging.info(f"Fetching profile for user_id: {user_id}", flush=True)
+    logging.info(f"Fetching profile for user_id: {user_id}") # <<< FIXED THIS LINE: Removed flush=True
 
     resident = Resident.query.get(user_id)
 
     if resident:
-        logging.info(f"User profile found for {user_id}: {resident.name}", flush=True)
+        logging.info(f"User profile found for {user_id}: {resident.name}") # <<< FIXED THIS LINE: Removed flush=True
         return jsonify({"id": resident.id, "name": resident.name, "email": resident.email}), 200
     else:
-        logging.warning(f"User profile not found for user_id: {user_id}", flush=True)
+        logging.warning(f"User profile not found for user_id: {user_id}") # <<< FIXED THIS LINE: Removed flush=True
         return jsonify({"message": "User not found"}), 404
