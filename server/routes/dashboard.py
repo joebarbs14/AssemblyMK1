@@ -1,8 +1,8 @@
-from flask import Blueprint, jsonify, request # Import request to get current_identity
+from flask import Blueprint, jsonify, request
 from models import Process
 import traceback
 import logging
-from app import auth_required # Import the custom decorator from app.py
+from routes.decorators import auth_required # <<< CHANGED THIS LINE - Import from decorators.py
 
 dashboard = Blueprint('dashboard', __name__)
 
@@ -10,11 +10,9 @@ dashboard = Blueprint('dashboard', __name__)
 @auth_required # Use the custom authentication decorator
 def get_dashboard():
     try:
-        # Get the identity from request.current_identity set by the auth_required decorator
         user_id = request.current_identity
         logging.info(f"[dashboard] Authenticated user_id: {user_id} (Type: {type(user_id)})", flush=True)
 
-        # Ensure user_id was successfully extracted and is a valid integer
         if user_id is None or not isinstance(user_id, int) or user_id <= 0:
             logging.error(f"[dashboard] ERROR: user_id is invalid or None after authentication: {user_id}.", flush=True)
             return jsonify({
@@ -22,7 +20,6 @@ def get_dashboard():
                 "details": "User ID could not be determined or is invalid from the provided token."
             }), 401
 
-        # Consistent categories
         categories = [
             "Rates", "Water", "Development", "Community",
             "Roads", "Waste", "Animals", "Public Health", "Environment"
@@ -38,7 +35,7 @@ def get_dashboard():
                 data[category] = [p.title for p in processes]
             except Exception as db_e:
                 logging.error(f"[dashboard] ERROR: Database query failed for category '{category}' and user {user_id}. Error: {db_e}", exc_info=True)
-                raise db_e # Re-raise to hit the main exception handler
+                raise db_e
 
         return jsonify(data), 200
 
