@@ -89,9 +89,9 @@ function DashboardPage() {
         throw new Error(dashboardErrorData.error || dashboardErrorData.message || `Server responded with status: ${dashboardRes.status} for dashboard data`);
       }
 
-      const dashboardData = await dashboardRes.json();
+      const dashboardData = await dashboardRes.json(); // This is the variable name
       console.log('Dashboard data received:', dashboardData);
-      setProcesses(typeof dashboardData === 'object' && dashboardData !== null ? data : {});
+      setProcesses(typeof dashboardData === 'object' && dashboardData !== null ? dashboardData : {}); // <<< FIXED THIS LINE
 
     } catch (err) {
       console.error('DashboardPage: Error during data fetch:', err);
@@ -139,7 +139,7 @@ function DashboardPage() {
         <button onClick={() => window.location.reload()}>Retry</button>
         <p>
           If the problem persists, please{' '}
-          <span className="link" onClick={() => { localStorage.removeItem('token'); localStorage.removeItem('userName'); navigate('/#/'); }}> {/* Clear userName on logout */}
+          <span className="link" onClick={() => { localStorage.removeItem('token'); localStorage.removeItem('userName'); navigate('/#/'); }}>
             log in again
           </span>.
         </p>
