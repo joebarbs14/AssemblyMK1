@@ -13,29 +13,40 @@ load_dotenv()
 
 app = Flask(__name__)
 
-# ✅ Basic Config
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'changeme')
+# --- Configuration Section ---
 
-# ✅ JWT Config (Required by flask_jwt_extended)
-app.config['JWT_SECRET_KEY'] = app.config['SECRET_KEY']
+# Get SECRET_KEY from environment, with a strong warning if using default
+secret_key = os.getenv('SECRET_KEY')
+if secret_key is None or secret_key == 'changeme':
+    print("WARNING: 'SECRET_KEY' environment variable is not set or is set to 'changeme'.")
+    print("         This is INSECURE for production and will cause JWT validation failures.")
+    print("         Please set a strong, unique SECRET_KEY in your Render environment variables.")
+    # For development, you might still want a fallback, but in production, this should ideally crash
+    # if a proper key isn't provided. For now, we'll let it proceed with 'changeme' if unset.
+    secret_key = 'changeme_insecure_default' # Make the default visibly insecure
+
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
+app.config['SECRET_KEY'] = secret_key # Use the determined secret_key
+app.config['JWT_SECRET_KEY'] = app.config['SECRET_KEY'] # JWT uses the same secret key
+
+# JWT Config (Required by flask_jwt_extended)
 app.config['JWT_TOKEN_LOCATION'] = ['headers']
 app.config['JWT_HEADER_NAME'] = 'Authorization'
 app.config['JWT_HEADER_TYPE'] = 'Bearer'
 
-# ✅ CORS: Allow deployed + local dev frontends
+# CORS: Allow deployed + local dev frontends
 CORS(app, resources={r"/*": {"origins": [
     "https://assemblymk1.onrender.com",
     "http://localhost:3000"
 ]}}, supports_credentials=True)
 
-# ✅ Initialize Extensions
+# --- Initialize Extensions ---
 JWTManager(app)
 db.init_app(app)
 
-# ✅ Register Blueprints
+# --- Register Blueprints ---
 app.register_blueprint(auth, url_prefix='/auth')
-app.register_blueprint(dashboard, url_prefix='/dashboard')  # Make sure the route inside dashboard.py is @dashboard.route('/', ...)
+app.register_blueprint(dashboard, url_prefix='/dashboard')
 app.register_blueprint(process, url_prefix='/process')
 app.register_blueprint(admin, url_prefix='/admin')
 
@@ -44,4 +55,5 @@ def index():
     return "LocalGov API running!"
 
 if __name__ == '__main__':
+    # When running locally, set debug=True. Render handles production debugging.
     app.run(host='0.0.0.0', port=5000, debug=True)
