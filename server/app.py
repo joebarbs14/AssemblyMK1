@@ -1,7 +1,7 @@
-# REMOVED: import flask_jwt_extended # <<< REMOVE THIS LINE
+# REMOVED: import flask_jwt_extended # No longer needed
 from flask import Flask, jsonify
 from flask_cors import CORS
-# REMOVED: from flask_jwt_extended import JWTManager # REMOVE THIS LINE
+# REMOVED: from flask_jwt_extended import JWTManager # No longer needed
 from models import db
 from routes.auth import auth
 from routes.dashboard import dashboard
@@ -10,10 +10,10 @@ from routes.admin import admin
 from routes.user import user_bp
 from dotenv import load_dotenv
 import os
-from datetime import timedelta, datetime # Import datetime for Authlib JWT expiry
+from datetime import timedelta, datetime
 import logging
-# ADDED: from authlib.integrations.flask_client import OAuth # Authlib for OAuth/JWT client
-from authlib.jose import JsonWebToken, util # Authlib for JWT encoding/decoding
+# REMOVED: from authlib.integrations.flask_client import OAuth # Not directly used for JWTs
+from authlib.jose import JsonWebToken, util # Keep this for JWT encoding/decoding
 from routes.decorators import auth_required, jwt_instance # Import auth_required and jwt_instance
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -31,7 +31,7 @@ if secret_key is None or secret_key == 'changeme':
     secret_key = 'changeme_insecure_default'
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
-app.config['SECRET_KEY'] = secret_key # Used by Flask itself
+app.config['SECRET_KEY'] = secret_key
 app.config['JWT_SECRET_KEY'] = app.config['SECRET_KEY'] # Used by Authlib for JWT signing
 
 # CORS: Allow deployed + local dev frontends
@@ -41,7 +41,6 @@ CORS(app, resources={r"/*": {"origins": [
 ]}}, supports_credentials=True)
 
 # --- Initialize Extensions ---
-# REMOVED: jwt = JWTManager(app) # REMOVE THIS LINE
 db.init_app(app)
 
 # --- Database Table Creation (runs when app is loaded by WSGI server) ---
@@ -49,12 +48,8 @@ with app.app_context():
     logging.info("Attempting to create all database tables if they don't exist...")
     db.create_all()
     logging.info("Database table creation process completed.")
-    import Authlib # Import Authlib here to get its version
-    logging.info(f"Authlib version: {Authlib.__version__}")
-    # REMOVED: logging.info(f"Flask-JWT-Extended version: {flask_jwt_extended.__version__}") # REMOVE THIS LINE
-
-# --- REMOVED Custom Decorator for JWT Protection (it's now in routes/decorators.py) ---
-# --- END REMOVED ---
+    # <<< FIXED THIS LINE: Access version from authlib.jose, which is already imported >>>
+    logging.info(f"Authlib version: {authlib.jose.__version__}") # Use authlib.jose.__version__
 
 # --- Register Blueprints ---
 app.register_blueprint(auth, url_prefix='/auth')
