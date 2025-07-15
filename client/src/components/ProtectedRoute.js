@@ -4,20 +4,26 @@ import { Navigate } from 'react-router-dom';
 function ProtectedRoute({ children }) {
   const token = localStorage.getItem('token');
 
-  // ✅ Basic auth check
-  const isAuthenticated = !!token;
+  if (!token) {
+    return <Navigate to="/" replace />;
+  }
 
-  // 🔒 Optional enhancement for token expiry (future-proof):
-  // try {
-  //   const [, payload] = token.split('.');
-  //   const decoded = JSON.parse(atob(payload));
-  //   const isExpired = decoded.exp * 1000 < Date.now();
-  //   if (isExpired) return <Navigate to="/" replace />;
-  // } catch (e) {
-  //   return <Navigate to="/" replace />;
-  // }
+  // ✅ Token expiry validation (optional but recommended)
+  try {
+    const [, payload] = token.split('.');
+    const decoded = JSON.parse(atob(payload));
+    const isExpired = decoded.exp * 1000 < Date.now(); // expiration is in seconds
 
-  return isAuthenticated ? children : <Navigate to="/" replace />;
+    if (isExpired) {
+      localStorage.removeItem('token'); // clean up expired token
+      return <Navigate to="/" replace />;
+    }
+  } catch (e) {
+    console.error('Error decoding token:', e);
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
 }
 
 export default ProtectedRoute;
