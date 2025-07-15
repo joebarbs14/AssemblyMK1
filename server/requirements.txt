@@ -4,5 +4,5 @@ flask_cors
 python-dotenv
 PyJWT
 Werkzeug
-Flask-JWT-Extended>=4.4.0
+Flask-JWT-Extended
 psycopg2-binary
