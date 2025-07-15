@@ -3,8 +3,8 @@ from models import db, Resident
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
 import logging
-from authlib.jose import JsonWebToken
-from routes.decorators import jwt_instance
+from authlib.jose import JsonWebToken # Keep this for encoding method directly
+from routes.decorators import jwt_instance # Import jwt_instance
 
 auth = Blueprint('auth', __name__)
 
@@ -35,8 +35,8 @@ def register():
         'exp': datetime.utcnow() + timedelta(hours=24),
         'name': new_resident.name
     }
-    # <<< FIXED THIS LINE: Added {} for the header argument >>>
-    token = jwt_instance.encode({}, payload, current_app.config['JWT_SECRET_KEY'])
+    # <<< FIXED THIS LINE: Explicitly added 'alg': 'HS256' to the header dictionary >>>
+    token = jwt_instance.encode({'alg': 'HS256'}, payload, current_app.config['JWT_SECRET_KEY'])
 
     return jsonify({
         "message": "Registration successful.",
@@ -63,8 +63,8 @@ def login():
         'exp': datetime.utcnow() + timedelta(hours=24),
         'name': resident.name
     }
-    # <<< FIXED THIS LINE: Added {} for the header argument >>>
-    token = jwt_instance.encode({}, payload, current_app.config['JWT_SECRET_KEY'])
+    # <<< FIXED THIS LINE: Explicitly added 'alg': 'HS256' to the header dictionary >>>
+    token = jwt_instance.encode({'alg': 'HS256'}, payload, current_app.config['JWT_SECRET_KEY'])
 
     print(f"✅ Login successful. Token: {token.decode('utf-8')}")
     return jsonify({
