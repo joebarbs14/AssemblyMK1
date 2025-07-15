@@ -26,6 +26,9 @@ function DashboardPage() {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
+    // <<< ADDED CONSOLE.LOG TO CONFIRM TOKEN RETRIEVAL >>>
+    console.log('DashboardPage: Token retrieved from localStorage:', token);
+
     if (!token) {
       console.warn('No token found, redirecting to login.');
       navigate('/#/');
@@ -33,10 +36,11 @@ function DashboardPage() {
     }
 
     const decoded = decodeToken(token);
-    if (decoded?.name) {
-      setUserName(decoded.name);
+    // Corrected: Access 'name' from within the 'sub' object [cite: user's previous conversation]
+    if (decoded?.sub?.name) { // <<< CHANGED THIS LINE
+      setUserName(decoded.sub.name); // <<< CHANGED THIS LINE
     } else {
-      console.warn('Decoded token missing "name" field. Defaulting name to "Resident".');
+      console.warn('Decoded token missing "name" field in "sub" object. Defaulting name to "Resident".', decoded); // Added 'decoded' for more context
       setUserName('Resident');
     }
 
@@ -47,7 +51,10 @@ function DashboardPage() {
       try {
         const res = await fetch('https://assemblymk1-backend.onrender.com/dashboard/', {
           method: 'GET',
-          headers: { 'Authorization': 'Bearer ' + token }
+          headers: {
+            'Content-Type': 'application/json', // Good practice to include
+            'Authorization': 'Bearer ' + token // Ensure token is not undefined here
+          }
         });
 
         const contentType = res.headers.get('content-type');
@@ -76,7 +83,7 @@ function DashboardPage() {
     };
 
     fetchData();
-  }, [navigate]);
+  }, [navigate]); // Dependency array
 
   if (loading) {
     return (
@@ -101,34 +108,6 @@ function DashboardPage() {
         </p>
       </div>
     );
-  }
-
-  return (
-    <div className="dashboard">
-      <div className="dashboard-header">
-        <h1>Welcome, {userName}</h1>
-        <button className="logout-btn" onClick={() => {
-          localStorage.removeItem('token');
-          navigate('/#/');
-        }}>Logout</button>
-      </div>
-
-      <div className="tiles">
-        {categories.map(category => (
-          <div key={category} className="tile">
-            <h3>{category}</h3>
-            <ul>
-              {(processes[category] || []).map((title, idx) => (
-                <li key={idx}>{title}</li>
-              ))}
-              {(!processes[category] || processes[category].length === 0) && (
-                <li className="no-items">No entries yet</li>
-              )}
-            </ul>
-          </div>
-        ))}
-      </div>
-    </div>
   );
 }
 
