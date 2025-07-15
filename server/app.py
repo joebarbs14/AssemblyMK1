@@ -8,6 +8,7 @@ from routes.process import process
 from routes.admin import admin
 from dotenv import load_dotenv
 import os
+from datetime import timedelta # Import timedelta
 
 load_dotenv()
 
@@ -33,6 +34,18 @@ app.config['JWT_SECRET_KEY'] = app.config['SECRET_KEY'] # JWT uses the same secr
 app.config['JWT_TOKEN_LOCATION'] = ['headers']
 app.config['JWT_HEADER_NAME'] = 'Authorization'
 app.config['JWT_HEADER_TYPE'] = 'Bearer'
+
+# --- ADDED/MODIFIED FOR DEBUGGING JWT VALIDATION ---
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1) # Ensure a reasonable expiry
+app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=30) # Good practice to set refresh token expiry
+app.config["JWT_ALGORITHM"] = "HS256" # Explicitly define algorithm, though HS256 is default
+
+# THIS IS THE KEY CHANGE FOR DEBUGGING 422s with valid signatures:
+# It tells Flask-JWT-Extended to allow non-fresh tokens on @jwt_required() by default.
+# Remove this in production if you want to enforce fresh logins for certain actions.
+app.config["JWT_FRESH_TOKEN_REQUIRED"] = False
+# --- END ADDED/MODIFIED ---
+
 
 # CORS: Allow deployed + local dev frontends
 CORS(app, resources={r"/*": {"origins": [
