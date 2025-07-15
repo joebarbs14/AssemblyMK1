@@ -33,19 +33,14 @@ function LoginPage() {
       if (res.ok && data.token) {
         localStorage.setItem('token', data.token);
 
-        const base64Url = data.token.split('.')[1];
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const jsonPayload = decodeURIComponent(atob(base64).split('').map(c =>
-          '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
-        ).join(''));
-        const decoded = JSON.parse(jsonPayload);
-
+        // Decode the JWT and store name
+        const base64 = data.token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+        const decoded = JSON.parse(atob(base64));
         if (decoded.name) {
           localStorage.setItem('userName', decoded.name);
         }
 
-        // ✅ Corrected navigation (HashRouter handles the #)
-        navigate('/dashboard');
+        navigate('/dashboard'); // ✅ Route works in HashRouter
       } else {
         console.error('Login failed:', data);
         alert(data.message || 'Login failed. Please check your credentials.');
