@@ -27,7 +27,7 @@ def register():
     db.session.add(new_resident)
     db.session.commit()
 
-    logging.info(f"User registered: {email}") # <<< FIXED THIS LINE: Removed flush=True
+    logging.info(f"User registered: {email}")
 
     payload = {
         'sub': new_resident.id,
@@ -35,7 +35,8 @@ def register():
         'exp': datetime.utcnow() + timedelta(hours=24),
         'name': new_resident.name
     }
-    token = jwt_instance.encode(payload, current_app.config['JWT_SECRET_KEY'])
+    # <<< FIXED THIS LINE: Added {} for the header argument >>>
+    token = jwt_instance.encode({}, payload, current_app.config['JWT_SECRET_KEY'])
 
     return jsonify({
         "message": "Registration successful.",
@@ -51,10 +52,10 @@ def login():
     resident = Resident.query.filter_by(email=email).first()
 
     if not resident or not check_password_hash(resident.password_hash, password):
-        logging.warning(f"Login failed for email: {email}") # <<< FIXED THIS LINE: Removed flush=True
+        logging.warning(f"Login failed for email: {email}")
         return jsonify({"message": "Invalid credentials"}), 401
 
-    logging.info(f"Login successful for user: {email}") # <<< FIXED THIS LINE: Removed flush=True
+    logging.info(f"Login successful for user: {email}")
 
     payload = {
         'sub': resident.id,
@@ -62,9 +63,10 @@ def login():
         'exp': datetime.utcnow() + timedelta(hours=24),
         'name': resident.name
     }
-    token = jwt_instance.encode(payload, current_app.config['JWT_SECRET_KEY'])
+    # <<< FIXED THIS LINE: Added {} for the header argument >>>
+    token = jwt_instance.encode({}, payload, current_app.config['JWT_SECRET_KEY'])
 
-    print(f"✅ Login successful. Token: {token.decode('utf-8')}") # This print is fine as it's print()
+    print(f"✅ Login successful. Token: {token.decode('utf-8')}")
     return jsonify({
         "message": "Login successful.",
         "token": token.decode('utf-8')
