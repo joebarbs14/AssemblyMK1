@@ -1,22 +1,22 @@
-# routes/user.py
-from flask import Blueprint, jsonify
-from flask_jwt_extended import jwt_required, get_jwt_identity
-from models import Resident # Import Resident model
+from flask import Blueprint, jsonify, request # Import request
+from models import Resident
+import logging
+from app import auth_required # Import the custom decorator from app.py
 
 user_bp = Blueprint('user_bp', __name__)
 
 @user_bp.route('/profile', methods=['GET'])
-@jwt_required()
+@auth_required # Use the custom authentication decorator
 def get_user_profile():
-    # get_jwt_identity() will now return the integer user ID (e.g., 1)
-    user_id = get_jwt_identity()
-    logging.info(f"Fetching profile for user_id: {user_id}", flush=True) # Added logging
+    # Get the identity from request.current_identity set by the auth_required decorator
+    user_id = request.current_identity
+    logging.info(f"Fetching profile for user_id: {user_id}", flush=True)
 
-    resident = Resident.query.get(user_id) # Fetch the resident by ID
+    resident = Resident.query.get(user_id)
 
     if resident:
-        logging.info(f"User profile found for {user_id}: {resident.name}", flush=True) # Added logging
+        logging.info(f"User profile found for {user_id}: {resident.name}", flush=True)
         return jsonify({"id": resident.id, "name": resident.name, "email": resident.email}), 200
     else:
-        logging.warning(f"User profile not found for user_id: {user_id}", flush=True) # Added logging
+        logging.warning(f"User profile not found for user_id: {user_id}", flush=True)
         return jsonify({"message": "User not found"}), 404
