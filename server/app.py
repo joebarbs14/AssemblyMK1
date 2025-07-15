@@ -59,43 +59,34 @@ with app.app_context():
 # --- JWT Identity Loader ---
 @jwt.user_identity_loader
 def user_identity_lookup(user):
-    # If the 'sub' claim is now an integer (15), this will simply return 15.
-    # If it were a dict {"id": 15, "name": "jb1234"}, it would return 15.
-    # This loader is for *validation*, not *creation*.
     if isinstance(user, dict) and 'id' in user:
         return user['id']
     return user
 
-# --- ADD CUSTOM ERROR HANDLERS FOR JWT EXCEPTIONS ---
+# --- ADD CUSTOM ERROR HANDLERS FOR JWT EXCEPTIONS (ADJUSTED FOR OLDER FLASK-JWT-EXTENDED) ---
+# This will capture the specific exception Flask-JWT-Extended is raising.
 @app.errorhandler(exceptions.NoAuthorizationError)
 def handle_auth_error(e):
     logging.error(f"No Authorization Error: {e.args[0]}", exc_info=True)
     return jsonify({"message": e.args[0]}), 401
 
-@app.errorhandler(exceptions.InvalidHeaderError)
+@app.errorhandler(exceptions.InvalidHeaderError) # This one was suggested by the error
 def handle_invalid_header_error(e):
     logging.error(f"Invalid Header Error: {e.args[0]}", exc_info=True)
-    return jsonify({"message": e.args[0]}), 422 # Often a 422
-
-@app.errorhandler(exceptions.InvalidTokenError)
-def handle_invalid_token_error(e):
-    logging.error(f"Invalid Token Error: {e.args[0]}", exc_info=True)
-    return jsonify({"message": e.args[0]}), 422 # Often a 422
+    return jsonify({"message": e.args[0]}), 422
 
 @app.errorhandler(exceptions.ExpiredSignatureError)
 def handle_expired_signature_error(e):
     logging.error(f"Expired Signature Error: {e.args[0]}", exc_info=True)
     return jsonify({"message": "Token has expired"}), 401
 
-@app.errorhandler(exceptions.DecodeError)
+@app.errorhandler(exceptions.DecodeError) # This handles general decoding issues
 def handle_decode_error(e):
     logging.error(f"Decode Error: {e.args[0]}", exc_info=True)
     return jsonify({"message": "Token could not be decoded"}), 422
 
-@app.errorhandler(exceptions.WrongTokenError)
-def handle_wrong_token_error(e):
-    logging.error(f"Wrong Token Error: {e.args[0]}", exc_info=True)
-    return jsonify({"message": "Wrong token type"}), 422
+# Removed InvalidTokenError and WrongTokenError as they caused AttributeError
+# If other specific errors occur, we can add handlers for them.
 
 @app.errorhandler(exceptions.RevokedTokenError)
 def handle_revoked_token_error(e):
@@ -120,6 +111,4 @@ def index():
     return "LocalGov API running!"
 
 if __name__ == '__main__':
-    # Removed debug=True for production clarity, as Render handles debugging.
-    # This block is primarily for local development setup.
     app.run(host='0.0.0.0', port=5000)
