@@ -33,14 +33,20 @@ function LoginPage() {
       if (res.ok && data.token) {
         localStorage.setItem('token', data.token);
 
-        // Decode the JWT and store name
-        const base64 = data.token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
-        const decoded = JSON.parse(atob(base64));
-        if (decoded.name) {
-          localStorage.setItem('userName', decoded.name);
+        // ✅ Decode JWT and store user name
+        try {
+          const [, payload] = data.token.split('.');
+          const decoded = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')));
+          if (decoded?.name) {
+            localStorage.setItem('userName', decoded.name);
+          }
+        } catch (decodeErr) {
+          console.warn('Failed to decode token:', decodeErr);
         }
 
-        navigate('/dashboard'); // ✅ Route works in HashRouter
+        // ✅ Redirect to original page or default to dashboard
+        const redirectTo = new URLSearchParams(window.location.search).get('redirect') || '/dashboard';
+        navigate(redirectTo);
       } else {
         console.error('Login failed:', data);
         alert(data.message || 'Login failed. Please check your credentials.');
