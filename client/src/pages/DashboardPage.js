@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react'; // Added useCallback
+import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './DashboardPage.css';
 
@@ -7,6 +7,11 @@ const categories = [
   "Roads", "Waste", "Animals", "Public Health", "Environment"
 ];
 
+// The decodeToken function is no longer needed for userName extraction
+// as userName will be fetched from the /user/profile endpoint.
+// However, if you use it elsewhere for other token claims, you can keep it.
+// For this specific context, it's not directly used for setting userName.
+/*
 function decodeToken(token) {
   try {
     const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
@@ -16,6 +21,7 @@ function decodeToken(token) {
     return null;
   }
 }
+*/
 
 function DashboardPage() {
   const [processes, setProcesses] = useState({});
@@ -42,6 +48,7 @@ function DashboardPage() {
         if (userProfileRes.status === 401 || userProfileRes.status === 403) {
           alert('Your session has expired or is invalid. Please log in again.');
           localStorage.removeItem('token');
+          localStorage.removeItem('userName'); // Clear userName on logout
           navigate('/#/');
           return; // Exit early
         }
@@ -55,6 +62,7 @@ function DashboardPage() {
         console.log('DashboardPage: User name fetched and set:', userProfileData.name);
       } else {
         console.warn('DashboardPage: User profile fetched, but "name" field is missing.', userProfileData);
+        setUserName('Resident'); // Default if name is missing from profile endpoint
       }
 
       // 2. Now fetch dashboard data
@@ -74,6 +82,7 @@ function DashboardPage() {
         if (dashboardRes.status === 401 || dashboardRes.status === 403) {
           alert('Your session has expired or is invalid. Please log in again.');
           localStorage.removeItem('token');
+          localStorage.removeItem('userName'); // Clear userName on logout
           navigate('/#/');
           return; // Exit early
         }
@@ -82,7 +91,7 @@ function DashboardPage() {
 
       const dashboardData = await dashboardRes.json();
       console.log('Dashboard data received:', dashboardData);
-      setProcesses(typeof dashboardData === 'object' && dashboardData !== null ? dashboardData : {});
+      setProcesses(typeof dashboardData === 'object' && dashboardData !== null ? data : {});
 
     } catch (err) {
       console.error('DashboardPage: Error during data fetch:', err);
@@ -94,7 +103,13 @@ function DashboardPage() {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    console.log('DashboardPage: Token retrieved from localStorage for useEffect:', token); // Added for initial check
+    // Try to get userName from localStorage first to avoid flicker
+    const storedUserName = localStorage.getItem('userName');
+    if (storedUserName) {
+      setUserName(storedUserName);
+    }
+
+    console.log('DashboardPage: Token retrieved from localStorage for useEffect:', token);
 
     if (!token) {
       console.warn('No token found, redirecting to login.');
@@ -124,7 +139,7 @@ function DashboardPage() {
         <button onClick={() => window.location.reload()}>Retry</button>
         <p>
           If the problem persists, please{' '}
-          <span className="link" onClick={() => { localStorage.removeItem('token'); navigate('/#/'); }}>
+          <span className="link" onClick={() => { localStorage.removeItem('token'); localStorage.removeItem('userName'); navigate('/#/'); }}> {/* Clear userName on logout */}
             log in again
           </span>.
         </p>
@@ -138,6 +153,7 @@ function DashboardPage() {
         <h1>Welcome, {userName}</h1>
         <button className="logout-btn" onClick={() => {
           localStorage.removeItem('token');
+          localStorage.removeItem('userName'); // Clear userName on logout
           navigate('/#/');
         }}>Logout</button>
       </div>
