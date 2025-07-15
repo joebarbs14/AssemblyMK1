@@ -1,6 +1,6 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify # Keep jsonify for general use, though not used in error handlers anymore
 from flask_cors import CORS
-from flask_jwt_extended import JWTManager, exceptions # Import exceptions
+from flask_jwt_extended import JWTManager # Removed 'exceptions' import as it's no longer needed here
 from models import db
 from routes.auth import auth
 from routes.dashboard import dashboard
@@ -63,27 +63,10 @@ def user_identity_lookup(user):
         return user['id']
     return user
 
-# --- ADD CUSTOM ERROR HANDLERS FOR JWT EXCEPTIONS (ADJUSTED FOR FLASK-JWT-EXTENDED 4.7.1) ---
-@app.errorhandler(exceptions.NoAuthorizationError)
-def handle_no_authorization_error(e):
-    logging.error(f"No Authorization Error: {e.args[0]}", exc_info=True)
-    return jsonify({"message": e.args[0]}), 401
-
-@app.errorhandler(exceptions.InvalidHeaderError)
-def handle_invalid_header_error(e):
-    logging.error(f"Invalid Header Error: {e.args[0]}", exc_info=True)
-    return jsonify({"message": e.args[0]}), 422
-
-@app.errorhandler(exceptions.JWTDecodeError) # <<< CHANGED THIS LINE
-def handle_jwt_decode_error(e): # <<< CHANGED FUNCTION NAME FOR CLARITY
-    logging.error(f"JWT Decode Error: {e.args[0]}", exc_info=True)
-    return jsonify({"message": "Token could not be decoded"}), 422
-
-# We are now only including the most fundamental error handlers based on your specific version's errors.
-# If a 422/401 still occurs, it will fall through to a generic Flask error or the default JWT response,
-# but at least the app should start.
-
-# --- END CUSTOM ERROR HANDLERS ---
+# --- REMOVED CUSTOM ERROR HANDLERS FOR JWT EXCEPTIONS ---
+# These handlers were causing AttributeError due to Flask-JWT-Extended version mismatch.
+# Flask-JWT-Extended will now use its default error responses.
+# --- END REMOVED CUSTOM ERROR HANDLERS ---
 
 # --- Register Blueprints ---
 app.register_blueprint(auth, url_prefix='/auth')
