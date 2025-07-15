@@ -32,14 +32,16 @@ function LoginPage() {
 
       if (res.ok && data.token) {
         localStorage.setItem('token', data.token);
+        // <<< ADDED THIS CONSOLE.LOG >>>
+        console.log('LoginPage: Token successfully stored in localStorage:', localStorage.getItem('token'));
 
         // ✅ Decode JWT and store user name
         try {
           const [, payload] = data.token.split('.');
           const decoded = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')));
           // Corrected: Access 'name' from within the 'sub' object
-          if (decoded?.sub?.name) { // <<< CHANGED THIS LINE
-            localStorage.setItem('userName', decoded.sub.name); // <<< CHANGED THIS LINE
+          if (decoded?.sub?.name) {
+            localStorage.setItem('userName', decoded.sub.name);
           }
         } catch (decodeErr) {
           console.warn('Failed to decode token:', decodeErr);
