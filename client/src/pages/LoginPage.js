@@ -37,8 +37,9 @@ function LoginPage() {
         try {
           const [, payload] = data.token.split('.');
           const decoded = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')));
-          if (decoded?.name) {
-            localStorage.setItem('userName', decoded.name);
+          // Corrected: Access 'name' from within the 'sub' object
+          if (decoded?.sub?.name) { // <<< CHANGED THIS LINE
+            localStorage.setItem('userName', decoded.sub.name); // <<< CHANGED THIS LINE
           }
         } catch (decodeErr) {
           console.warn('Failed to decode token:', decodeErr);
@@ -66,7 +67,7 @@ function LoginPage() {
       <input
         type="email"
         id="loginEmail" // Added id
-        name="email"   // Added name
+        name="email"    // Added name
         value={email}
         onChange={e => setEmail(e.target.value)}
         placeholder="Email"
@@ -77,7 +78,7 @@ function LoginPage() {
       <input
         type="password"
         id="loginPassword" // Added id
-        name="password"   // Added name
+        name="password"    // Added name
         value={password}
         onChange={e => setPassword(e.target.value)}
         placeholder="Password"
