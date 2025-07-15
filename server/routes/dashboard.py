@@ -71,7 +71,7 @@ def get_dashboard():
 
     except Exception as e:
         # This catches any remaining unexpected errors, including those re-raised from db_e
-        print(f"[dashboard] UNEXPECTED SERVER ERROR in get_dashboard: {str(e)}", flush=True) # Reverted note to original
+        print(f"[dashboard] UNEXPECTED SERVER ERROR in get_dashboard: {str(e)}", flush=True)
         traceback.print_exc() # This will print the full stack trace to your Render logs
         return jsonify({
             "error": "Unable to load dashboard due to server error",
