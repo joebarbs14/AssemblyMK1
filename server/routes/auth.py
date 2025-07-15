@@ -17,9 +17,11 @@ def register():
         data = request.get_json(force=True)
 
         if not data or not data.get('email') or not data.get('password') or not data.get('name'):
+            print("❌ Registration: Missing required fields", flush=True) # Added flush=True
             return jsonify({"message": "Missing required fields"}), 400
 
         if Resident.query.filter_by(email=data['email']).first():
+            print(f"❌ Registration: Email '{data['email']}' already exists", flush=True) # Added flush=True
             return jsonify({"message": "Email already exists"}), 409
 
         hashed = generate_password_hash(data['password'])
@@ -35,7 +37,7 @@ def register():
 
         access_token = create_access_token(identity={"id": new_user.id, "name": new_user.name})
 
-        print("✅ Registration successful. Token:", access_token)
+        print("✅ Registration successful. Token:", access_token, flush=True) # Added flush=True
 
         return jsonify({
             "message": "Registered successfully",
@@ -44,7 +46,7 @@ def register():
         }), 201
 
     except Exception as e:
-        print("❌ Error in /register:", str(e))
+        print("❌ Error in /register:", str(e), flush=True) # Added flush=True
         return jsonify({
             "message": "Server error occurred",
             "error": str(e)
@@ -61,16 +63,18 @@ def login():
         data = request.get_json(force=True)
 
         if not data or not data.get('email') or not data.get('password'):
+            print("❌ Login: Missing credentials", flush=True) # Added flush=True
             return jsonify({"message": "Missing credentials"}), 400
 
         user = Resident.query.filter_by(email=data['email']).first()
 
         if not user or not check_password_hash(user.password_hash, data['password']):
+            print("❌ Login: Invalid credentials (user not found or password mismatch)", flush=True) # Added flush=True
             return jsonify({"message": "Invalid credentials"}), 401
 
         access_token = create_access_token(identity={"id": user.id, "name": user.name})
 
-        print("✅ Login successful. Token:", access_token)
+        print("✅ Login successful. Token:", access_token, flush=True) # Added flush=True
 
         return jsonify({
             "token": access_token,
@@ -79,7 +83,7 @@ def login():
         }), 200
 
     except Exception as e:
-        print("❌ Error in /login:", str(e))
+        print("❌ Error in /login:", str(e), flush=True) # Added flush=True
         return jsonify({
             "message": "Login failed",
             "error": str(e)
