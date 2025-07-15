@@ -1,29 +1,39 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 
-function ProtectedRoute({ children }) {
+function ProtectedRoute({ children /*, roles = [] */ }) {
   const token = localStorage.getItem('token');
+  const location = useLocation();
 
   if (!token) {
-    return <Navigate to="/" replace />;
+    // Redirect to login with return path
+    return <Navigate to={`/?redirect=${encodeURIComponent(location.pathname)}`} replace />;
   }
 
-  // ✅ Token expiry validation (optional but recommended)
   try {
     const [, payload] = token.split('.');
     const decoded = JSON.parse(atob(payload));
-    const isExpired = decoded.exp * 1000 < Date.now(); // expiration is in seconds
+    const isExpired = decoded.exp * 1000 < Date.now();
 
     if (isExpired) {
-      localStorage.removeItem('token'); // clean up expired token
-      return <Navigate to="/" replace />;
+      console.warn('Token expired');
+      localStorage.removeItem('token');
+      return <Navigate to={`/?redirect=${encodeURIComponent(location.pathname)}`} replace />;
     }
-  } catch (e) {
-    console.error('Error decoding token:', e);
-    return <Navigate to="/" replace />;
-  }
 
-  return children;
+    // ✅ Optional role-based access
+    /*
+    if (roles.length && !roles.includes(decoded.role)) {
+      return <Navigate to="/unauthorized" replace />;
+    }
+    */
+
+    return children;
+  } catch (err) {
+    console.error('Invalid token format:', err);
+    localStorage.removeItem('token');
+    return <Navigate to={`/?redirect=${encodeURIComponent(location.pathname)}`} replace />;
+  }
 }
 
 export default ProtectedRoute;
