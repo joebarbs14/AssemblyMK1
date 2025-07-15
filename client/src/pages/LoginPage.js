@@ -10,6 +10,8 @@ function LoginPage() {
 
   useEffect(() => {
     localStorage.removeItem('token');
+    // Also remove userName if it was stored from previous attempts
+    localStorage.removeItem('userName');
   }, []);
 
   const login = async () => {
@@ -32,20 +34,12 @@ function LoginPage() {
 
       if (res.ok && data.token) {
         localStorage.setItem('token', data.token);
-        // <<< ADDED THIS CONSOLE.LOG >>>
         console.log('LoginPage: Token successfully stored in localStorage:', localStorage.getItem('token'));
 
-        // ✅ Decode JWT and store user name
-        try {
-          const [, payload] = data.token.split('.');
-          const decoded = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')));
-          // Corrected: Access 'name' from within the 'sub' object
-          if (decoded?.sub?.name) {
-            localStorage.setItem('userName', decoded.sub.name);
-          }
-        } catch (decodeErr) {
-          console.warn('Failed to decode token:', decodeErr);
-        }
+        // --- REMOVED JWT DECODING FOR USER NAME ---
+        // The userName will now be fetched by DashboardPage from the /user/profile endpoint
+        // This avoids the "Decoded token missing 'name' field" warning as 'name' is not in 'sub'
+        // --- END REMOVED ---
 
         // ✅ Redirect to original page or default to dashboard
         const redirectTo = new URLSearchParams(window.location.search).get('redirect') || '/dashboard';
