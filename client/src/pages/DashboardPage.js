@@ -12,6 +12,7 @@ function DashboardPage() {
   const [userName, setUserName] = useState('Resident');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState(null); // New state for selected category
   const navigate = useNavigate();
 
   const fetchUserProfileAndDashboardData = useCallback(async (token) => {
@@ -27,10 +28,10 @@ function DashboardPage() {
 
       // Read user profile data once
       const userProfileContentType = userProfileRes.headers.get('content-type');
-      let userProfileData = {}; // Initialize to empty object
+      let userProfileData = {};
 
       if (userProfileContentType?.includes('application/json')) {
-          userProfileData = await userProfileRes.json(); // Read the body once
+          userProfileData = await userProfileRes.json();
       }
 
       if (!userProfileRes.ok) {
@@ -65,10 +66,10 @@ function DashboardPage() {
 
       // Read dashboard response body ONLY ONCE
       const dashboardContentType = dashboardRes.headers.get('content-type');
-      let dashboardResultData = {}; // Declare a variable to hold the parsed JSON
+      let dashboardResultData = {};
 
       if (dashboardContentType?.includes('application/json')) {
-          dashboardResultData = await dashboardRes.json(); // Read the body once
+          dashboardResultData = await dashboardRes.json();
       }
 
       if (!dashboardRes.ok) {
@@ -113,6 +114,14 @@ function DashboardPage() {
 
   }, [navigate, fetchUserProfileAndDashboardData]);
 
+  // Handler for tile click
+  const handleTileClick = (category) => {
+    setSelectedCategory(category);
+  };
+
+  // Get items for the selected category
+  const selectedCategoryItems = selectedCategory ? (processes[selectedCategory] || []) : [];
+
   if (loading) {
     return (
       <div className="dashboard">
@@ -151,19 +160,57 @@ function DashboardPage() {
 
       <div className="tiles">
         {categories.map(category => (
-          <div key={category} className="tile">
+          <div
+            key={category}
+            className={`tile ${selectedCategory === category ? 'selected-tile' : ''}`}
+            onClick={() => handleTileClick(category)} // Add onClick handler
+          >
             <h3>{category}</h3>
             <ul>
-              {(processes[category] || []).map((title, idx) => (
-                <li key={idx}>{title}</li>
-              ))}
-              {(!processes[category] || processes[category].length === 0) && (
+              {/* Display a summary or first item in the tile */}
+              {(processes[category] && processes[category].length > 0) ? (
+                <li className="process-item-summary">
+                  {processes[category][0].title}
+                  {processes[category].length > 1 && ` (+${processes[category].length - 1} more)`}
+                </li>
+              ) : (
                 <li className="no-items">No entries yet</li>
               )}
             </ul>
           </div>
         ))}
       </div>
+
+      {/* New section to display detailed information below the tiles */}
+      {selectedCategory && (
+        <div className="selected-category-details">
+          <h2>Details for {selectedCategory}</h2>
+          {selectedCategoryItems.length > 0 ? (
+            <ul>
+              {selectedCategoryItems.map((item) => (
+                <li key={item.id} className="process-item-full-detail">
+                  <div className="process-title">{item.title}</div>
+                  <div className="process-detail">Status: {item.status}</div>
+                  {item.submitted_at && (
+                    <div className="process-detail">Submitted: {new Date(item.submitted_at).toLocaleDateString()}</div>
+                  )}
+                  {item.updated_at && (
+                    <div className="process-detail">Updated: {new Date(item.updated_at).toLocaleDateString()}</div>
+                  )}
+                  {/* You can add more details from item.form_data here if needed */}
+                  {item.form_data && Object.keys(item.form_data).length > 0 && (
+                    <div className="process-detail">
+                      Form Data: {JSON.stringify(item.form_data)}
+                    </div>
+                  )}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>No entries found for {selectedCategory}.</p>
+          )}
+        </div>
+      )}
     </div>
   );
 }
