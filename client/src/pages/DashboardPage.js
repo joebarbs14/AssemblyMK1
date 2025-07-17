@@ -8,7 +8,7 @@ const categories = [
 ];
 
 function DashboardPage() {
-  const [processes, setProcesses] = useState({});
+  const [processes, setProcesses] = useState({}); // This state will now hold both processes and properties
   const [userName, setUserName] = useState('Resident');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -55,7 +55,7 @@ function DashboardPage() {
         setUserName('Resident');
       }
 
-      // 2. Now fetch dashboard data
+      // 2. Now fetch dashboard data (which includes properties for 'Rates')
       const dashboardRes = await fetch('https://assemblymk1-backend.onrender.com/dashboard/', {
         method: 'GET',
         headers: {
@@ -170,7 +170,8 @@ function DashboardPage() {
               {/* Display a summary or first item in the tile */}
               {(processes[category] && processes[category].length > 0) ? (
                 <li className="process-item-summary">
-                  {processes[category][0].title}
+                  {/* Display title for processes, or address for properties */}
+                  {processes[category][0].type === 'property' ? processes[category][0].address : processes[category][0].title}
                   {processes[category].length > 1 && ` (+${processes[category].length - 1} more)`}
                 </li>
               ) : (
@@ -189,19 +190,46 @@ function DashboardPage() {
             <ul>
               {selectedCategoryItems.map((item) => (
                 <li key={item.id} className="process-item-full-detail">
-                  <div className="process-title">{item.title}</div>
-                  <div className="process-detail">Status: {item.status}</div>
-                  {item.submitted_at && (
-                    <div className="process-detail">Submitted: {new Date(item.submitted_at).toLocaleDateString()}</div>
-                  )}
-                  {item.updated_at && (
-                    <div className="process-detail">Updated: {new Date(item.updated_at).toLocaleDateString()}</div>
-                  )}
-                  {/* You can add more details from item.form_data here if needed */}
-                  {item.form_data && Object.keys(item.form_data).length > 0 && (
-                    <div className="process-detail">
-                      Form Data: {JSON.stringify(item.form_data)}
-                    </div>
+                  {/* Conditionally render details based on item type */}
+                  {item.type === 'property' ? (
+                    <>
+                      <div className="process-title">Address: {item.address}</div>
+                      <div className="process-detail">Council: {item.council}</div>
+                      {item.gps_coordinates && (
+                        <div className="process-detail">GPS: {typeof item.gps_coordinates === 'object' ? `Lat: ${item.gps_coordinates.lat}, Lon: ${item.gps_coordinates.lon}` : item.gps_coordinates}</div>
+                      )}
+                      {item.land_size_sqm && (
+                        <div className="process-detail">Land Size: {item.land_size_sqm} m²</div>
+                      )}
+                      {item.property_value && (
+                        <div className="process-detail">Property Value: ${item.property_value.toLocaleString()}</div>
+                      )}
+                      {item.land_value && (
+                        <div className="process-detail">Land Value: ${item.land_value.toLocaleString()}</div>
+                      )}
+                      {item.zone && (
+                        <div className="process-detail">Zone: {item.zone}</div>
+                      )}
+                      {item.shape_file_data && (
+                        <div className="process-detail">Shape File Data: {item.shape_file_data}</div>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <div className="process-title">{item.title}</div>
+                      <div className="process-detail">Status: {item.status}</div>
+                      {item.submitted_at && (
+                        <div className="process-detail">Submitted: {new Date(item.submitted_at).toLocaleDateString()}</div>
+                      )}
+                      {item.updated_at && (
+                        <div className="process-detail">Updated: {new Date(item.updated_at).toLocaleDateString()}</div>
+                      )}
+                      {item.form_data && Object.keys(item.form_data).length > 0 && (
+                        <div className="process-detail">
+                          Form Data: {JSON.stringify(item.form_data)}
+                        </div>
+                      )}
+                    </>
                   )}
                 </li>
               ))}
