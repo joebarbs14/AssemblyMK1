@@ -120,16 +120,7 @@ function PropertyItem({ item }) {
         {item.property_type && (
           <div className="property-info">Type: {item.property_type.charAt(0).toUpperCase() + item.property_type.slice(1)}</div>
         )}
-        {/* REMOVED: GPS display line to resolve persistent syntax error */}
-        {/*
-        {item.gps_coordinates && (
-          <div className="property-info">
-            GPS: {typeof item.gps_coordinates === 'object' && item.gps_coordinates.lat != null && item.gps_coordinates.lon != null
-              ? `Lat: ${item.gps_coordinates.lat.toFixed(4)}, Lon: ${item.gps_coordinates.lon.toFixed(4)}`
-              : (item.gps_coordinates ? JSON.stringify(item.gps_coordinates) : '')}
-          </div>
-        )}
-        */}
+        {/* GPS display line has been completely removed to resolve persistent syntax error */}
         {item.land_size_sqm && (
           <div className="property-info">Land Size: {item.land_size_sqm} m²</div>
         )}
