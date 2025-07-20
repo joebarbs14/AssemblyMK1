@@ -2,57 +2,10 @@
 import React, { useState } from 'react';
 import './DashboardPage.css'; // Re-use existing CSS for general card/button styling
 
-// Mock data for adoptable animals
-const mockAdoptableAnimals = [
-  {
-    id: 'a1',
-    name: 'Buddy',
-    mainPhoto: 'https://placehold.co/200x150/87CEEB/ffffff?text=Buddy',
-    gallery: [
-      'https://placehold.co/100x75/87CEEB/ffffff?text=Buddy1',
-      'https://placehold.co/100x75/87CEEB/ffffff?text=Buddy2',
-      'https://placehold.co/100x75/87CEEB/ffffff?text=Buddy3',
-    ],
-    type: 'Dog',
-    breed: 'Golden Retriever',
-    mixed: false,
-    sex: 'Male',
-    age: '2 years',
-    temperament: 'Friendly, energetic, good with kids and other pets. Loves to play fetch.'
-  },
-  {
-    id: 'a2',
-    name: 'Whiskers',
-    mainPhoto: 'https://placehold.co/200x150/FFB6C1/ffffff?text=Whiskers',
-    gallery: [
-      'https://placehold.co/100x75/FFB6C1/ffffff?text=Whisker1',
-      'https://placehold.co/100x75/FFB6C1/ffffff?text=Whisker2',
-    ],
-    type: 'Cat',
-    breed: 'Siamese',
-    mixed: true,
-    sex: 'Female',
-    age: '1 year',
-    temperament: 'Affectionate, vocal, enjoys quiet environments. Can be shy at first.'
-  },
-  {
-    id: 'a3',
-    name: 'Patches',
-    mainPhoto: 'https://placehold.co/200x150/90EE90/ffffff?text=Patches',
-    gallery: [
-      'https://placehold.co/100x75/90EE90/ffffff?text=Patch1',
-    ],
-    type: 'Rabbit',
-    breed: 'Dutch',
-    mixed: false,
-    sex: 'Female',
-    age: '6 months',
-    temperament: 'Curious, gentle, likes to explore. Enjoys fresh vegetables.'
-  }
-];
+// Removed: mockAdoptableAnimals data is no longer needed as data comes from props
 
-function AnimalDetails() {
-  const [selectedAnimalAction, setSelectedAnimalAction] = useState(null);
+function AnimalDetails({ animals }) { // Now accepts 'animals' as a prop
+  const [selectedAnimalAction, setSelectedAnimalAction] = useState('Adopt'); // Default to 'Adopt' to show listings
 
   const handleAnimalActionClick = (action) => {
     setSelectedAnimalAction(action);
@@ -91,16 +44,16 @@ function AnimalDetails() {
       {selectedAnimalAction === 'Adopt' && (
         <div className="adoptable-animals-listing">
           <h4 className="listing-title">Animals Available for Adoption</h4>
-          {mockAdoptableAnimals.length > 0 ? (
+          {animals && animals.length > 0 ? ( // Check if 'animals' prop exists and has data
             <div className="animal-cards-grid">
-              {mockAdoptableAnimals.map(animal => (
+              {animals.map(animal => (
                 <div key={animal.id} className="animal-card">
                   <div className="animal-main-photo-container">
-                    <img src={animal.mainPhoto} alt={animal.name} className="animal-main-photo" />
+                    <img src={animal.main_photo_url} alt={animal.name} className="animal-main-photo" />
                   </div>
-                  {animal.gallery && animal.gallery.length > 0 && (
+                  {animal.gallery_urls && animal.gallery_urls.length > 0 && (
                     <div className="animal-gallery">
-                      {animal.gallery.map((imgSrc, idx) => (
+                      {animal.gallery_urls.map((imgSrc, idx) => (
                         <img key={idx} src={imgSrc} alt={`${animal.name} gallery ${idx + 1}`} className="animal-gallery-thumbnail" />
                       ))}
                     </div>
@@ -112,6 +65,9 @@ function AnimalDetails() {
                     <p className="animal-info">Sex: {animal.sex}</p>
                     <p className="animal-info">Age: {animal.age}</p>
                     <p className="animal-temperament">{animal.temperament}</p>
+                    {animal.council_name && (
+                      <p className="animal-info">Council: {animal.council_name}</p>
+                    )}
                   </div>
                 </div>
               ))}
