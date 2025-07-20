@@ -187,38 +187,44 @@
   margin: 0;
 }
 
-.process-item-full-detail {
-  background-color: #ffffff; /* White background for individual items */
-  border: 1px solid #e9ecef; /* Lighter border */
-  border-radius: 10px; /* More rounded corners */
-  padding: 18px; /* Slightly more padding */
+/* New style for each property item card */
+.property-item-card {
+  background-color: #ffffff;
+  border: 1px solid #e9ecef;
+  border-radius: 10px;
+  padding: 15px; /* Adjusted padding for better fit with mini-map */
   margin-bottom: 15px;
-  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05); /* Lighter shadow */
-  transition: all 0.2s ease-in-out; /* Smooth transition */
-  display: flex; /* Use flexbox for internal layout */
-  flex-direction: column; /* Stack content vertically */
-  align-items: flex-start; /* Align content to the start */
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease-in-out;
+  display: flex; /* Use flexbox for details and mini-map side-by-side */
+  align-items: flex-start; /* Align items to the top */
+  gap: 15px; /* Space between details and mini-map */
 }
 
-.process-item-full-detail:hover {
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1); /* More pronounced shadow on hover */
-  transform: translateY(-2px); /* Slight lift on hover */
+.property-item-card:hover {
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
 }
 
-.process-item-full-detail .process-title {
-  font-size: 1.15em; /* Slightly larger title */
+.property-details-content { /* Container for the text details within the card */
+  flex-grow: 1; /* Allow text content to take available space */
+  text-align: left; /* Ensure text aligns left within its container */
+}
+
+.property-title { /* Renamed from .process-title */
+  font-size: 1.15em;
   font-weight: bold;
   color: #007bff;
-  margin-bottom: 8px; /* More space */
+  margin-bottom: 8px;
 }
 
-.process-item-full-detail .process-detail {
-  font-size: 0.95em; /* Slightly larger detail font */
+.property-info { /* Renamed from .process-detail */
+  font-size: 0.95em;
   color: #555;
-  margin-bottom: 4px; /* More space */
+  margin-bottom: 4px;
 }
 
-/* Styles for property details within RatesDetails.js */
+/* Styles for property header within RatesDetails.js */
 .property-header {
   display: flex;
   justify-content: space-between;
@@ -242,23 +248,34 @@
   box-shadow: 0 1px 4px rgba(0,0,0,0.1); /* Subtle shadow */
 }
 
-/* Hide the shape file data display */
-.process-item-full-detail .process-detail:has(span.shape-file-data-label) {
-  display: none; /* Hide the entire div if it contains the shape file label */
+/* Mini-map container styles for each property item */
+.mini-map-container {
+  width: 150px; /* Fixed width for the mini-map */
+  height: 100px; /* Fixed height for the mini-map */
+  border-radius: 8px; /* Rounded corners for the mini-map */
+  overflow: hidden; /* Ensure map content stays within bounds */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for the mini-map */
+  flex-shrink: 0; /* Prevent mini-map from shrinking */
+  border: 1px solid #ddd; /* Light border for definition */
 }
 
-/* Map container styles */
-.map-container {
-  flex: 1; /* Allow map to take up available space */
-  background-color: #e0e0e0; /* Placeholder background */
-  border-radius: 12px; /* More rounded corners */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); /* Subtle shadow */
-  overflow: hidden; /* Hide anything outside the map boundaries */
-  min-height: 350px; /* Slightly increased minimum height for better map view */
-}
-
-/* Ensure map canvas fills its container */
-#map { /* Leaflet creates a div with id="map" by default */
+/* Ensure Leaflet map fills its container */
+.mini-map-container #map { /* Target the map div inside mini-map-container */
   width: 100%;
   height: 100%;
 }
+
+/* Hide the shape file data text display */
+.property-info:has(span.shape-file-data-label) { /* Target the div containing the specific label */
+  display: none;
+}
+
+/* REMOVED the old main map container styles as it's no longer used */
+/*
+.map-container {
+  display: none;
+}
+#map {
+  display: none;
+}
+*/
