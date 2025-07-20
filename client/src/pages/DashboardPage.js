@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './DashboardPage.css';
+import RatesDetails from './RatesDetails'; // Import the new RatesDetails component
 
 const categories = [
   "Rates", "Water", "Development", "Community",
@@ -187,34 +188,14 @@ function DashboardPage() {
         <div className="selected-category-details">
           <h2>Details for {selectedCategory}</h2>
           {selectedCategoryItems.length > 0 ? (
-            <ul>
-              {selectedCategoryItems.map((item) => (
-                <li key={item.id} className="process-item-full-detail">
-                  {/* Conditionally render details based on item type */}
-                  {item.type === 'property' ? (
-                    <>
-                      <div className="process-title">Address: {item.address}</div>
-                      <div className="process-detail">Council: {item.council}</div>
-                      {item.gps_coordinates && (
-                        <div className="process-detail">GPS: {typeof item.gps_coordinates === 'object' ? `Lat: ${item.gps_coordinates.lat}, Lon: ${item.gps_coordinates.lon}` : item.gps_coordinates}</div>
-                      )}
-                      {item.land_size_sqm && (
-                        <div className="process-detail">Land Size: {item.land_size_sqm} m²</div>
-                      )}
-                      {item.property_value && (
-                        <div className="process-detail">Property Value: ${item.property_value.toLocaleString()}</div>
-                      )}
-                      {item.land_value && (
-                        <div className="process-detail">Land Value: ${item.land_value.toLocaleString()}</div>
-                      )}
-                      {item.zone && (
-                        <div className="process-detail">Zone: {item.zone}</div>
-                      )}
-                      {item.shape_file_data && (
-                        <div className="process-detail">Shape File Data: {item.shape_file_data}</div>
-                      )}
-                    </>
-                  ) : (
+            // Conditionally render RatesDetails or generic process details
+            selectedCategory === 'Rates' ? (
+              <RatesDetails properties={selectedCategoryItems} />
+            ) : (
+              <ul>
+                {selectedCategoryItems.map((item) => (
+                  <li key={item.id} className="process-item-full-detail">
+                    {/* Render details for generic processes */}
                     <>
                       <div className="process-title">{item.title}</div>
                       <div className="process-detail">Status: {item.status}</div>
@@ -230,10 +211,10 @@ function DashboardPage() {
                         </div>
                       )}
                     </>
-                  )}
-                </li>
-              ))}
-            </ul>
+                  </li>
+                ))}
+              </ul>
+            )
           ) : (
             <p>No entries found for {selectedCategory}.</p>
           )}
