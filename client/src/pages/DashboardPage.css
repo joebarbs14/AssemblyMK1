@@ -1,10 +1,11 @@
 .dashboard {
-  padding: 1rem;
+  padding: 1.5rem; /* Increased padding for more breathing room */
   text-align: center;
   font-family: 'Inter', sans-serif; /* Apple-like font */
   min-height: 100vh; /* Ensure dashboard takes full viewport height */
   display: flex;
   flex-direction: column; /* Stack main sections vertically */
+  background-color: #f8f9fa; /* Light background for the whole page */
 }
 
 .dashboard-top-row { /* Container for the entire top row: logo, welcome, tiles, logout */
@@ -12,35 +13,37 @@
   justify-content: space-between; /* Distributes items along the main axis */
   align-items: center; /* Vertically centers items in the flex container */
   flex-wrap: wrap; /* Allows wrapping on smaller screens if content exceeds width */
-  margin-bottom: 1rem;
-  padding: 0 1rem;
-  gap: 10px; /* Space between the three main sections (left, tiles, right) */
+  margin-bottom: 2rem; /* Increased margin for more separation */
+  padding: 0 1.5rem; /* Increased padding to match overall page padding */
+  gap: 15px; /* Increased space between the three main sections (left, tiles, right) */
   width: 100%; /* Ensure it takes full width */
 }
 
 .header-left { /* Container for logo and welcome */
   display: flex;
   align-items: center;
-  gap: 10px; /* Space between logo and welcome text */
+  gap: 15px; /* Increased space between logo and welcome text */
   flex-shrink: 0; /* Prevent this section from shrinking */
 }
 
 .dashboard-header h1, .welcome-heading { /* Combined for consistency */
-  font-size: clamp(1.2rem, 3vw, 1.8rem); /* Responsive font size for welcome */
+  font-size: clamp(1.5rem, 4vw, 2.2rem); /* More responsive and slightly larger font for welcome */
   margin: 0; /* Remove default margin */
   display: flex; /* Added for aligning logo with text */
   align-items: center; /* Center logo vertically with text */
   gap: 10px; /* Space between text and logo */
-  color: #333; /* Darker text for contrast */
+  color: #212529; /* Darker, more prominent text */
   white-space: nowrap; /* Prevent text from wrapping */
+  font-weight: 600; /* Slightly bolder for prominence */
 }
 
 .council-logo {
-  width: clamp(30px, 6vw, 50px); /* Auto-size: min 30px, max 50px, fluid 6vw */
-  height: clamp(30px, 6vw, 50px); /* Auto-size: min 30px, max 50px, fluid 6vw */
+  width: clamp(35px, 7vw, 60px); /* Slightly larger auto-size for main logo */
+  height: clamp(35px, 7vw, 60px); /* Slightly larger auto-size for main logo */
   border-radius: 50%; /* Make it round */
   object-fit: cover; /* Ensure image covers the area */
-  border: 1px solid #ddd; /* Optional: subtle border */
+  border: 2px solid #e9ecef; /* More prominent border */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* Subtle shadow */
   flex-shrink: 0; /* Prevent shrinking */
 }
 
@@ -48,16 +51,18 @@
   background-color: #dc3545;
   color: white;
   border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  font-size: 0.9rem;
+  padding: 0.6rem 1.2rem; /* Slightly larger padding */
+  border-radius: 8px; /* More rounded corners */
+  font-size: 1rem; /* Slightly larger font */
   cursor: pointer;
-  transition: background-color 0.2s ease-in-out;
+  transition: background-color 0.2s ease-in-out, transform 0.2s ease; /* Added transform for hover effect */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Subtle shadow */
   flex-shrink: 0; /* Prevent shrinking */
 }
 
 .logout-btn:hover {
   background-color: #c82333;
+  transform: translateY(-1px); /* Slight lift on hover */
 }
 
 .tiles-inline-container { /* Container for tiles to align them */
@@ -65,61 +70,65 @@
   display: flex;
   justify-content: center; /* Center the tiles horizontally within their container */
   min-width: 0; /* Allows flex item to shrink below content size */
-  /* Added specific styling for the tiles container to ensure horizontal flow */
   overflow-x: auto; /* Allow horizontal scrolling if tiles exceed screen width */
   -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
   padding-bottom: 5px; /* Space for scrollbar on some systems */
 }
 
 .tiles {
-  display: flex; /* Changed to flex to ensure horizontal alignment */
+  display: flex; /* Ensures horizontal alignment */
   flex-wrap: nowrap; /* Prevent tiles from wrapping to a new line */
-  gap: 0.4rem; /* Even smaller gap */
+  gap: 0.75rem; /* Increased gap between tiles */
   padding: 0 0.5rem; /* Reduced padding */
   align-items: center; /* Align items vertically in the flex container */
   justify-content: center; /* Center tiles horizontally if there's extra space */
 }
 
 .tile {
-  background: white;
-  padding: 0.4rem; /* Smaller padding */
-  border-radius: 8px; /* Slightly smaller border-radius for smaller tiles */
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); /* Slightly smaller shadow */
+  background: linear-gradient(145deg, #ffffff, #f0f0f0); /* Subtle gradient for depth */
+  padding: 0.6rem; /* Slightly larger padding */
+  border-radius: 12px; /* More rounded corners for a softer look */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* More pronounced shadow for elegance */
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  transition: all 0.3s ease-in-out; /* Smoother transition for all properties */
   display: flex;
   flex-direction: column; /* Stack emoji and text vertically */
   align-items: center;
   justify-content: center;
-  width: 70px; /* Fixed width for smaller tiles */
-  height: 70px; /* Fixed height for smaller tiles */
+  width: 80px; /* Slightly larger fixed width for better visual balance */
+  height: 80px; /* Slightly larger fixed height for better visual balance */
   flex-shrink: 0; /* Prevent tiles from shrinking */
+  border: 1px solid #e0e0e0; /* Subtle border */
 }
 
 .tile:hover {
-  background-color: #f0f0f0;
-  transform: translateY(-2px);
+  background-color: #e9ecef; /* Lighter hover background */
+  transform: translateY(-3px) scale(1.03); /* More pronounced lift and slight scale on hover */
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15); /* Enhanced shadow on hover */
 }
 
 .tile.selected-tile {
-  border: 2px solid #007bff;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border: 3px solid #007bff; /* Thicker, more prominent border for selected state */
+  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3); /* Blue glowing effect for selected */
+  background: linear-gradient(145deg, #e0f2ff, #cce7ff); /* Subtle blue gradient for selected */
 }
 
 .tile h3 {
   margin: 0; /* Remove default h3 margin */
-  font-size: 0.8em; /* Adjusted font size for category name */
+  font-size: 0.9em; /* Adjusted font size for category name */
   display: flex;
   flex-direction: column; /* Stack emoji and text vertically */
   align-items: center;
-  gap: 3px; /* Smaller space between emoji and text */
-  line-height: 1.1; /* Adjust line height for better spacing */
+  gap: 5px; /* Slightly larger space between emoji and text */
+  line-height: 1.2; /* Adjust line height for better spacing */
   white-space: nowrap; /* Prevent text from wrapping inside tile */
+  color: #495057; /* Slightly softer text color */
+  font-weight: 500; /* Medium font weight */
 }
 
 .tile h3 .emoji {
-  font-size: 1.4em; /* Slightly smaller emoji size */
-  margin-bottom: 3px; /* Space between emoji and text */
+  font-size: 1.6em; /* Slightly larger emoji size */
+  margin-bottom: 5px; /* Space between emoji and text */
 }
 
 .no-items {
@@ -132,7 +141,7 @@
 .selected-category-details-container {
   display: flex; /* Use flexbox for side-by-side layout */
   flex-direction: column; /* Default to column on small screens */
-  gap: 20px; /* Space between details and map */
+  gap: 25px; /* Increased space between details and map */
   margin-top: 30px;
   width: 90%;
   max-width: 1200px;
@@ -140,6 +149,10 @@
   margin-right: auto;
   text-align: left;
   flex-grow: 1; /* Allow this section to take remaining vertical space */
+  background-color: #ffffff; /* White background for the container */
+  border-radius: 15px; /* More rounded corners */
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08); /* More subtle, elegant shadow */
+  padding: 25px; /* Increased padding */
 }
 
 /* Styles for larger screens to enable side-by-side */
@@ -151,18 +164,21 @@
 }
 
 .selected-category-details {
-  background-color: #fff;
-  border-radius: 10px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  background-color: #fff; /* Explicitly white */
+  border-radius: 12px; /* Consistent rounded corners */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* Lighter shadow */
   padding: 20px;
   flex: 1; /* Allow details to take up available space */
   min-width: 300px; /* Ensure it doesn't get too small */
+  border: 1px solid #f0f0f0; /* Very light border */
 }
 
 .selected-category-details h2 {
   color: #333;
   margin-bottom: 20px;
   text-align: center;
+  font-size: 1.6rem; /* Slightly larger heading */
+  font-weight: 600;
 }
 
 .selected-category-details ul {
@@ -172,25 +188,31 @@
 }
 
 .process-item-full-detail {
-  background-color: #f9f9f9;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 15px;
+  background-color: #ffffff; /* White background for individual items */
+  border: 1px solid #e9ecef; /* Lighter border */
+  border-radius: 10px; /* More rounded corners */
+  padding: 18px; /* Slightly more padding */
   margin-bottom: 15px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05); /* Lighter shadow */
+  transition: all 0.2s ease-in-out; /* Smooth transition */
+}
+
+.process-item-full-detail:hover {
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1); /* More pronounced shadow on hover */
+  transform: translateY(-2px); /* Slight lift on hover */
 }
 
 .process-item-full-detail .process-title {
-  font-size: 1.1em;
+  font-size: 1.15em; /* Slightly larger title */
   font-weight: bold;
   color: #007bff;
-  margin-bottom: 5px;
+  margin-bottom: 8px; /* More space */
 }
 
 .process-item-full-detail .process-detail {
-  font-size: 0.9em;
+  font-size: 0.95em; /* Slightly larger detail font */
   color: #555;
-  margin-bottom: 3px;
+  margin-bottom: 4px; /* More space */
 }
 
 /* Styles for property details within RatesDetails.js */
@@ -206,23 +228,24 @@
 }
 
 .council-logo-small {
-  width: 30px; /* Smaller logo for individual property details */
-  height: 30px;
+  width: 35px; /* Slightly larger for better visibility */
+  height: 35px;
   border-radius: 50%;
   object-fit: cover;
-  border: 1px solid #eee;
+  border: 1px solid #e0e0e0; /* Lighter border */
   margin-left: 10px;
   flex-shrink: 0;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1); /* Subtle shadow */
 }
 
 /* Map container styles */
 .map-container {
   flex: 1; /* Allow map to take up available space */
   background-color: #e0e0e0; /* Placeholder background */
-  border-radius: 10px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  border-radius: 12px; /* More rounded corners */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); /* Subtle shadow */
   overflow: hidden; /* Hide anything outside the map boundaries */
-  min-height: 300px; /* Minimum height for the map */
+  min-height: 350px; /* Slightly increased minimum height for better map view */
 }
 
 /* Ensure map canvas fills its container */
