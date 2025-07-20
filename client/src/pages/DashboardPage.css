@@ -70,9 +70,6 @@
   display: flex;
   justify-content: center; /* Center the tiles horizontally within their container */
   min-width: 0; /* Allows flex item to shrink below content size */
-  /* REMOVED: overflow-x: auto; */ /* Removed horizontal scrolling */
-  /* REMOVED: -webkit-overflow-scrolling: touch; */
-  /* REMOVED: padding-bottom: 5px; */
 }
 
 .tiles {
@@ -182,17 +179,17 @@
 }
 
 .selected-category-details ul {
-  list-style: none; /* REMOVED BULLET POINTS */
+  list-style: none;
   padding: 0;
   margin: 0;
 }
 
-/* New style for each property item card */
+/* Styles for individual property item cards (used by RatesDetails and WaterDetails) */
 .property-item-card {
   background-color: #ffffff;
   border: 1px solid #e9ecef;
   border-radius: 10px;
-  padding: 15px; /* Adjusted padding for better fit with mini-map */
+  padding: 15px;
   margin-bottom: 15px;
   box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
   transition: all 0.2s ease-in-out;
@@ -211,20 +208,20 @@
   text-align: left; /* Ensure text aligns left within its container */
 }
 
-.property-title { /* Renamed from .process-title */
+.property-title {
   font-size: 1.15em;
   font-weight: bold;
   color: #007bff;
   margin-bottom: 8px;
 }
 
-.property-info { /* Renamed from .process-detail */
+.property-info {
   font-size: 0.95em;
   color: #555;
   margin-bottom: 4px;
 }
 
-/* Styles for property header within RatesDetails.js */
+/* Styles for property header within property item cards */
 .property-header {
   display: flex;
   justify-content: space-between;
@@ -248,7 +245,7 @@
   box-shadow: 0 1px 4px rgba(0,0,0,0.1); /* Subtle shadow */
 }
 
-/* Mini-map container styles for each property item */
+/* Mini-map container styles for each property item (used by RatesDetails) */
 .mini-map-container {
   width: 150px; /* Fixed width for the mini-map */
   height: 100px; /* Fixed height for the mini-map */
@@ -260,7 +257,7 @@
 }
 
 /* Ensure Leaflet map fills its container */
-.mini-map-container #map { /* Target the map div inside mini-map-container */
+.mini-map-container .leaflet-container { /* Target Leaflet's main container */
   width: 100%;
   height: 100%;
 }
@@ -270,12 +267,287 @@
   display: none;
 }
 
-/* REMOVED the old main map container styles as it's no longer used */
-/*
-.map-container {
-  display: none;
+/* --- STYLES FOR WATER DETAILS COMPONENT (Existing) --- */
+.water-details-content {
+  /* Inherits general styling from selected-category-details-container */
 }
-#map {
-  display: none;
+
+.water-section-title {
+  font-size: 1.2em;
+  font-weight: bold;
+  color: #0056b3; /* A shade of blue for water section */
+  margin-top: 15px;
+  margin-bottom: 10px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #eee; /* Subtle separator */
 }
-*/
+
+.water-consumption-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.water-quarter-card {
+  background-color: #fefefe; /* Very light background for quarters */
+  border: 1px solid #e0f2f7; /* Light blue border */
+  border-radius: 8px;
+  padding: 12px 15px;
+  margin-bottom: 10px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  transition: all 0.2s ease-in-out;
+}
+
+.water-quarter-card:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transform: translateY(-1px);
+}
+
+.quarter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #333;
+}
+
+.quarter-title {
+  font-size: 1em;
+}
+
+.bill-due-date {
+  font-size: 0.85em;
+  color: #666;
+  background-color: #ffe0b2; /* Light orange background */
+  padding: 3px 8px;
+  border-radius: 5px;
+}
+
+.consumption-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Responsive grid for details */
+  gap: 8px 15px; /* Row and column gap */
+  margin-bottom: 10px;
+}
+
+.consumption-item {
+  font-size: 0.9em;
+  color: #555;
+}
+
+.consumption-item .value {
+  font-weight: bold;
+  color: #212529;
+}
+
+.consumption-item.over-allocation .value {
+  color: #dc3545; /* Red for over allocation */
+}
+
+.progress-bar-container {
+  width: 100%;
+  background-color: #e9ecef;
+  border-radius: 5px;
+  height: 15px;
+  overflow: hidden;
+  position: relative;
+  margin-top: 5px;
+}
+
+.progress-bar {
+  height: 100%;
+  border-radius: 5px;
+  text-align: right;
+  color: white;
+  font-size: 0.75em;
+  line-height: 15px;
+  transition: width 0.5s ease-in-out, background-color 0.3s ease-in-out;
+}
+
+.progress-text {
+  position: absolute;
+  right: 5px;
+  top: 0;
+  color: #333; /* Dark text for contrast on lighter bar */
+  font-size: 0.75em;
+  line-height: 15px;
+  text-shadow: 0 0 2px rgba(255,255,255,0.5); /* Subtle shadow for readability */
+}
+
+/* --- NEW STYLES FOR ANIMAL DETAILS COMPONENT --- */
+.animal-details-content {
+  /* Inherits general styling from selected-category-details-container */
+}
+
+.animal-section-title {
+  font-size: 1.2em;
+  font-weight: bold;
+  color: #28a745; /* Green shade for animal section */
+  margin-top: 15px;
+  margin-bottom: 15px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #eee;
+}
+
+.animal-action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px; /* Space between action tiles */
+  margin-bottom: 25px;
+}
+
+.animal-action-tile {
+  background: linear-gradient(145deg, #e6f7ff, #cceeff); /* Light blue gradient */
+  padding: 12px 15px;
+  border-radius: 10px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95em;
+  font-weight: 500;
+  color: #0056b3; /* Darker blue text */
+  border: 1px solid #b3e0ff;
+  flex-basis: calc(50% - 10px); /* Two columns on larger screens */
+  max-width: 250px; /* Max width for individual tile */
+  text-align: left;
+}
+
+@media (min-width: 600px) {
+  .animal-action-tile {
+    flex-basis: calc(25% - 10px); /* Four columns on larger screens */
+  }
+}
+
+.animal-action-tile:hover {
+  background-color: #b3e0ff;
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.12);
+}
+
+.animal-action-tile.selected-action-tile {
+  border: 2px solid #007bff;
+  box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
+  background: linear-gradient(145deg, #a0d9ff, #80c8ff);
+  color: #003366;
+}
+
+.animal-action-tile .emoji {
+  font-size: 1.2em;
+}
+
+.adoptable-animals-listing {
+  margin-top: 20px;
+}
+
+.listing-title {
+  font-size: 1.3em;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.animal-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Responsive grid for animal cards */
+  gap: 25px;
+  justify-content: center; /* Center cards in the grid */
+}
+
+.animal-card {
+  background-color: #ffffff;
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  overflow: hidden; /* Ensures rounded corners apply to images */
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  text-align: left;
+}
+
+.animal-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.animal-main-photo-container {
+  width: 100%;
+  height: 180px; /* Fixed height for main photo container */
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f0f0f0; /* Placeholder background */
+}
+
+.animal-main-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensures image covers the area, cropping if necessary */
+  display: block;
+}
+
+.animal-gallery {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  padding: 10px;
+  background-color: #f8f9fa; /* Light background for gallery */
+  border-bottom: 1px solid #eee;
+}
+
+.animal-gallery-thumbnail {
+  width: 60px;
+  height: 45px;
+  object-fit: cover;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.animal-gallery-thumbnail:hover {
+  transform: scale(1.05);
+}
+
+.animal-details-text {
+  padding: 15px;
+}
+
+.animal-name {
+  font-size: 1.4em;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.animal-info {
+  font-size: 0.95em;
+  color: #555;
+  margin-bottom: 4px;
+}
+
+.animal-temperament {
+  font-size: 0.9em;
+  color: #666;
+  line-height: 1.4;
+  margin-top: 10px;
+  font-style: italic;
+}
+
+.action-info {
+  background-color: #f0f8ff; /* Light blue background for info sections */
+  border: 1px solid #b0e0e6;
+  border-radius: 10px;
+  padding: 20px;
+  margin-top: 20px;
+  color: #333;
+  font-size: 1em;
+  line-height: 1.5;
+  text-align: center;
+}
