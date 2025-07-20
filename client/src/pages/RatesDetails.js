@@ -17,7 +17,7 @@ function PropertyItem({ item }) {
   const miniMapInstance = useRef(null);
 
   useEffect(() => {
-    if (!miniMapRef.current) return;
+    if (!miniMapRef.current) return; // Ensure the map container div exists
 
     // Initialize the mini-map only once for this property item
     if (!miniMapInstance.current) {
@@ -51,7 +51,7 @@ function PropertyItem({ item }) {
     const bounds = [];
 
     // Add marker for GPS coordinates
-    if (item.gps_coordinates && typeof item.gps_coordinates === 'object' && item.gps_coordinates.lat && item.gps_coordinates.lon) {
+    if (item.gps_coordinates && typeof item.gps_coordinates === 'object' && item.gps_coordinates.lat != null && item.gps_coordinates.lon != null) {
       const latLng = [item.gps_coordinates.lat, item.gps_coordinates.lon];
       L.marker(latLng).addTo(map);
       bounds.push(latLng);
@@ -82,7 +82,7 @@ function PropertyItem({ item }) {
     // Fit map to bounds of this single property, if any
     if (bounds.length > 0) {
       map.fitBounds(L.latLngBounds(bounds), { padding: [10, 10], maxZoom: 16 }); // Tighter padding, maxZoom to prevent over-zooming
-    } else if (item.gps_coordinates && item.gps_coordinates.lat && item.gps_coordinates.lon) {
+    } else if (item.gps_coordinates && item.gps_coordinates.lat != null && item.gps_coordinates.lon != null) {
       // If no shape data but has GPS, set view to the marker
       map.setView([item.gps_coordinates.lat, item.gps_coordinates.lon], 15); // Default zoom for single marker
     } else {
@@ -120,8 +120,13 @@ function PropertyItem({ item }) {
         {item.property_type && (
           <div className="property-info">Type: {item.property_type.charAt(0).toUpperCase() + item.property_type.slice(1)}</div>
         )}
-        {item.gps_coordinates && (
-          <div className="property-info">GPS: {typeof item.gps_coordinates === 'object' ? `Lat: ${item.gps_coordinates.lat.toFixed(4)}, Lon: ${item.gps_coordinates.lon.toFixed(4)}` : JSON.stringify(item.gps_coordinates)}</div>
+        {/* Refined GPS coordinates display for syntax error fix */}
+        {item.gps_coordinates && typeof item.gps_coordinates === 'object' && item.gps_coordinates.lat != null && item.gps_coordinates.lon != null ? (
+          <div className="property-info">GPS: Lat: {item.gps_coordinates.lat.toFixed(4)}, Lon: {item.gps_coordinates.lon.toFixed(4)}</div>
+        ) : (
+          item.gps_coordinates ? (
+            <div className="property-info">GPS: {JSON.stringify(item.gps_coordinates)}</div>
+          ) : null // Or an empty string if nothing to display
         )}
         {item.land_size_sqm && (
           <div className="property-info">Land Size: {item.land_size_sqm} m²</div>
@@ -135,7 +140,7 @@ function PropertyItem({ item }) {
         {item.zone && (
           <div className="property-info">Zone: {item.zone}</div>
         )}
-        {/* Shape file data text display is now hidden via CSS, but still used for map */}
+        {/* Shape file data text display is now hidden via CSS, but still drawn on map */}
       </div>
       <div className="mini-map-container" ref={miniMapRef}>
         {/* Mini-map will be rendered here */}
