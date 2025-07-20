@@ -15,7 +15,7 @@
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.21.2",
     "react-scripts": "5.0.1",
-    "leaflet": "^1.9.4"  // <--- ADDED THIS LINE
+    "leaflet": "^1.9.4"
   },
   "eslintConfig": {
     "extends": ["react-app", "react-app/jest"]
