@@ -1,18 +1,19 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.dialects.postgresql import JSONB
-import datetime
+from sqlalchemy.dialects.postgresql import JSONB # For JSONB type
+import datetime # For datetime.datetime.utcnow()
 
 db = SQLAlchemy()
 
 class Resident(db.Model):
     __tablename__ = 'resident'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100))
-    email = db.Column(db.String(100), unique=True, nullable=False)
-    password_hash = db.Column(db.String(255), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    name = db.Column(db.String(100)) # Added length for String
+    email = db.Column(db.String(100), unique=True, nullable=False) # Added length and nullable
+    password_hash = db.Column(db.String(255), nullable=False) # Added length and nullable
+    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow) # Added default
+    # Relationships to other models
     processes = db.relationship('Process', backref='resident', lazy=True)
-    properties = db.relationship('Property', backref='owner', lazy=True)
+    properties = db.relationship('Property', backref='owner', lazy=True) # Relationship to Property
 
     def __repr__(self):
         return f'<Resident {self.email}>'
@@ -20,11 +21,11 @@ class Resident(db.Model):
 class Policy(db.Model):
     __tablename__ = 'policies'
     id = db.Column(db.Integer, primary_key=True)
-    category = db.Column(db.String(100), nullable=False)
-    title = db.Column(db.String(200), nullable=False)
-    document_url = db.Column(db.String(500))
-    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    updated_at = db.Column(db.DateTime, onupdate=datetime.datetime.utcnow)
+    category = db.Column(db.String(100), nullable=False) # Added length and nullable
+    title = db.Column(db.String(200), nullable=False) # Added length and nullable
+    document_url = db.Column(db.String(500)) # Added length
+    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow) # Ensure created_at is here if needed
+    updated_at = db.Column(db.DateTime, onupdate=datetime.datetime.utcnow) # Ensure updated_at is here if needed
 
     def __repr__(self):
         return f'<Policy {self.title}>'
@@ -33,48 +34,67 @@ class Process(db.Model):
     __tablename__ = 'processes'
     id = db.Column(db.Integer, primary_key=True)
     resident_id = db.Column(db.Integer, db.ForeignKey('resident.id'), nullable=False)
-    category = db.Column(db.String(100), nullable=False)
-    title = db.Column(db.String(200), nullable=False)
-    form_data = db.Column(JSONB)
-    status = db.Column(db.String(50), default='pending', nullable=False)
-    submitted_at = db.Column(db.DateTime, default=datetime.datetime.utcnow, nullable=False)
-    updated_at = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow, nullable=False)
+    category = db.Column(db.String(100), nullable=False) # Added length and nullable
+    title = db.Column(db.String(200), nullable=False) # Added length and nullable
+    form_data = db.Column(JSONB) # Changed from db.JSON to JSONB
+    status = db.Column(db.String(50), default='pending', nullable=False) # Added length, default, and nullable
+    submitted_at = db.Column(db.DateTime, default=datetime.datetime.utcnow, nullable=False) # Added default and nullable
+    updated_at = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow, nullable=False) # Added default, onupdate, and nullable
 
     def __repr__(self):
         return f'<Process {self.title}>'
 
+class Council(db.Model):
+    __tablename__ = 'council'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(200), unique=True, nullable=False) # e.g., "City of Sydney"
+    shire_name = db.Column(db.String(200), nullable=True) # e.g., "Sydney" (if different from name)
+    logo_url = db.Column(db.String(500), nullable=True)
+    population = db.Column(db.Integer, nullable=True)
+    lga_shape_file = db.Column(db.Text, nullable=True) # Could be JSONB for complex GeoJSON
+    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    updated_at = db.Column(db.DateTime, onupdate=datetime.datetime.utcnow)
+    # Relationship to properties
+    properties = db.relationship('Property', backref='council_obj', lazy=True)
+
+    def __repr__(self):
+        return f'<Council {self.name}>'
+
+# Property Model (Updated to include relationship to WaterConsumption)
 class Property(db.Model):
-    __tablename__ = 'property'
+    __tablename__ = 'property' # Explicitly define table name
     id = db.Column(db.Integer, primary_key=True)
     resident_id = db.Column(db.Integer, db.ForeignKey('resident.id'), nullable=False)
-    council_id = db.Column(db.Integer, db.ForeignKey('council.id'), nullable=False)
+    council_id = db.Column(db.Integer, db.ForeignKey('council.id'), nullable=False) # Foreign key to Council
     address = db.Column(db.String(255), nullable=False)
-    # New column for property type
-    property_type = db.Column(db.String(50), nullable=False, default='investment') # 'primary' or 'investment'
-    gps_coordinates = db.Column(JSONB, nullable=True)
-    shape_file_data = db.Column(db.Text, nullable=True) # GeoJSON as text
+    gps_coordinates = db.Column(JSONB, nullable=True) # Storing as JSONB for flexibility
+    shape_file_data = db.Column(db.Text, nullable=True) # Storing as Text, could be JSON for complex shapes
     land_size_sqm = db.Column(db.Float, nullable=True)
     property_value = db.Column(db.Float, nullable=True)
     land_value = db.Column(db.Float, nullable=True)
     zone = db.Column(db.String(100), nullable=True)
+    property_type = db.Column(db.String(50), nullable=True) # Added property_type
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     updated_at = db.Column(db.DateTime, onupdate=datetime.datetime.utcnow)
-
-    council_obj = db.relationship('Council', backref='properties', lazy=True)
+    
+    # New relationship to WaterConsumption
+    water_consumptions = db.relationship('WaterConsumption', backref='property', lazy=True)
 
     def __repr__(self):
         return f'<Property {self.address}>'
 
-class Council(db.Model):
-    __tablename__ = 'council'
+# New WaterConsumption Model
+class WaterConsumption(db.Model):
+    __tablename__ = 'water_consumption'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(200), unique=True, nullable=False)
-    shire_name = db.Column(db.String(200), nullable=True)
-    logo_url = db.Column(db.String(500), nullable=True)
-    population = db.Column(db.Integer, nullable=True)
-    lga_shape_file = db.Column(db.Text, nullable=True)
+    property_id = db.Column(db.Integer, db.ForeignKey('property.id'), nullable=False)
+    quarter_start_date = db.Column(db.Date, nullable=False) # Start of the calendar quarter
+    consumed_litres = db.Column(db.Float, nullable=False)
+    allocated_litres = db.Column(db.Float, nullable=False)
+    amount_owing = db.Column(db.Float, nullable=True)
+    bill_due_date = db.Column(db.Date, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     updated_at = db.Column(db.DateTime, onupdate=datetime.datetime.utcnow)
 
     def __repr__(self):
-        return f'<Council {self.name}>'
+        return f'<WaterConsumption Property:{self.property_id} Quarter:{self.quarter_start_date.year}-Q{((self.quarter_start_date.month-1)//3)+1}>'
