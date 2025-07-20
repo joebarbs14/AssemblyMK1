@@ -2,27 +2,31 @@
   padding: 1rem;
   text-align: center;
   font-family: 'Inter', sans-serif; /* Apple-like font */
+  min-height: 100vh; /* Ensure dashboard takes full viewport height */
+  display: flex;
+  flex-direction: column; /* Stack main sections vertically */
 }
 
-.dashboard-top-row { /* New container for the entire top row */
+.dashboard-top-row { /* Container for the entire top row: logo, welcome, tiles, logout */
   display: flex;
   justify-content: space-between; /* Distributes items along the main axis */
-  align-items: center;
-  flex-wrap: wrap; /* Allows wrapping on smaller screens */
+  align-items: center; /* Vertically centers items in the flex container */
+  flex-wrap: wrap; /* Allows wrapping on smaller screens if content exceeds width */
   margin-bottom: 1rem;
   padding: 0 1rem;
   gap: 10px; /* Space between the three main sections (left, tiles, right) */
+  width: 100%; /* Ensure it takes full width */
 }
 
 .header-left { /* Container for logo and welcome */
   display: flex;
   align-items: center;
   gap: 10px; /* Space between logo and welcome text */
-  /* flex-shrink: 0; */ /* Prevent shrinking */
+  flex-shrink: 0; /* Prevent this section from shrinking */
 }
 
 .dashboard-header h1, .welcome-heading { /* Combined for consistency */
-  font-size: 1.8rem;
+  font-size: clamp(1.2rem, 3vw, 1.8rem); /* Responsive font size for welcome */
   margin: 0; /* Remove default margin */
   display: flex; /* Added for aligning logo with text */
   align-items: center; /* Center logo vertically with text */
@@ -32,8 +36,8 @@
 }
 
 .council-logo {
-  width: clamp(30px, 8vw, 50px); /* Auto-size: min 30px, max 50px, fluid 8vw */
-  height: clamp(30px, 8vw, 50px); /* Auto-size: min 30px, max 50px, fluid 8vw */
+  width: clamp(30px, 6vw, 50px); /* Auto-size: min 30px, max 50px, fluid 6vw */
+  height: clamp(30px, 6vw, 50px); /* Auto-size: min 30px, max 50px, fluid 6vw */
   border-radius: 50%; /* Make it round */
   object-fit: cover; /* Ensure image covers the area */
   border: 1px solid #ddd; /* Optional: subtle border */
@@ -61,17 +65,19 @@
   display: flex;
   justify-content: center; /* Center the tiles horizontally within their container */
   min-width: 0; /* Allows flex item to shrink below content size */
+  /* Added specific styling for the tiles container to ensure horizontal flow */
+  overflow-x: auto; /* Allow horizontal scrolling if tiles exceed screen width */
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  padding-bottom: 5px; /* Space for scrollbar on some systems */
 }
 
 .tiles {
-  display: grid;
-  /* Adjusted grid template for smaller tiles */
-  grid-template-columns: repeat(auto-fit, minmax(60px, 1fr)); /* Even smaller minwidth for more tiles in line */
+  display: flex; /* Changed to flex to ensure horizontal alignment */
+  flex-wrap: nowrap; /* Prevent tiles from wrapping to a new line */
   gap: 0.4rem; /* Even smaller gap */
-  /* max-width: 100%; */ /* Allow it to fill its flex-grow container */
   padding: 0 0.5rem; /* Reduced padding */
-  align-items: center; /* Align items in the grid */
-  justify-content: center; /* Center items in the grid */
+  align-items: center; /* Align items vertically in the flex container */
+  justify-content: center; /* Center tiles horizontally if there's extra space */
 }
 
 .tile {
@@ -85,9 +91,9 @@
   flex-direction: column; /* Stack emoji and text vertically */
   align-items: center;
   justify-content: center;
-  min-height: 60px; /* Adjusted minimum height for smaller tiles */
-  text-align: center;
-  flex-shrink: 0; /* Prevent tiles from shrinking too much */
+  width: 70px; /* Fixed width for smaller tiles */
+  height: 70px; /* Fixed height for smaller tiles */
+  flex-shrink: 0; /* Prevent tiles from shrinking */
 }
 
 .tile:hover {
@@ -133,6 +139,7 @@
   margin-left: auto;
   margin-right: auto;
   text-align: left;
+  flex-grow: 1; /* Allow this section to take remaining vertical space */
 }
 
 /* Styles for larger screens to enable side-by-side */
@@ -219,7 +226,7 @@
 }
 
 /* Ensure map canvas fills its container */
-#map {
+#map { /* Leaflet creates a div with id="map" by default */
   width: 100%;
   height: 100%;
 }
