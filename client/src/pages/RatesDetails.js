@@ -102,6 +102,14 @@ function PropertyItem({ item }) {
     };
   }, [item]); // Rerun effect when the specific item data changes
 
+  // Helper for GPS display string
+  const getGpsDisplay = (gps) => {
+    if (gps && typeof gps === 'object' && gps.lat != null && gps.lon != null) {
+      return `Lat: ${gps.lat.toFixed(4)}, Lon: ${gps.lon.toFixed(4)}`;
+    }
+    return gps ? JSON.stringify(gps) : 'N/A'; // Fallback for non-object or missing data
+  };
+
   return (
     <li key={item.id} className="property-item-card"> {/* Changed class name for better semantic */}
       <div className="property-details-content"> {/* Container for text details */}
@@ -123,10 +131,7 @@ function PropertyItem({ item }) {
         {/* Refined GPS coordinates display for syntax error fix */}
         {item.gps_coordinates && (
           <div className="property-info">
-            GPS:
-            {typeof item.gps_coordinates === 'object' && item.gps_coordinates.lat != null && item.gps_coordinates.lon != null
-              ? ` Lat: ${item.gps_coordinates.lat.toFixed(4)}, Lon: ${item.gps_coordinates.lon.toFixed(4)}`
-              : ` ${JSON.stringify(item.gps_coordinates)}`}
+            GPS: {getGpsDisplay(item.gps_coordinates)}
           </div>
         )}
         {item.land_size_sqm && (
