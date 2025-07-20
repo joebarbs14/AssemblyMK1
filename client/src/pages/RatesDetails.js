@@ -1,7 +1,6 @@
 // src/pages/RatesDetails.js (or src/components/RatesDetails.js)
 import React, { useEffect, useRef } from 'react';
 import L from 'leaflet'; // Import Leaflet library
-import 'leaflet/dist/leaflet.css'; // Import Leaflet CSS
 import './DashboardPage.css'; // Assuming DashboardPage.css has the necessary styles
 
 // Fix for default Leaflet icon paths (important for Webpack/CRA builds)
