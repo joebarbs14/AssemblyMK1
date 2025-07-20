@@ -1,19 +1,45 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './DashboardPage.css';
-import RatesDetails from './RatesDetails'; // Import the new RatesDetails component
+import RatesDetails from './RatesDetails'; // Import the RatesDetails component
 
 const categories = [
   "Rates", "Water", "Development", "Community",
   "Roads", "Waste", "Animals", "Public Health", "Environment"
 ];
 
+// Helper function to get emoji for each category
+const getCategoryEmoji = (category) => {
+  switch (category) {
+    case "Rates": return "💰";
+    case "Water": return "💧";
+    case "Development": return "🏗️";
+    case "Community": return "🤝";
+    case "Roads": return "🛣️";
+    case "Waste": return "🗑️";
+    case "Animals": return "🐾";
+    case "Public Health": return "🏥";
+    case "Environment": return "🌳";
+    default: return "✨";
+  }
+};
+
+// Mock council logos (replace with actual URLs or integrate with backend)
+const councilLogos = {
+  "Anytown City Council": "https://placehold.co/50x50/ADD8E6/000000?text=AC", // Light blue background, black text
+  "Greenfield Shire": "https://placehold.co/50x50/90EE90/000000?text=GS", // Light green background, black text
+  "Riverside Council": "https://placehold.co/50x50/FFD700/000000?text=RC", // Gold background, black text
+  // Add more councils as needed
+};
+
+
 function DashboardPage() {
-  const [processes, setProcesses] = useState({}); // This state will now hold both processes and properties
+  const [processes, setProcesses] = useState({});
   const [userName, setUserName] = useState('Resident');
+  const [userCouncil, setUserCouncil] = useState(null); // New state for user's council
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState(null); // New state for selected category
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const navigate = useNavigate();
 
   const fetchUserProfileAndDashboardData = useCallback(async (token) => {
@@ -21,13 +47,12 @@ function DashboardPage() {
     setError(null);
 
     try {
-      // 1. Fetch user profile (name) using the token
+      // 1. Fetch user profile (name and council) using the token
       const userProfileRes = await fetch('https://assemblymk1-backend.onrender.com/user/profile', {
         method: 'GET',
         headers: { 'Authorization': 'Bearer ' + token }
       });
 
-      // Read user profile data once
       const userProfileContentType = userProfileRes.headers.get('content-type');
       let userProfileData = {};
 
@@ -41,6 +66,7 @@ function DashboardPage() {
           alert('Your session has expired or is invalid. Please log in again.');
           localStorage.removeItem('token');
           localStorage.removeItem('userName');
+          localStorage.removeItem('userCouncil'); // Clear council on logout
           navigate('/#/');
           return;
         }
@@ -56,6 +82,17 @@ function DashboardPage() {
         setUserName('Resident');
       }
 
+      // Assuming your /user/profile endpoint might return a 'council' field
+      if (userProfileData.council) {
+        setUserCouncil(userProfileData.council);
+        localStorage.setItem('userCouncil', userProfileData.council);
+        console.log('DashboardPage: User council fetched and set:', userProfileData.council);
+      } else {
+        console.warn('DashboardPage: User profile fetched, but "council" field is missing. Defaulting to null.');
+        setUserCouncil(null); // Default if council is missing
+      }
+
+
       // 2. Now fetch dashboard data (which includes properties for 'Rates')
       const dashboardRes = await fetch('https://assemblymk1-backend.onrender.com/dashboard/', {
         method: 'GET',
@@ -65,7 +102,6 @@ function DashboardPage() {
         }
       });
 
-      // Read dashboard response body ONLY ONCE
       const dashboardContentType = dashboardRes.headers.get('content-type');
       let dashboardResultData = {};
 
@@ -79,6 +115,7 @@ function DashboardPage() {
           alert('Your session has expired or is invalid. Please log in again.');
           localStorage.removeItem('token');
           localStorage.removeItem('userName');
+          localStorage.removeItem('userCouncil'); // Clear council on logout
           navigate('/#/');
           return;
         }
@@ -99,8 +136,13 @@ function DashboardPage() {
   useEffect(() => {
     const token = localStorage.getItem('token');
     const storedUserName = localStorage.getItem('userName');
+    const storedUserCouncil = localStorage.getItem('userCouncil'); // Get stored council
+
     if (storedUserName) {
       setUserName(storedUserName);
+    }
+    if (storedUserCouncil) { // Set council if found
+      setUserCouncil(storedUserCouncil);
     }
 
     console.log('DashboardPage: Token retrieved from localStorage for useEffect:', token);
@@ -115,12 +157,10 @@ function DashboardPage() {
 
   }, [navigate, fetchUserProfileAndDashboardData]);
 
-  // Handler for tile click
   const handleTileClick = (category) => {
     setSelectedCategory(category);
   };
 
-  // Get items for the selected category
   const selectedCategoryItems = selectedCategory ? (processes[selectedCategory] || []) : [];
 
   if (loading) {
@@ -140,7 +180,7 @@ function DashboardPage() {
         <button onClick={() => window.location.reload()}>Retry</button>
         <p>
           If the problem persists, please{' '}
-          <span className="link" onClick={() => { localStorage.removeItem('token'); localStorage.removeItem('userName'); navigate('/#/'); }}>
+          <span className="link" onClick={() => { localStorage.removeItem('token'); localStorage.removeItem('userName'); localStorage.removeItem('userCouncil'); navigate('/#/'); }}>
             log in again
           </span>.
         </p>
@@ -151,51 +191,57 @@ function DashboardPage() {
   return (
     <div className="dashboard">
       <div className="dashboard-header">
-        <h1>Welcome, {userName}</h1>
+        {/* Moved logout button here */}
         <button className="logout-btn" onClick={() => {
           localStorage.removeItem('token');
           localStorage.removeItem('userName');
+          localStorage.removeItem('userCouncil'); // Clear council on logout
           navigate('/#/');
         }}>Logout</button>
+        
+        {/* Welcome and Name */}
+        <h1 className="welcome-heading">
+          Welcome, {userName}
+          {userCouncil && councilLogos[userCouncil] && (
+            <img src={councilLogos[userCouncil]} alt={`${userCouncil} Logo`} className="council-logo" />
+          )}
+        </h1>
       </div>
 
+      {/* Tiles moved between header and details */}
       <div className="tiles">
         {categories.map(category => (
           <div
             key={category}
             className={`tile ${selectedCategory === category ? 'selected-tile' : ''}`}
-            onClick={() => handleTileClick(category)} // Add onClick handler
+            onClick={() => handleTileClick(category)}
           >
-            <h3>{category}</h3>
-            <ul>
-              {/* Display a summary or first item in the tile */}
-              {(processes[category] && processes[category].length > 0) ? (
-                <li className="process-item-summary">
-                  {/* Display title for processes, or address for properties */}
-                  {processes[category][0].type === 'property' ? processes[category][0].address : processes[category][0].title}
-                  {processes[category].length > 1 && ` (+${processes[category].length - 1} more)`}
-                </li>
-              ) : (
-                <li className="no-items">No entries yet</li>
-              )}
-            </ul>
+            <h3>
+              {getCategoryEmoji(category)} {category} {/* Added emoji */}
+            </h3>
+            {/* Removed summary description from each tile */}
+            {/* {(processes[category] && processes[category].length > 0) ? (
+              <li className="process-item-summary">
+                {processes[category][0].type === 'property' ? processes[category][0].address : processes[category][0].title}
+                {processes[category].length > 1 && ` (+${processes[category].length - 1} more)`}
+              </li>
+            ) : (
+              <li className="no-items">No entries yet</li>
+            )} */}
           </div>
         ))}
       </div>
 
-      {/* New section to display detailed information below the tiles */}
       {selectedCategory && (
         <div className="selected-category-details">
           <h2>Details for {selectedCategory}</h2>
           {selectedCategoryItems.length > 0 ? (
-            // Conditionally render RatesDetails or generic process details
             selectedCategory === 'Rates' ? (
               <RatesDetails properties={selectedCategoryItems} />
             ) : (
               <ul>
                 {selectedCategoryItems.map((item) => (
                   <li key={item.id} className="process-item-full-detail">
-                    {/* Render details for generic processes */}
                     <>
                       <div className="process-title">{item.title}</div>
                       <div className="process-detail">Status: {item.status}</div>
