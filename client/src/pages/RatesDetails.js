@@ -102,16 +102,16 @@ function PropertyItem({ item }) {
     };
   }, [item]); // Rerun effect when the specific item data changes
 
-  // Helper for GPS display string
-  const getGpsDisplay = (gps) => {
-    if (gps && typeof gps === 'object' && gps.lat != null && gps.lon != null) {
-      return `Lat: ${gps.lat.toFixed(4)}, Lon: ${gps.lon.toFixed(4)}`;
+  // Pre-compute the GPS display string
+  let gpsContentToDisplay = '';
+  if (item.gps_coordinates && typeof item.gps_coordinates === 'object') {
+    if (typeof item.gps_coordinates.lat === 'number' && typeof item.gps_coordinates.lon === 'number') {
+      gpsContentToDisplay = `Lat: ${item.gps_coordinates.lat.toFixed(4)}, Lon: ${item.gps_coordinates.lon.toFixed(4)}`;
+    } else {
+      // Fallback for non-numeric lat/lon but still an object (e.g., empty object)
+      gpsContentToDisplay = JSON.stringify(item.gps_coordinates);
     }
-    // Return an empty string if no valid GPS data to avoid displaying 'N/A' or raw JSON
-    return '';
-  };
-
-  const gpsDisplayString = getGpsDisplay(item.gps_coordinates);
+  }
 
   return (
     <li key={item.id} className="property-item-card"> {/* Changed class name for better semantic */}
@@ -131,10 +131,10 @@ function PropertyItem({ item }) {
         {item.property_type && (
           <div className="property-info">Type: {item.property_type.charAt(0).toUpperCase() + item.property_type.slice(1)}</div>
         )}
-        {/* Refined GPS coordinates display for syntax error fix */}
-        {gpsDisplayString && ( // Only render if gpsDisplayString is not empty
+        {/* Use the pre-computed string directly, only render the div if content exists */}
+        {gpsContentToDisplay && (
           <div className="property-info">
-            GPS: {gpsDisplayString}
+            GPS: {gpsContentToDisplay}
           </div>
         )}
         {item.land_size_sqm && (
