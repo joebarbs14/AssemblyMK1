@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './DashboardPage.css';
 import RatesDetails from './RatesDetails'; // Import the RatesDetails component
+import WaterDetails from './WaterDetails'; // Import the new WaterDetails component
 
 const categories = [
   "Rates", "Water", "Development", "Community",
@@ -11,14 +12,14 @@ const categories = [
 // Helper function to get emoji for each category
 const getCategoryEmoji = (category) => {
   switch (category) {
-    case "Rates": return "💰";
+    case "Rates": return "🏠";
     case "Water": return "💧";
     case "Development": return "🏗️";
     case "Community": return "🤝";
     case "Roads": return "🛣️";
     case "Waste": return "🗑️";
     case "Animals": return "🐾";
-    case "Public Health": return "🏥";
+    case "Public Health": return "⚕️"; // Changed from 🏥 to ⚕️ for consistency with previous output
     case "Environment": return "🌳";
     default: return "✨";
   }
@@ -41,12 +42,12 @@ const councilLogos = {
 
 
 function DashboardPage() {
-  const [processes, setProcesses] = useState({});
+  const [processes, setProcesses] = useState({}); // This state will now hold processes, properties, and water data
   const [userName, setUserName] = useState('Resident');
   const [userCouncil, setUserCouncil] = useState(null); // New state for user's council
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState(null); // State for selected category
   const navigate = useNavigate();
 
   const fetchUserProfileAndDashboardData = useCallback(async (token) => {
@@ -101,8 +102,7 @@ function DashboardPage() {
         setUserCouncil(null); // Default if council is missing
       }
 
-
-      // 2. Now fetch dashboard data (which includes properties for 'Rates')
+      // 2. Now fetch dashboard data (which includes properties for 'Rates' and 'Water')
       const dashboardRes = await fetch('https://assemblymk1-backend.onrender.com/dashboard/', {
         method: 'GET',
         headers: {
@@ -166,10 +166,12 @@ function DashboardPage() {
 
   }, [navigate, fetchUserProfileAndDashboardData]);
 
+  // Handler for tile click
   const handleTileClick = (category) => {
     setSelectedCategory(category);
   };
 
+  // Get items for the selected category
   const selectedCategoryItems = selectedCategory ? (processes[selectedCategory] || []) : [];
 
   if (loading) {
@@ -199,17 +201,15 @@ function DashboardPage() {
 
   return (
     <div className="dashboard">
-      <div className="dashboard-top-row"> {/* New container for the entire top row */}
-        {/* Council Logo and Welcome Message (Left aligned) */}
+      <div className="dashboard-top-row"> {/* Use dashboard-top-row for overall top layout */}
         <div className="header-left">
           {userCouncil && councilLogos[userCouncil] && (
             <img src={councilLogos[userCouncil]} alt={`${userCouncil} Logo`} className="council-logo" />
           )}
           <h1 className="welcome-heading">Welcome, {userName}</h1>
         </div>
-
-        {/* Tiles (Centered or distributed) */}
-        <div className="tiles-inline-container"> {/* Container for tiles to align them */}
+        
+        <div className="tiles-inline-container"> {/* Container for tiles to allow horizontal scrolling if needed */}
           <div className="tiles">
             {categories.map(category => (
               <div
@@ -225,48 +225,54 @@ function DashboardPage() {
             ))}
           </div>
         </div>
-        
-        {/* Logout Button (Right aligned) */}
+
         <button className="logout-btn" onClick={() => {
           localStorage.removeItem('token');
           localStorage.removeItem('userName');
-          localStorage.removeItem('userCouncil');
+          localStorage.removeItem('userCouncil'); // Clear council on logout
           navigate('/#/');
         }}>Logout</button>
       </div>
 
+      {/* New section to display detailed information below the tiles */}
       {selectedCategory && (
-        <div className="selected-category-details-container"> {/* New container for details and map */}
-          <h2>Details for {selectedCategory}</h2>
-          {selectedCategoryItems.length > 0 ? (
-            selectedCategory === 'Rates' ? (
-              <RatesDetails properties={selectedCategoryItems} />
+        <div className="selected-category-details-container"> {/* Use the container for side-by-side layout */}
+          <div className="selected-category-details">
+            <h2>Details for {selectedCategory}</h2>
+            {selectedCategoryItems.length > 0 ? (
+              // Conditionally render RatesDetails, WaterDetails, or generic process details
+              selectedCategory === 'Rates' ? (
+                <RatesDetails properties={selectedCategoryItems} />
+              ) : selectedCategory === 'Water' ? ( // NEW: Render WaterDetails for 'Water' category
+                <WaterDetails properties={selectedCategoryItems} />
+              ) : (
+                <ul>
+                  {selectedCategoryItems.map((item) => (
+                    <li key={item.id} className="process-item-full-detail">
+                      {/* Render details for generic processes */}
+                      <>
+                        <div className="process-title">{item.title}</div>
+                        <div className="process-detail">Status: {item.status}</div>
+                        {item.submitted_at && (
+                          <div className="process-detail">Submitted: {new Date(item.submitted_at).toLocaleDateString()}</div>
+                        )}
+                        {item.updated_at && (
+                          <div className="process-detail">Updated: {new Date(item.updated_at).toLocaleDateString()}</div>
+                        )}
+                        {item.form_data && Object.keys(item.form_data).length > 0 && (
+                          <div className="process-detail">
+                            Form Data: {JSON.stringify(item.form_data)}
+                          </div>
+                        )}
+                      </>
+                    </li>
+                  ))}
+                </ul>
+              )
             ) : (
-              <ul>
-                {selectedCategoryItems.map((item) => (
-                  <li key={item.id} className="process-item-full-detail">
-                    <>
-                      <div className="process-title">{item.title}</div>
-                      <div className="process-detail">Status: {item.status}</div>
-                      {item.submitted_at && (
-                        <div className="process-detail">Submitted: {new Date(item.submitted_at).toLocaleDateString()}</div>
-                      )}
-                      {item.updated_at && (
-                        <div className="process-detail">Updated: {new Date(item.updated_at).toLocaleDateString()}</div>
-                      )}
-                      {item.form_data && Object.keys(item.form_data).length > 0 && (
-                        <div className="process-detail">
-                          Form Data: {JSON.stringify(item.form_data)}
-                        </div>
-                      )}
-                    </>
-                  </li>
-                ))}
-              </ul>
-            )
-          ) : (
-            <p>No entries found for {selectedCategory}.</p>
-          )}
+              <p className="no-entries">No entries found for {selectedCategory}.</p>
+            )}
+          </div>
         </div>
       )}
     </div>
