@@ -25,11 +25,18 @@ const getCategoryEmoji = (category) => {
 };
 
 // Mock council logos (replace with actual URLs or integrate with backend)
+// These should ideally come from the backend's /user/profile or a dedicated /council endpoint
 const councilLogos = {
-  "Anytown City Council": "https://placehold.co/50x50/ADD8E6/000000?text=AC", // Light blue background, black text
-  "Greenfield Shire": "https://placehold.co/50x50/90EE90/000000?text=GS", // Light green background, black text
-  "Riverside Council": "https://placehold.co/50x50/FFD700/000000?text=RC", // Gold background, black text
-  // Add more councils as needed
+  "City of Sydney": "https://placehold.co/50x50/ADD8E6/000000?text=SYD", // Placeholder for City of Sydney
+  "Northern Beaches Council": "https://placehold.co/50x50/90EE90/000000?text=NB", // Placeholder for Northern Beaches
+  "Parramatta City Council": "https://placehold.co/50x50/FFD700/000000?text=PAR", // Placeholder for Parramatta
+  "Blacktown City Council": "https://placehold.co/50x50/FFB6C1/000000?text=BT", // Placeholder for Blacktown
+  "Wollongong City Council": "https://placehold.co/50x50/DDA0DD/000000?text=WOL", // Placeholder for Wollongong
+  "Newcastle City Council": "https://placehold.co/50x50/87CEEB/000000?text=NEW", // Placeholder for Newcastle
+  "Central Coast Council": "https://placehold.co/50x50/F08080/000000?text=CC", // Placeholder for Central Coast
+  "Canterbury-Bankstown Council": "https://placehold.co/50x50/C0C0C0/000000?text=CB", // Placeholder for Canterbury-Bankstown
+  "Liverpool City Council": "https://placehold.co/50x50/ADD8E6/000000?text=LIV", // Placeholder for Liverpool
+  "Penrith City Council": "https://placehold.co/50x50/90EE90/000000?text=PEN", // Placeholder for Penrith
 };
 
 
@@ -83,6 +90,8 @@ function DashboardPage() {
       }
 
       // Assuming your /user/profile endpoint might return a 'council' field
+      // This 'council' field should ideally be the council's name (e.g., "City of Sydney")
+      // which can then be used to look up the logo.
       if (userProfileData.council) {
         setUserCouncil(userProfileData.council);
         localStorage.setItem('userCouncil', userProfileData.council);
@@ -191,45 +200,40 @@ function DashboardPage() {
   return (
     <div className="dashboard">
       <div className="dashboard-header">
-        {/* Moved logout button here */}
-        <button className="logout-btn" onClick={() => {
-          localStorage.removeItem('token');
-          localStorage.removeItem('userName');
-          localStorage.removeItem('userCouncil'); // Clear council on logout
-          navigate('/#/');
-        }}>Logout</button>
-        
-        {/* Welcome and Name */}
-        <h1 className="welcome-heading">
-          Welcome, {userName}
+        {/* Council Logo and Welcome Message */}
+        <div className="header-left">
           {userCouncil && councilLogos[userCouncil] && (
             <img src={councilLogos[userCouncil]} alt={`${userCouncil} Logo`} className="council-logo" />
           )}
-        </h1>
+          <h1 className="welcome-heading">Welcome, {userName}</h1>
+        </div>
+        
+        {/* Logout Button */}
+        <button className="logout-btn" onClick={() => {
+          localStorage.removeItem('token');
+          localStorage.removeItem('userName');
+          localStorage.removeItem('userCouncil');
+          navigate('/#/');
+        }}>Logout</button>
       </div>
 
-      {/* Tiles moved between header and details */}
-      <div className="tiles">
-        {categories.map(category => (
-          <div
-            key={category}
-            className={`tile ${selectedCategory === category ? 'selected-tile' : ''}`}
-            onClick={() => handleTileClick(category)}
-          >
-            <h3>
-              {getCategoryEmoji(category)} {category} {/* Added emoji */}
-            </h3>
-            {/* Removed summary description from each tile */}
-            {/* {(processes[category] && processes[category].length > 0) ? (
-              <li className="process-item-summary">
-                {processes[category][0].type === 'property' ? processes[category][0].address : processes[category][0].title}
-                {processes[category].length > 1 && ` (+${processes[category].length - 1} more)`}
-              </li>
-            ) : (
-              <li className="no-items">No entries yet</li>
-            )} */}
-          </div>
-        ))}
+      {/* Tiles moved to be inline with the header, and made smaller */}
+      <div className="tiles-container"> {/* New container for tiles */}
+        <div className="tiles">
+          {categories.map(category => (
+            <div
+              key={category}
+              className={`tile ${selectedCategory === category ? 'selected-tile' : ''}`}
+              onClick={() => handleTileClick(category)}
+            >
+              <h3>
+                <span className="emoji">{getCategoryEmoji(category)}</span> {/* Emoji inside a span for styling */}
+                {category}
+              </h3>
+              {/* Removed summary description from each tile */}
+            </div>
+          ))}
+        </div>
       </div>
 
       {selectedCategory && (
