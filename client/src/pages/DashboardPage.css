@@ -70,15 +70,15 @@
   display: flex;
   justify-content: center; /* Center the tiles horizontally within their container */
   min-width: 0; /* Allows flex item to shrink below content size */
-  overflow-x: auto; /* Allow horizontal scrolling if tiles exceed screen width */
-  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-  padding-bottom: 5px; /* Space for scrollbar on some systems */
+  /* REMOVED: overflow-x: auto; */ /* Removed horizontal scrolling */
+  /* REMOVED: -webkit-overflow-scrolling: touch; */
+  /* REMOVED: padding-bottom: 5px; */
 }
 
 .tiles {
   display: flex; /* Ensures horizontal alignment */
-  flex-wrap: nowrap; /* Prevent tiles from wrapping to a new line */
-  gap: 0.75rem; /* Increased gap between tiles */
+  flex-wrap: wrap; /* ALLOWS tiles to wrap to a new line if needed */
+  gap: 0.5rem; /* Reduced gap between tiles for compactness */
   padding: 0 0.5rem; /* Reduced padding */
   align-items: center; /* Align items vertically in the flex container */
   justify-content: center; /* Center tiles horizontally if there's extra space */
@@ -86,25 +86,25 @@
 
 .tile {
   background: linear-gradient(145deg, #ffffff, #f0f0f0); /* Subtle gradient for depth */
-  padding: 0.6rem; /* Slightly larger padding */
-  border-radius: 12px; /* More rounded corners for a softer look */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* More pronounced shadow for elegance */
+  padding: 0.5rem; /* Reduced padding for smaller tiles */
+  border-radius: 10px; /* Slightly less rounded for compactness */
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08); /* Slightly less pronounced shadow */
   cursor: pointer;
   transition: all 0.3s ease-in-out; /* Smoother transition for all properties */
   display: flex;
   flex-direction: column; /* Stack emoji and text vertically */
   align-items: center;
   justify-content: center;
-  width: 80px; /* Slightly larger fixed width for better visual balance */
-  height: 80px; /* Slightly larger fixed height for better visual balance */
+  width: 70px; /* Reduced fixed width for compactness */
+  height: 70px; /* Reduced fixed height for compactness */
   flex-shrink: 0; /* Prevent tiles from shrinking */
   border: 1px solid #e0e0e0; /* Subtle border */
 }
 
 .tile:hover {
   background-color: #e9ecef; /* Lighter hover background */
-  transform: translateY(-3px) scale(1.03); /* More pronounced lift and slight scale on hover */
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15); /* Enhanced shadow on hover */
+  transform: translateY(-2px) scale(1.02); /* Less pronounced lift and scale on hover */
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.12); /* Enhanced shadow on hover */
 }
 
 .tile.selected-tile {
@@ -115,20 +115,20 @@
 
 .tile h3 {
   margin: 0; /* Remove default h3 margin */
-  font-size: 0.9em; /* Adjusted font size for category name */
+  font-size: 0.8em; /* Slightly smaller font size for category name */
   display: flex;
   flex-direction: column; /* Stack emoji and text vertically */
   align-items: center;
-  gap: 5px; /* Slightly larger space between emoji and text */
-  line-height: 1.2; /* Adjust line height for better spacing */
+  gap: 3px; /* Reduced space between emoji and text */
+  line-height: 1.1; /* Adjust line height for better spacing */
   white-space: nowrap; /* Prevent text from wrapping inside tile */
   color: #495057; /* Slightly softer text color */
   font-weight: 500; /* Medium font weight */
 }
 
 .tile h3 .emoji {
-  font-size: 1.6em; /* Slightly larger emoji size */
-  margin-bottom: 5px; /* Space between emoji and text */
+  font-size: 1.5em; /* Slightly smaller emoji size */
+  margin-bottom: 3px; /* Space between emoji and text */
 }
 
 .no-items {
