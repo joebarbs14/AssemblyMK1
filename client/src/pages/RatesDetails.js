@@ -1,6 +1,6 @@
 // src/pages/RatesDetails.js (or src/components/RatesDetails.js)
 import React from 'react';
-import './DashboardPage.css'; // <<< FIXED THIS LINE: Corrected path to DashboardPage.css
+import './DashboardPage.css'; // Assuming DashboardPage.css has the necessary styles
 
 function RatesDetails({ properties }) {
   if (!properties || properties.length === 0) {
@@ -12,8 +12,21 @@ function RatesDetails({ properties }) {
       {properties.map((item) => (
         <li key={item.id} className="process-item-full-detail">
           <>
-            <div className="process-title">Address: {item.address}</div>
-            <div className="process-detail">Council: {item.council}</div>
+            <div className="property-header">
+              <div className="property-address-council">
+                <div className="process-title">Address: {item.address}</div>
+                {item.council_name && (
+                  <div className="process-detail">Council: {item.council_name}</div>
+                )}
+              </div>
+              {item.council_logo_url && (
+                <img src={item.council_logo_url} alt={`${item.council_name} Logo`} className="council-logo-small" />
+              )}
+            </div>
+
+            {item.property_type && (
+              <div className="process-detail">Type: {item.property_type.charAt(0).toUpperCase() + item.property_type.slice(1)}</div>
+            )}
             {item.gps_coordinates && (
               <div className="process-detail">GPS: {typeof item.gps_coordinates === 'object' ? `Lat: ${item.gps_coordinates.lat}, Lon: ${item.gps_coordinates.lon}` : item.gps_coordinates}</div>
             )}
@@ -32,6 +45,7 @@ function RatesDetails({ properties }) {
             {item.shape_file_data && (
               <div className="process-detail">Shape File Data: {item.shape_file_data}</div>
             )}
+            {/* Map will go here in a later iteration */}
           </>
         </li>
       ))}
