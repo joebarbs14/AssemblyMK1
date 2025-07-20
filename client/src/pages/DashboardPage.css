@@ -4,41 +4,40 @@
   font-family: 'Inter', sans-serif; /* Apple-like font */
 }
 
-.dashboard-header {
+.dashboard-top-row { /* New container for the entire top row */
   display: flex;
-  justify-content: space-between; /* Pushes left and right content to edges */
+  justify-content: space-between; /* Distributes items along the main axis */
   align-items: center;
-  flex-wrap: wrap;
+  flex-wrap: wrap; /* Allows wrapping on smaller screens */
   margin-bottom: 1rem;
   padding: 0 1rem;
+  gap: 10px; /* Space between the three main sections (left, tiles, right) */
 }
 
-.header-left { /* New container for logo and welcome */
+.header-left { /* Container for logo and welcome */
   display: flex;
   align-items: center;
   gap: 10px; /* Space between logo and welcome text */
+  /* flex-shrink: 0; */ /* Prevent shrinking */
 }
 
-.dashboard-header h1 {
+.dashboard-header h1, .welcome-heading { /* Combined for consistency */
   font-size: 1.8rem;
   margin: 0; /* Remove default margin */
   display: flex; /* Added for aligning logo with text */
   align-items: center; /* Center logo vertically with text */
   gap: 10px; /* Space between text and logo */
-}
-
-.welcome-heading { /* Specific style for the welcome text */
-  font-size: 1.8rem;
-  margin: 0;
   color: #333; /* Darker text for contrast */
+  white-space: nowrap; /* Prevent text from wrapping */
 }
 
 .council-logo {
-  width: 40px; /* Make logo smaller */
-  height: 40px; /* Make logo smaller */
+  width: clamp(30px, 8vw, 50px); /* Auto-size: min 30px, max 50px, fluid 8vw */
+  height: clamp(30px, 8vw, 50px); /* Auto-size: min 30px, max 50px, fluid 8vw */
   border-radius: 50%; /* Make it round */
   object-fit: cover; /* Ensure image covers the area */
   border: 1px solid #ddd; /* Optional: subtle border */
+  flex-shrink: 0; /* Prevent shrinking */
 }
 
 .logout-btn {
@@ -50,41 +49,45 @@
   font-size: 0.9rem;
   cursor: pointer;
   transition: background-color 0.2s ease-in-out;
+  flex-shrink: 0; /* Prevent shrinking */
 }
 
 .logout-btn:hover {
   background-color: #c82333;
 }
 
-.tiles-container { /* New container to hold tiles and align them */
+.tiles-inline-container { /* Container for tiles to align them */
+  flex-grow: 1; /* Allows tiles to take up available space */
   display: flex;
-  justify-content: center; /* Center the tiles horizontally */
-  width: 100%;
-  margin-top: 1.5rem; /* Space from header */
+  justify-content: center; /* Center the tiles horizontally within their container */
+  min-width: 0; /* Allows flex item to shrink below content size */
 }
 
 .tiles {
   display: grid;
   /* Adjusted grid template for smaller tiles */
-  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); /* Even smaller minwidth */
-  gap: 0.5rem; /* Even smaller gap */
-  max-width: 90%; /* Limit overall width of the tile grid */
-  padding: 0 1rem; /* Added padding to align with header */
+  grid-template-columns: repeat(auto-fit, minmax(60px, 1fr)); /* Even smaller minwidth for more tiles in line */
+  gap: 0.4rem; /* Even smaller gap */
+  /* max-width: 100%; */ /* Allow it to fill its flex-grow container */
+  padding: 0 0.5rem; /* Reduced padding */
+  align-items: center; /* Align items in the grid */
+  justify-content: center; /* Center items in the grid */
 }
 
 .tile {
   background: white;
-  padding: 0.5rem; /* Smaller padding */
-  border-radius: 10px;
-  box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
+  padding: 0.4rem; /* Smaller padding */
+  border-radius: 8px; /* Slightly smaller border-radius for smaller tiles */
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); /* Slightly smaller shadow */
   cursor: pointer;
   transition: background-color 0.3s ease, transform 0.2s ease;
   display: flex;
-  flex-direction: column;
+  flex-direction: column; /* Stack emoji and text vertically */
   align-items: center;
   justify-content: center;
-  min-height: 70px; /* Adjusted minimum height */
-  text-align: center; /* Ensure text is centered within the tile */
+  min-height: 60px; /* Adjusted minimum height for smaller tiles */
+  text-align: center;
+  flex-shrink: 0; /* Prevent tiles from shrinking too much */
 }
 
 .tile:hover {
@@ -99,20 +102,19 @@
 
 .tile h3 {
   margin: 0; /* Remove default h3 margin */
-  font-size: 0.9em; /* Adjusted font size for category name */
+  font-size: 0.8em; /* Adjusted font size for category name */
   display: flex;
   flex-direction: column; /* Stack emoji and text vertically */
   align-items: center;
-  gap: 5px; /* Space between emoji and text */
-  line-height: 1.2; /* Adjust line height for better spacing */
+  gap: 3px; /* Smaller space between emoji and text */
+  line-height: 1.1; /* Adjust line height for better spacing */
+  white-space: nowrap; /* Prevent text from wrapping inside tile */
 }
 
 .tile h3 .emoji {
-  font-size: 1.5em; /* Larger emoji size */
-  margin-bottom: 5px; /* Space between emoji and text */
+  font-size: 1.4em; /* Slightly smaller emoji size */
+  margin-bottom: 3px; /* Space between emoji and text */
 }
-
-/* Removed .process-item-summary as it's no longer used in tiles */
 
 .no-items {
   color: #888;
@@ -120,18 +122,34 @@
   font-size: 0.8em;
 }
 
-/* Styles for the detailed view section remain largely the same */
-.selected-category-details {
-  background-color: #fff;
-  border-radius: 10px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  padding: 20px;
+/* New container for details and map to enable side-by-side */
+.selected-category-details-container {
+  display: flex; /* Use flexbox for side-by-side layout */
+  flex-direction: column; /* Default to column on small screens */
+  gap: 20px; /* Space between details and map */
   margin-top: 30px;
   width: 90%;
   max-width: 1200px;
   margin-left: auto;
   margin-right: auto;
   text-align: left;
+}
+
+/* Styles for larger screens to enable side-by-side */
+@media (min-width: 768px) {
+  .selected-category-details-container {
+    flex-direction: row; /* Row layout on larger screens */
+    align-items: flex-start; /* Align items to the top */
+  }
+}
+
+.selected-category-details {
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  flex: 1; /* Allow details to take up available space */
+  min-width: 300px; /* Ensure it doesn't get too small */
 }
 
 .selected-category-details h2 {
@@ -166,4 +184,42 @@
   font-size: 0.9em;
   color: #555;
   margin-bottom: 3px;
+}
+
+/* Styles for property details within RatesDetails.js */
+.property-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.property-address-council {
+  flex-grow: 1;
+}
+
+.council-logo-small {
+  width: 30px; /* Smaller logo for individual property details */
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #eee;
+  margin-left: 10px;
+  flex-shrink: 0;
+}
+
+/* Map container styles */
+.map-container {
+  flex: 1; /* Allow map to take up available space */
+  background-color: #e0e0e0; /* Placeholder background */
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  overflow: hidden; /* Hide anything outside the map boundaries */
+  min-height: 300px; /* Minimum height for the map */
+}
+
+/* Ensure map canvas fills its container */
+#map {
+  width: 100%;
+  height: 100%;
 }
