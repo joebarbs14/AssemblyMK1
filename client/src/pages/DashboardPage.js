@@ -17,7 +17,7 @@ const getCategoryEmoji = (category) => {
     case "Community": return "🤝";
     case "Roads": return "🛣️";
     case "Waste": return "🗑️";
-    case "Animals": return "🐾";
+    case "Animals": return "�";
     case "Public Health": return "🏥";
     case "Environment": return "🌳";
     default: return "✨";
@@ -275,3 +275,4 @@ function DashboardPage() {
 }
 
 export default DashboardPage;
+�
