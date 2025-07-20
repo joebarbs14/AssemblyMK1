@@ -1,4 +1,4 @@
-// src/pages/RatesDetails.js (or src/components/RatesDetails.js)
+// src/pages/RatesDetails.js
 import React, { useEffect, useRef } from 'react';
 import L from 'leaflet'; // Import Leaflet library
 // Note: leaflet.css is now linked directly in public/index.html
@@ -103,13 +103,13 @@ function PropertyItem({ item }) {
   }, [item]); // Rerun effect when the specific item data changes
 
   return (
-    <li key={item.id} className="property-item-card"> {/* Changed class name for better semantic */}
-      <div className="property-details-content"> {/* Container for text details */}
+    <li key={item.id} className="property-item-card">
+      <div className="property-details-content">
         <div className="property-header">
           <div className="property-address-council">
-            <div className="property-title">Address: {item.address}</div> {/* Changed class name */}
+            <div className="property-title">Address: {item.address}</div>
             {item.council_name && (
-              <div className="property-info">Council: {item.council_name}</div> {/* Changed class name */}
+              <div className="property-info">Council: {item.council_name}</div>
             )}
           </div>
           {item.council_logo_url && (
@@ -120,7 +120,6 @@ function PropertyItem({ item }) {
         {item.property_type && (
           <div className="property-info">Type: {item.property_type.charAt(0).toUpperCase() + item.property_type.slice(1)}</div>
         )}
-        {/* GPS display line has been completely removed to resolve persistent syntax error */}
         {item.land_size_sqm && (
           <div className="property-info">Land Size: {item.land_size_sqm} m²</div>
         )}
@@ -133,7 +132,7 @@ function PropertyItem({ item }) {
         {item.zone && (
           <div className="property-info">Zone: {item.zone}</div>
         )}
-        {/* Shape file data text display is now hidden via CSS, but still drawn on map */}
+        {/* Shape file data text display is hidden via CSS */}
       </div>
       <div className="mini-map-container" ref={miniMapRef}>
         {/* Mini-map will be rendered here */}
@@ -142,22 +141,20 @@ function PropertyItem({ item }) {
   );
 }
 
-
 function RatesDetails({ properties }) {
   if (!properties || properties.length === 0) {
     return <p>No properties found for this user.</p>;
   }
 
   return (
-    <div className="rates-details-content"> {/* This container will hold the list of property cards */}
-      <div className="property-list-details"> {/* This will hold the individual property cards */}
+    <div className="rates-details-content">
+      <div className="property-list-details">
         <ul>
           {properties.map((item) => (
             <PropertyItem key={item.id} item={item} />
           ))}
         </ul>
       </div>
-      {/* The main map container is now removed from RatesDetails as it's replaced by mini-maps */}
     </div>
   );
 }
