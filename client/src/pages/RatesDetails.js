@@ -121,12 +121,13 @@ function PropertyItem({ item }) {
           <div className="property-info">Type: {item.property_type.charAt(0).toUpperCase() + item.property_type.slice(1)}</div>
         )}
         {/* Refined GPS coordinates display for syntax error fix */}
-        {item.gps_coordinates && typeof item.gps_coordinates === 'object' && item.gps_coordinates.lat != null && item.gps_coordinates.lon != null ? (
-          <div className="property-info">GPS: Lat: {item.gps_coordinates.lat.toFixed(4)}, Lon: {item.gps_coordinates.lon.toFixed(4)}</div>
-        ) : (
-          item.gps_coordinates ? (
-            <div className="property-info">GPS: {JSON.stringify(item.gps_coordinates)}</div>
-          ) : null // Or an empty string if nothing to display
+        {item.gps_coordinates && (
+          <div className="property-info">
+            GPS:
+            {typeof item.gps_coordinates === 'object' && item.gps_coordinates.lat != null && item.gps_coordinates.lon != null
+              ? ` Lat: ${item.gps_coordinates.lat.toFixed(4)}, Lon: ${item.gps_coordinates.lon.toFixed(4)}`
+              : ` ${JSON.stringify(item.gps_coordinates)}`}
+          </div>
         )}
         {item.land_size_sqm && (
           <div className="property-info">Land Size: {item.land_size_sqm} m²</div>
