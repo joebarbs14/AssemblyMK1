@@ -6,3 +6,4 @@ PyJWT
 Werkzeug
 Authlib
 psycopg2-binary
+leaflet
