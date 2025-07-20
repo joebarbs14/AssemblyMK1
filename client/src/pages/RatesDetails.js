@@ -1,6 +1,6 @@
 // src/pages/RatesDetails.js (or src/components/RatesDetails.js)
 import React from 'react';
-import '.././DashboardPage.css'; // Assuming DashboardPage.css has the necessary styles
+import './DashboardPage.css'; // <<< FIXED THIS LINE: Corrected path to DashboardPage.css
 
 function RatesDetails({ properties }) {
   if (!properties || properties.length === 0) {
@@ -11,7 +11,6 @@ function RatesDetails({ properties }) {
     <ul>
       {properties.map((item) => (
         <li key={item.id} className="process-item-full-detail">
-          {/* Conditionally render details based on item type (though here we expect 'property') */}
           <>
             <div className="process-title">Address: {item.address}</div>
             <div className="process-detail">Council: {item.council}</div>
