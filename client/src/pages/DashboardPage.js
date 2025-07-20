@@ -2,7 +2,8 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './DashboardPage.css';
 import RatesDetails from './RatesDetails'; // Import the RatesDetails component
-import WaterDetails from './WaterDetails'; // Import the new WaterDetails component
+import WaterDetails from './WaterDetails'; // Import the WaterDetails component
+import AnimalDetails from './AnimalDetails'; // Import the new AnimalDetails component
 
 const categories = [
   "Rates", "Water", "Development", "Community",
@@ -19,14 +20,13 @@ const getCategoryEmoji = (category) => {
     case "Roads": return "🛣️";
     case "Waste": return "🗑️";
     case "Animals": return "🐾";
-    case "Public Health": return "⚕️"; // Changed from 🏥 to ⚕️ for consistency with previous output
+    case "Public Health": return "⚕️";
     case "Environment": return "🌳";
     default: return "✨";
   }
 };
 
 // Mock council logos (replace with actual URLs or integrate with backend)
-// These should ideally come from the backend's /user/profile or a dedicated /council endpoint
 const councilLogos = {
   "City of Sydney": "https://placehold.co/50x50/ADD8E6/000000?text=SYD", // Placeholder for City of Sydney
   "Northern Beaches Council": "https://placehold.co/50x50/90EE90/000000?text=NB", // Placeholder for Northern Beaches
@@ -42,12 +42,12 @@ const councilLogos = {
 
 
 function DashboardPage() {
-  const [processes, setProcesses] = useState({}); // This state will now hold processes, properties, and water data
+  const [processes, setProcesses] = useState({});
   const [userName, setUserName] = useState('Resident');
-  const [userCouncil, setUserCouncil] = useState(null); // New state for user's council
+  const [userCouncil, setUserCouncil] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState(null); // State for selected category
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const navigate = useNavigate();
 
   const fetchUserProfileAndDashboardData = useCallback(async (token) => {
@@ -74,7 +74,7 @@ function DashboardPage() {
           alert('Your session has expired or is invalid. Please log in again.');
           localStorage.removeItem('token');
           localStorage.removeItem('userName');
-          localStorage.removeItem('userCouncil'); // Clear council on logout
+          localStorage.removeItem('userCouncil');
           navigate('/#/');
           return;
         }
@@ -90,16 +90,13 @@ function DashboardPage() {
         setUserName('Resident');
       }
 
-      // Assuming your /user/profile endpoint might return a 'council' field
-      // This 'council' field should ideally be the council's name (e.g., "City of Sydney")
-      // which can then be used to look up the logo.
       if (userProfileData.council) {
         setUserCouncil(userProfileData.council);
         localStorage.setItem('userCouncil', userProfileData.council);
         console.log('DashboardPage: User council fetched and set:', userProfileData.council);
       } else {
         console.warn('DashboardPage: User profile fetched, but "council" field is missing. Defaulting to null.');
-        setUserCouncil(null); // Default if council is missing
+        setUserCouncil(null);
       }
 
       // 2. Now fetch dashboard data (which includes properties for 'Rates' and 'Water')
@@ -124,7 +121,7 @@ function DashboardPage() {
           alert('Your session has expired or is invalid. Please log in again.');
           localStorage.removeItem('token');
           localStorage.removeItem('userName');
-          localStorage.removeItem('userCouncil'); // Clear council on logout
+          localStorage.removeItem('userCouncil');
           navigate('/#/');
           return;
         }
@@ -145,12 +142,12 @@ function DashboardPage() {
   useEffect(() => {
     const token = localStorage.getItem('token');
     const storedUserName = localStorage.getItem('userName');
-    const storedUserCouncil = localStorage.getItem('userCouncil'); // Get stored council
+    const storedUserCouncil = localStorage.getItem('userCouncil');
 
     if (storedUserName) {
       setUserName(storedUserName);
     }
-    if (storedUserCouncil) { // Set council if found
+    if (storedUserCouncil) {
       setUserCouncil(storedUserCouncil);
     }
 
@@ -166,12 +163,10 @@ function DashboardPage() {
 
   }, [navigate, fetchUserProfileAndDashboardData]);
 
-  // Handler for tile click
   const handleTileClick = (category) => {
     setSelectedCategory(category);
   };
 
-  // Get items for the selected category
   const selectedCategoryItems = selectedCategory ? (processes[selectedCategory] || []) : [];
 
   if (loading) {
@@ -201,7 +196,7 @@ function DashboardPage() {
 
   return (
     <div className="dashboard">
-      <div className="dashboard-top-row"> {/* Use dashboard-top-row for overall top layout */}
+      <div className="dashboard-top-row">
         <div className="header-left">
           {userCouncil && councilLogos[userCouncil] && (
             <img src={councilLogos[userCouncil]} alt={`${userCouncil} Logo`} className="council-logo" />
@@ -209,7 +204,7 @@ function DashboardPage() {
           <h1 className="welcome-heading">Welcome, {userName}</h1>
         </div>
         
-        <div className="tiles-inline-container"> {/* Container for tiles to allow horizontal scrolling if needed */}
+        <div className="tiles-inline-container">
           <div className="tiles">
             {categories.map(category => (
               <div
@@ -229,27 +224,26 @@ function DashboardPage() {
         <button className="logout-btn" onClick={() => {
           localStorage.removeItem('token');
           localStorage.removeItem('userName');
-          localStorage.removeItem('userCouncil'); // Clear council on logout
+          localStorage.removeItem('userCouncil');
           navigate('/#/');
         }}>Logout</button>
       </div>
 
-      {/* New section to display detailed information below the tiles */}
       {selectedCategory && (
-        <div className="selected-category-details-container"> {/* Use the container for side-by-side layout */}
+        <div className="selected-category-details-container">
           <div className="selected-category-details">
             <h2>Details for {selectedCategory}</h2>
             {selectedCategoryItems.length > 0 ? (
-              // Conditionally render RatesDetails, WaterDetails, or generic process details
               selectedCategory === 'Rates' ? (
                 <RatesDetails properties={selectedCategoryItems} />
-              ) : selectedCategory === 'Water' ? ( // NEW: Render WaterDetails for 'Water' category
+              ) : selectedCategory === 'Water' ? (
                 <WaterDetails properties={selectedCategoryItems} />
+              ) : selectedCategory === 'Animals' ? ( // NEW: Render AnimalDetails for 'Animals' category
+                <AnimalDetails /> // AnimalDetails manages its own internal state and mock data for now
               ) : (
                 <ul>
                   {selectedCategoryItems.map((item) => (
                     <li key={item.id} className="process-item-full-detail">
-                      {/* Render details for generic processes */}
                       <>
                         <div className="process-title">{item.title}</div>
                         <div className="process-detail">Status: {item.status}</div>
