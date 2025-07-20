@@ -1,8 +1,9 @@
 from flask import Blueprint, jsonify, request
-from models import Process, Property # Import Property model
+from models import Process, Property, Council, db # Import Property, Council, and db
 import traceback
 import logging
 from routes.decorators import auth_required
+from sqlalchemy.orm import joinedload # Import joinedload for eager loading
 
 dashboard = Blueprint('dashboard', __name__)
 
@@ -31,13 +32,14 @@ def get_dashboard():
             logging.info(f"[dashboard] Querying for resident_id={user_id}, category={category}")
             try:
                 if category == "Rates":
-                    # Fetch properties for the 'Rates' category
-                    items = Property.query.filter_by(resident_id=user_id).all()
+                    # Fetch properties for the 'Rates' category, eager-loading the associated Council
+                    items = Property.query.options(joinedload(Property.council_obj)).filter_by(resident_id=user_id).all()
                     logging.info(f"[dashboard] Found {len(items)} properties for 'Rates' for user {user_id}.")
                     data[category] = [{
                         'id': item.id,
                         'address': item.address,
-                        'council': item.council,
+                        'council_name': item.council_obj.name if item.council_obj else None, # Get name from related Council object
+                        'council_logo_url': item.council_obj.logo_url if item.council_obj else None, # Get logo URL from related Council object
                         'gps_coordinates': item.gps_coordinates,
                         'shape_file_data': item.shape_file_data,
                         'land_size_sqm': item.land_size_sqm,
