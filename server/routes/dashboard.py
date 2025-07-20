@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
-from models import Process, Property, Council # Import Property and Council models
+# Import all necessary models: Process, Property, Council, Animal, WaterConsumption
+from models import Process, Property, Council, Animal, WaterConsumption
 import traceback
 import logging
 from routes.decorators import auth_required
@@ -74,6 +75,31 @@ def get_dashboard():
                             'bill_due_date': wc.bill_due_date.isoformat() if wc.bill_due_date else None,
                         } for wc in item.water_consumptions],
                         'type': 'property' # Add a type identifier for frontend
+                    } for item in items]
+                elif category == "Animals":
+                    # Fetch animals available for adoption, joining with Council for logo/name
+                    # For simplicity, we'll fetch all animals marked 'available_for_adoption'
+                    # In a real app, you might filter by user's council or proximity
+                    items = Animal.query.filter_by(status='available_for_adoption')\
+                                  .options(joinedload(Animal.council_obj)).all()
+                    logging.info(f"[dashboard] Found {len(items)} animals for 'Animals' category.")
+                    data[category] = [{
+                        'id': item.id,
+                        'name': item.name,
+                        'type': item.type,
+                        'breed': item.breed,
+                        'mixed': item.mixed,
+                        'sex': item.sex,
+                        'age': item.age,
+                        'temperament': item.temperament,
+                        'status': item.status,
+                        'main_photo_url': item.main_photo_url,
+                        'gallery_urls': item.gallery_urls, # JSONB will be deserialized by SQLAlchemy
+                        'council_name': item.council_obj.name if item.council_obj else None,
+                        'council_logo_url': item.council_obj.logo_url if item.council_obj else None,
+                        'created_at': item.created_at.isoformat() if item.created_at else None,
+                        'updated_at': item.updated_at.isoformat() if item.updated_at else None,
+                        'type': 'animal' # Add a type identifier for frontend
                     } for item in items]
                 else:
                     # Fetch processes for other categories
