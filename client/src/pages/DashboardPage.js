@@ -17,7 +17,7 @@ const getCategoryEmoji = (category) => {
     case "Community": return "🤝";
     case "Roads": return "🛣️";
     case "Waste": return "🗑️";
-    case "Animals": return "�";
+    case "Animals": return "🐾";
     case "Public Health": return "🏥";
     case "Environment": return "🌳";
     default: return "✨";
@@ -199,16 +199,34 @@ function DashboardPage() {
 
   return (
     <div className="dashboard">
-      <div className="dashboard-header">
-        {/* Council Logo and Welcome Message */}
+      <div className="dashboard-top-row"> {/* New container for the entire top row */}
+        {/* Council Logo and Welcome Message (Left aligned) */}
         <div className="header-left">
           {userCouncil && councilLogos[userCouncil] && (
             <img src={councilLogos[userCouncil]} alt={`${userCouncil} Logo`} className="council-logo" />
           )}
           <h1 className="welcome-heading">Welcome, {userName}</h1>
         </div>
+
+        {/* Tiles (Centered or distributed) */}
+        <div className="tiles-inline-container"> {/* Container for tiles to align them */}
+          <div className="tiles">
+            {categories.map(category => (
+              <div
+                key={category}
+                className={`tile ${selectedCategory === category ? 'selected-tile' : ''}`}
+                onClick={() => handleTileClick(category)}
+              >
+                <h3>
+                  <span className="emoji">{getCategoryEmoji(category)}</span>
+                  {category}
+                </h3>
+              </div>
+            ))}
+          </div>
+        </div>
         
-        {/* Logout Button */}
+        {/* Logout Button (Right aligned) */}
         <button className="logout-btn" onClick={() => {
           localStorage.removeItem('token');
           localStorage.removeItem('userName');
@@ -217,27 +235,8 @@ function DashboardPage() {
         }}>Logout</button>
       </div>
 
-      {/* Tiles moved to be inline with the header, and made smaller */}
-      <div className="tiles-container"> {/* New container for tiles */}
-        <div className="tiles">
-          {categories.map(category => (
-            <div
-              key={category}
-              className={`tile ${selectedCategory === category ? 'selected-tile' : ''}`}
-              onClick={() => handleTileClick(category)}
-            >
-              <h3>
-                <span className="emoji">{getCategoryEmoji(category)}</span> {/* Emoji inside a span for styling */}
-                {category}
-              </h3>
-              {/* Removed summary description from each tile */}
-            </div>
-          ))}
-        </div>
-      </div>
-
       {selectedCategory && (
-        <div className="selected-category-details">
+        <div className="selected-category-details-container"> {/* New container for details and map */}
           <h2>Details for {selectedCategory}</h2>
           {selectedCategoryItems.length > 0 ? (
             selectedCategory === 'Rates' ? (
