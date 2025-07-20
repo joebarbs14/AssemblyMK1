@@ -107,8 +107,11 @@ function PropertyItem({ item }) {
     if (gps && typeof gps === 'object' && gps.lat != null && gps.lon != null) {
       return `Lat: ${gps.lat.toFixed(4)}, Lon: ${gps.lon.toFixed(4)}`;
     }
-    return gps ? JSON.stringify(gps) : 'N/A'; // Fallback for non-object or missing data
+    // Return an empty string if no valid GPS data to avoid displaying 'N/A' or raw JSON
+    return '';
   };
+
+  const gpsDisplayString = getGpsDisplay(item.gps_coordinates);
 
   return (
     <li key={item.id} className="property-item-card"> {/* Changed class name for better semantic */}
@@ -129,9 +132,9 @@ function PropertyItem({ item }) {
           <div className="property-info">Type: {item.property_type.charAt(0).toUpperCase() + item.property_type.slice(1)}</div>
         )}
         {/* Refined GPS coordinates display for syntax error fix */}
-        {item.gps_coordinates && (
+        {gpsDisplayString && ( // Only render if gpsDisplayString is not empty
           <div className="property-info">
-            GPS: {getGpsDisplay(item.gps_coordinates)}
+            GPS: {gpsDisplayString}
           </div>
         )}
         {item.land_size_sqm && (
