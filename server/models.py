@@ -54,8 +54,9 @@ class Council(db.Model):
     lga_shape_file = db.Column(db.Text, nullable=True) # Could be JSONB for complex GeoJSON
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     updated_at = db.Column(db.DateTime, onupdate=datetime.datetime.utcnow)
-    # Relationship to properties
+    # Relationship to properties and animals
     properties = db.relationship('Property', backref='council_obj', lazy=True)
+    animals = db.relationship('Animal', backref='council_obj', lazy=True) # New relationship to Animal
 
     def __repr__(self):
         return f'<Council {self.name}>'
@@ -83,7 +84,7 @@ class Property(db.Model):
     def __repr__(self):
         return f'<Property {self.address}>'
 
-# New WaterConsumption Model
+# WaterConsumption Model
 class WaterConsumption(db.Model):
     __tablename__ = 'water_consumption'
     id = db.Column(db.Integer, primary_key=True)
@@ -98,3 +99,24 @@ class WaterConsumption(db.Model):
 
     def __repr__(self):
         return f'<WaterConsumption Property:{self.property_id} Quarter:{self.quarter_start_date.year}-Q{((self.quarter_start_date.month-1)//3)+1}>'
+
+# New Animal Model
+class Animal(db.Model):
+    __tablename__ = 'animal'
+    id = db.Column(db.Integer, primary_key=True)
+    council_id = db.Column(db.Integer, db.ForeignKey('council.id'), nullable=False) # Link to Council
+    name = db.Column(db.String(100), nullable=False)
+    type = db.Column(db.String(50), nullable=False) # e.g., Dog, Cat, Rabbit
+    breed = db.Column(db.String(100), nullable=True)
+    mixed = db.Column(db.Boolean, default=False, nullable=False)
+    sex = db.Column(db.String(10), nullable=True) # e.g., Male, Female
+    age = db.Column(db.String(50), nullable=True) # e.g., "2 years", "6 months"
+    temperament = db.Column(db.Text, nullable=True) # Short blurb
+    status = db.Column(db.String(50), default='available_for_adoption', nullable=False) # e.g., 'available_for_adoption', 'adopted', 'lost', 'found'
+    main_photo_url = db.Column(db.String(500), nullable=True)
+    gallery_urls = db.Column(JSONB, nullable=True) # Store as JSONB for list of photo URLs
+    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    updated_at = db.Column(db.DateTime, onupdate=datetime.datetime.utcnow)
+
+    def __repr__(self):
+        return f'<Animal {self.name} ({self.type})>'
