@@ -102,13 +102,16 @@ function PropertyItem({ item }) {
     };
   }, [item]); // Rerun effect when the specific item data changes
 
-  // Determine GPS display content directly within the render
-  const displayGps = item.gps_coordinates &&
-                     typeof item.gps_coordinates === 'object' &&
-                     typeof item.gps_coordinates.lat === 'number' &&
-                     typeof item.gps_coordinates.lon === 'number'
-                     ? `Lat: ${item.gps_coordinates.lat.toFixed(4)}, Lon: ${item.gps_coordinates.lon.toFixed(4)}`
-                     : null; // Set to null if not valid for clean conditional render
+  // Determine GPS display content directly within the render using an if block
+  let displayGps = null;
+  if (item.gps_coordinates && typeof item.gps_coordinates === 'object') {
+    if (typeof item.gps_coordinates.lat === 'number' && typeof item.gps_coordinates.lon === 'number') {
+      displayGps = `Lat: ${item.gps_coordinates.lat.toFixed(4)}, Lon: ${item.gps_coordinates.lon.toFixed(4)}`;
+    } else if (item.gps_coordinates) {
+      // Fallback for non-numeric lat/lon but still an object (e.g., empty object or malformed)
+      displayGps = JSON.stringify(item.gps_coordinates);
+    }
+  }
 
   return (
     <li key={item.id} className="property-item-card"> {/* Changed class name for better semantic */}
