@@ -182,7 +182,7 @@
 }
 
 .selected-category-details ul {
-  list-style: none;
+  list-style: none; /* REMOVED BULLET POINTS */
   padding: 0;
   margin: 0;
 }
@@ -195,6 +195,9 @@
   margin-bottom: 15px;
   box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05); /* Lighter shadow */
   transition: all 0.2s ease-in-out; /* Smooth transition */
+  display: flex; /* Use flexbox for internal layout */
+  flex-direction: column; /* Stack content vertically */
+  align-items: flex-start; /* Align content to the start */
 }
 
 .process-item-full-detail:hover {
@@ -221,6 +224,7 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 10px;
+  width: 100%; /* Ensure header takes full width within the item */
 }
 
 .property-address-council {
@@ -228,14 +232,19 @@
 }
 
 .council-logo-small {
-  width: 35px; /* Slightly larger for better visibility */
-  height: 35px;
+  width: 40px; /* Slightly larger for better visibility in details */
+  height: 40px;
   border-radius: 50%;
   object-fit: cover;
   border: 1px solid #e0e0e0; /* Lighter border */
-  margin-left: 10px;
+  margin-left: 15px; /* Increased margin for better separation */
   flex-shrink: 0;
   box-shadow: 0 1px 4px rgba(0,0,0,0.1); /* Subtle shadow */
+}
+
+/* Hide the shape file data display */
+.process-item-full-detail .process-detail:has(span.shape-file-data-label) {
+  display: none; /* Hide the entire div if it contains the shape file label */
 }
 
 /* Map container styles */
