@@ -102,15 +102,13 @@ function PropertyItem({ item }) {
     };
   }, [item]); // Rerun effect when the specific item data changes
 
-  // Helper for GPS display string
-  const getGpsDisplay = (gps) => {
-    if (gps && typeof gps === 'object' && typeof gps.lat === 'number' && typeof gps.lon === 'number') {
-      return `Lat: ${gps.lat.toFixed(4)}, Lon: ${gps.lon.toFixed(4)}`;
-    }
-    return null; // Return null if not valid numeric lat/lon
-  };
-
-  const gpsContentToDisplay = getGpsDisplay(item.gps_coordinates);
+  // Determine GPS display content directly within the render
+  const displayGps = item.gps_coordinates &&
+                     typeof item.gps_coordinates === 'object' &&
+                     typeof item.gps_coordinates.lat === 'number' &&
+                     typeof item.gps_coordinates.lon === 'number'
+                     ? `Lat: ${item.gps_coordinates.lat.toFixed(4)}, Lon: ${item.gps_coordinates.lon.toFixed(4)}`
+                     : null; // Set to null if not valid for clean conditional render
 
   return (
     <li key={item.id} className="property-item-card"> {/* Changed class name for better semantic */}
@@ -131,9 +129,9 @@ function PropertyItem({ item }) {
           <div className="property-info">Type: {item.property_type.charAt(0).toUpperCase() + item.property_type.slice(1)}</div>
         )}
         {/* Use the pre-computed string directly, only render the div if content exists */}
-        {gpsContentToDisplay && (
+        {displayGps && ( // Only render if displayGps is not null
           <div className="property-info">
-            GPS: {gpsContentToDisplay}
+            GPS: {displayGps}
           </div>
         )}
         {item.land_size_sqm && (
