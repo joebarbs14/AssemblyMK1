@@ -14,10 +14,10 @@ const categories = [
 // Helper function to get emoji for each category
 const getCategoryEmoji = (category) => {
   switch (category) {
-    case "Rates": return "🏠"; // Changed from '?' to '🏠' to fix syntax error
+    case "Rates": return "🏠";
     case "Water": return "💧";
     case "Development": return "🏗️";
-    case "Community": return "�";
+    case "Community": return "🤝"; // Changed from '?' to '🤝' to fix syntax error
     case "Roads": return "🛣️";
     case "Waste": return "🗑️";
     case "Animals": return "🐾";
