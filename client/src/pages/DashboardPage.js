@@ -99,7 +99,7 @@ function DashboardPage() {
         setUserCouncil(null);
       }
 
-      // 2. Now fetch dashboard data (which includes properties for 'Rates' and 'Water')
+      // 2. Now fetch dashboard data (which includes properties for 'Rates' and 'Water' and 'Animals')
       const dashboardRes = await fetch('https://assemblymk1-backend.onrender.com/dashboard/', {
         method: 'GET',
         headers: {
@@ -167,6 +167,8 @@ function DashboardPage() {
     setSelectedCategory(category);
   };
 
+  // Get items for the selected category
+  // For 'Animals', we'll pass the 'Animals' data directly
   const selectedCategoryItems = selectedCategory ? (processes[selectedCategory] || []) : [];
 
   if (loading) {
@@ -233,13 +235,13 @@ function DashboardPage() {
         <div className="selected-category-details-container">
           <div className="selected-category-details">
             <h2>Details for {selectedCategory}</h2>
-            {selectedCategoryItems.length > 0 ? (
+            {selectedCategoryItems.length > 0 || selectedCategory === 'Animals' ? ( // Always render AnimalDetails if selected, even if no animals
               selectedCategory === 'Rates' ? (
                 <RatesDetails properties={selectedCategoryItems} />
               ) : selectedCategory === 'Water' ? (
                 <WaterDetails properties={selectedCategoryItems} />
-              ) : selectedCategory === 'Animals' ? ( // NEW: Render AnimalDetails for 'Animals' category
-                <AnimalDetails /> // AnimalDetails manages its own internal state and mock data for now
+              ) : selectedCategory === 'Animals' ? (
+                <AnimalDetails animals={selectedCategoryItems} /> {/* Pass animals data to AnimalDetails */}
               ) : (
                 <ul>
                   {selectedCategoryItems.map((item) => (
