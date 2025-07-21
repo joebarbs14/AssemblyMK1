@@ -551,3 +551,88 @@
   line-height: 1.5;
   text-align: center;
 }
+
+/* --- New Styles for WasteDetails.js --- */
+.waste-details-content {
+  padding: 10px;
+}
+
+.waste-section-title {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.waste-action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.waste-action-tile {
+  background-color: #e9ecef;
+  padding: 15px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-weight: bold;
+  color: #495057;
+  min-width: 120px; /* Ensure buttons have a decent size */
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.waste-action-tile:hover {
+  background-color: #dee2e6;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.waste-action-tile.selected-action-tile {
+  background-color: #007bff;
+  color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border: 2px solid #0056b3;
+}
+
+.waste-action-tile .emoji {
+  font-size: 2em;
+  margin-bottom: 5px;
+}
+
+.waste-type-details {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+}
+
+.waste-type-details .listing-title {
+  font-size: 1.3em;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.waste-type-details .collection-info,
+.waste-type-details .collection-notes {
+  font-size: 1em;
+  color: #555;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.waste-map-container {
+  width: 100%;
+  height: 400px; /* Fixed height for the map */
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
