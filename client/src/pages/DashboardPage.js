@@ -14,7 +14,7 @@ const categories = [
 // Helper function to get emoji for each category
 const getCategoryEmoji = (category) => {
   switch (category) {
-    case "Rates": return "🏠";
+    case "Rates": return "�";
     case "Water": return "💧";
     case "Development": return "🏗️";
     case "Community": return "🤝";
@@ -22,30 +22,20 @@ const getCategoryEmoji = (category) => {
     case "Waste": return "🗑️";
     case "Animals": return "🐾";
     case "Public Health": return "⚕️";
-    case "Environment": return "�";
+    case "Environment": return "🌳"; // Changed from '?' to '🌳' to fix syntax error
     default: return "✨";
   }
 };
 
-// Mock council logos (replace with actual URLs or integrate with backend)
-const councilLogos = {
-  "City of Sydney": "https://placehold.co/50x50/ADD8E6/000000?text=SYD", // Placeholder for City of Sydney
-  "Northern Beaches Council": "https://placehold.co/50x50/90EE90/000000?text=NB", // Placeholder for Northern Beaches
-  "Parramatta City Council": "https://placehold.co/50x50/FFD700/000000?text=PAR", // Placeholder for Parramatta
-  "Blacktown City Council": "https://placehold.co/50x50/FFB6C1/000000?text=BT", // Placeholder for Blacktown
-  "Wollongong City Council": "https://placehold.co/50x50/DDA0DD/000000?text=WOL", // Placeholder for Wollongong
-  "Newcastle City Council": "https://placehold.co/50x50/87CEEB/000000?text=NEW", // Placeholder for Newcastle
-  "Central Coast Council": "https://placehold.co/50x50/F08080/000000?text=CC", // Placeholder for Central Coast
-  "Canterbury-Bankstown Council": "https://placehold.co/50x50/C0C0C0/000000?text=CB", // Placeholder for Canterbury-Bankstown
-  "Liverpool City Council": "https://placehold.co/50x50/ADD8E6/000000?text=LIV", // Placeholder for Liverpool
-  "Penrith City Council": "https://placehold.co/50x50/90EE90/000000?text=PEN", // Placeholder for Penrith
-};
+// REMOVED: Mock council logos (will now come from backend)
+// const councilLogos = { ... };
 
 
 function DashboardPage() {
   const [processes, setProcesses] = useState({});
   const [userName, setUserName] = useState('Resident');
-  const [userCouncil, setUserCouncil] = useState(null);
+  const [userCouncilName, setUserCouncilName] = useState(null); // Renamed for clarity
+  const [userCouncilLogoUrl, setUserCouncilLogoUrl] = useState(null); // New state for logo URL
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -56,7 +46,7 @@ function DashboardPage() {
     setError(null);
 
     try {
-      // 1. Fetch user profile (name and council) using the token
+      // 1. Fetch user profile (name, council name, and council logo URL)
       const userProfileRes = await fetch('https://assemblymk1-backend.onrender.com/user/profile', {
         method: 'GET',
         headers: { 'Authorization': 'Bearer ' + token }
@@ -75,7 +65,8 @@ function DashboardPage() {
           alert('Your session has expired or is invalid. Please log in again.');
           localStorage.removeItem('token');
           localStorage.removeItem('userName');
-          localStorage.removeItem('userCouncil');
+          localStorage.removeItem('userCouncilName'); // Clear old council name
+          localStorage.removeItem('userCouncilLogoUrl'); // Clear old logo URL
           navigate('/#/');
           return;
         }
@@ -91,16 +82,26 @@ function DashboardPage() {
         setUserName('Resident');
       }
 
-      if (userProfileData.council) {
-        setUserCouncil(userProfileData.council);
-        localStorage.setItem('userCouncil', userProfileData.council);
-        console.log('DashboardPage: User council fetched and set:', userProfileData.council);
+      // Update state and local storage with council name and logo URL
+      if (userProfileData.council_name) {
+        setUserCouncilName(userProfileData.council_name);
+        localStorage.setItem('userCouncilName', userProfileData.council_name);
+        console.log('DashboardPage: User council name fetched and set:', userProfileData.council_name);
       } else {
-        console.warn('DashboardPage: User profile fetched, but "council" field is missing. Defaulting to null.');
-        setUserCouncil(null);
+        console.warn('DashboardPage: User profile fetched, but "council_name" field is missing. Defaulting to null.');
+        setUserCouncilName(null);
       }
 
-      // 2. Now fetch dashboard data (which includes properties for 'Rates' and 'Water' and 'Animals')
+      if (userProfileData.council_logo_url) {
+        setUserCouncilLogoUrl(userProfileData.council_logo_url);
+        localStorage.setItem('userCouncilLogoUrl', userProfileData.council_logo_url);
+        console.log('DashboardPage: User council logo URL fetched and set:', userProfileData.council_logo_url);
+      } else {
+        console.warn('DashboardPage: User profile fetched, but "council_logo_url" field is missing. Defaulting to null.');
+        setUserCouncilLogoUrl(null);
+      }
+
+      // 2. Now fetch dashboard data (which includes properties, animals, waste etc.)
       const dashboardRes = await fetch('https://assemblymk1-backend.onrender.com/dashboard/', {
         method: 'GET',
         headers: {
@@ -122,7 +123,8 @@ function DashboardPage() {
           alert('Your session has expired or is invalid. Please log in again.');
           localStorage.removeItem('token');
           localStorage.removeItem('userName');
-          localStorage.removeItem('userCouncil');
+          localStorage.removeItem('userCouncilName');
+          localStorage.removeItem('userCouncilLogoUrl');
           navigate('/#/');
           return;
         }
@@ -143,13 +145,17 @@ function DashboardPage() {
   useEffect(() => {
     const token = localStorage.getItem('token');
     const storedUserName = localStorage.getItem('userName');
-    const storedUserCouncil = localStorage.getItem('userCouncil');
+    const storedUserCouncilName = localStorage.getItem('userCouncilName');
+    const storedUserCouncilLogoUrl = localStorage.getItem('userCouncilLogoUrl');
 
     if (storedUserName) {
       setUserName(storedUserName);
     }
-    if (storedUserCouncil) {
-      setUserCouncil(storedUserCouncil);
+    if (storedUserCouncilName) {
+      setUserCouncilName(storedUserCouncilName);
+    }
+    if (storedUserCouncilLogoUrl) {
+      setUserCouncilLogoUrl(storedUserCouncilLogoUrl);
     }
 
     console.log('DashboardPage: Token retrieved from localStorage for useEffect:', token);
@@ -168,8 +174,6 @@ function DashboardPage() {
     setSelectedCategory(category);
   };
 
-  // Get items for the selected category
-  // For 'Animals', we'll pass the 'Animals' data directly
   const selectedCategoryItems = selectedCategory ? (processes[selectedCategory] || []) : [];
 
   if (loading) {
@@ -189,7 +193,13 @@ function DashboardPage() {
         <button onClick={() => window.location.reload()}>Retry</button>
         <p>
           If the problem persists, please{' '}
-          <span className="link" onClick={() => { localStorage.removeItem('token'); localStorage.removeItem('userName'); localStorage.removeItem('userCouncil'); navigate('/#/'); }}>
+          <span className="link" onClick={() => {
+            localStorage.removeItem('token');
+            localStorage.removeItem('userName');
+            localStorage.removeItem('userCouncilName');
+            localStorage.removeItem('userCouncilLogoUrl');
+            navigate('/#/');
+          }}>
             log in again
           </span>.
         </p>
@@ -201,8 +211,11 @@ function DashboardPage() {
     <div className="dashboard">
       <div className="dashboard-top-row">
         <div className="header-left">
-          {userCouncil && councilLogos[userCouncil] && (
-            <img src={councilLogos[userCouncil]} alt={`${userCouncil} Logo`} className="council-logo" />
+          {userCouncilLogoUrl ? ( // Use userCouncilLogoUrl state
+            <img src={userCouncilLogoUrl} alt={`${userCouncilName || 'Council'} Logo`} className="council-logo" />
+          ) : (
+            // Optional: Placeholder if no logo is available
+            <div className="council-logo-placeholder"></div>
           )}
           <h1 className="welcome-heading">Welcome, {userName}</h1>
         </div>
@@ -227,7 +240,8 @@ function DashboardPage() {
         <button className="logout-btn" onClick={() => {
           localStorage.removeItem('token');
           localStorage.removeItem('userName');
-          localStorage.removeItem('userCouncil');
+          localStorage.removeItem('userCouncilName');
+          localStorage.removeItem('userCouncilLogoUrl');
           navigate('/#/');
         }}>Logout</button>
       </div>
@@ -242,7 +256,7 @@ function DashboardPage() {
               ) : selectedCategory === 'Water' ? (
                 <WaterDetails properties={selectedCategoryItems} />
               ) : selectedCategory === 'Animals' ? (
-                <AnimalDetails animals={selectedCategoryItems} /> 
+                <AnimalDetails animals={selectedCategoryItems} />
               ) : selectedCategory === 'Waste' ? (
                 <WasteDetails wasteData={selectedCategoryItems} /> {/* Pass wasteData to WasteDetails */}
               ) : (
