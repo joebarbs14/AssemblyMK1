@@ -4,6 +4,7 @@ import './DashboardPage.css';
 import RatesDetails from './RatesDetails'; // Import the RatesDetails component
 import WaterDetails from './WaterDetails'; // Import the WaterDetails component
 import AnimalDetails from './AnimalDetails'; // Import the new AnimalDetails component
+import WasteDetails from './WasteDetails'; // Import the new WasteDetails component
 
 const categories = [
   "Rates", "Water", "Development", "Community",
@@ -13,7 +14,7 @@ const categories = [
 // Helper function to get emoji for each category
 const getCategoryEmoji = (category) => {
   switch (category) {
-    case "Rates": return "�";
+    case "Rates": return "🏠";
     case "Water": return "💧";
     case "Development": return "🏗️";
     case "Community": return "🤝";
@@ -21,7 +22,7 @@ const getCategoryEmoji = (category) => {
     case "Waste": return "🗑️";
     case "Animals": return "🐾";
     case "Public Health": return "⚕️";
-    case "Environment": return "🌳";
+    case "Environment": return "�";
     default: return "✨";
   }
 };
@@ -235,13 +236,15 @@ function DashboardPage() {
         <div className="selected-category-details-container">
           <div className="selected-category-details">
             <h2>Details for {selectedCategory}</h2>
-            {selectedCategoryItems.length > 0 || selectedCategory === 'Animals' ? ( // Always render AnimalDetails if selected, even if no animals
+            {selectedCategoryItems.length > 0 || selectedCategory === 'Animals' || selectedCategory === 'Waste' ? (
               selectedCategory === 'Rates' ? (
                 <RatesDetails properties={selectedCategoryItems} />
               ) : selectedCategory === 'Water' ? (
                 <WaterDetails properties={selectedCategoryItems} />
               ) : selectedCategory === 'Animals' ? (
                 <AnimalDetails animals={selectedCategoryItems} /> 
+              ) : selectedCategory === 'Waste' ? (
+                <WasteDetails wasteData={selectedCategoryItems} /> {/* Pass wasteData to WasteDetails */}
               ) : (
                 <ul>
                   {selectedCategoryItems.map((item) => (
