@@ -57,6 +57,9 @@ class Council(db.Model):
     # Relationship to properties and animals
     properties = db.relationship('Property', backref='council_obj', lazy=True)
     animals = db.relationship('Animal', backref='council_obj', lazy=True) # New relationship to Animal
+    # New relationship for WasteCollection
+    waste_collections = db.relationship('WasteCollection', backref='council', lazy=True)
+
 
     def __repr__(self):
         return f'<Council {self.name}>'
@@ -120,3 +123,20 @@ class Animal(db.Model):
 
     def __repr__(self):
         return f'<Animal {self.name} ({self.type})>'
+
+# WasteCollection Model (Ensuring this is present)
+class WasteCollection(db.Model):
+    __tablename__ = 'waste_collection'
+    id = db.Column(db.Integer, primary_key=True)
+    council_id = db.Column(db.Integer, db.ForeignKey('council.id'), nullable=False)
+    collection_type = db.Column(db.String(50), nullable=False) # e.g., 'Garbage', 'Recycling', 'Greenwaste', 'Repurpose'
+    collection_day = db.Column(db.String(20), nullable=True) # e.g., 'Monday', 'Tuesday'
+    collection_frequency = db.Column(db.String(50), nullable=True) # e.g., 'weekly', 'fortnightly'
+    next_collection_date = db.Column(db.DateTime, nullable=True)
+    route_geojson = db.Column(JSONB, nullable=True) # GeoJSON for the truck route
+    notes = db.Column(db.Text, nullable=True) # General notes or specific instructions
+    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    updated_at = db.Column(db.DateTime, onupdate=datetime.datetime.utcnow)
+
+    def __repr__(self):
+        return f'<WasteCollection {self.collection_type} for Council {self.council_id}>'
