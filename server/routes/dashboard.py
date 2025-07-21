@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
-# Import all necessary models: Process, Property, Council, Animal
-from models import Process, Property, Council, Animal, WaterConsumption # Ensure WaterConsumption is imported if used
+# Import all necessary models: Process, Property, Council, Animal, WaterConsumption, WasteCollection
+from models import Process, Property, Council, Animal, WaterConsumption, WasteCollection
 import traceback
 import logging
 from routes.decorators import auth_required
@@ -40,18 +40,18 @@ def get_dashboard():
                     data[category] = [{
                         'id': item.id,
                         'address': item.address,
-                        'council_name': item.council_obj.name if item.council_obj else None, # Get council name
-                        'council_logo_url': item.council_obj.logo_url if item.council_obj else None, # Get council logo
+                        'council_name': item.council_obj.name if item.council_obj else None,
+                        'council_logo_url': item.council_obj.logo_url if item.council_obj else None,
                         'gps_coordinates': item.gps_coordinates,
                         'shape_file_data': item.shape_file_data,
                         'land_size_sqm': item.land_size_sqm,
                         'property_value': item.property_value,
                         'land_value': item.land_value,
                         'zone': item.zone,
-                        'property_type': item.property_type, # Include property_type
+                        'property_type': item.property_type,
                         'created_at': item.created_at.isoformat() if item.created_at else None,
                         'updated_at': item.updated_at.isoformat() if item.updated_at else None,
-                        'type': 'property' # Add a type identifier for frontend
+                        'type': 'property'
                     } for item in items]
                 elif category == "Water":
                     # Fetch properties for 'Water' category, eager-loading WaterConsumption and Council
@@ -62,10 +62,10 @@ def get_dashboard():
                     data[category] = [{
                         'id': item.id,
                         'address': item.address,
-                        'council_name': item.council_obj.name if item.council_obj else None, # Get council name
-                        'council_logo_url': item.council_obj.logo_url if item.council_obj else None, # Get council logo
-                        'property_type': item.property_type, # Include property_type
-                        'land_size_sqm': item.land_size_sqm, # Include land size for water details
+                        'council_name': item.council_obj.name if item.council_obj else None,
+                        'council_logo_url': item.council_obj.logo_url if item.council_obj else None,
+                        'property_type': item.property_type,
+                        'land_size_sqm': item.land_size_sqm,
                         'water_consumptions': [{
                             'id': wc.id,
                             'quarter_start_date': wc.quarter_start_date.isoformat(),
@@ -74,12 +74,10 @@ def get_dashboard():
                             'amount_owing': wc.amount_owing,
                             'bill_due_date': wc.bill_due_date.isoformat() if wc.bill_due_date else None,
                         } for wc in item.water_consumptions],
-                        'type': 'property' # Add a type identifier for frontend
+                        'type': 'property'
                     } for item in items]
                 elif category == "Animals":
                     # Fetch animals available for adoption, joining with Council for logo/name
-                    # For simplicity, we'll fetch all animals marked 'available_for_adoption'
-                    # In a real app, you might filter by user's council or proximity
                     items = Animal.query.filter_by(status='available_for_adoption')\
                                   .options(joinedload(Animal.council_obj)).all()
                     logging.info(f"[dashboard] Found {len(items)} animals for 'Animals' category.")
@@ -94,13 +92,39 @@ def get_dashboard():
                         'temperament': item.temperament,
                         'status': item.status,
                         'main_photo_url': item.main_photo_url,
-                        'gallery_urls': item.gallery_urls, # JSONB will be deserialized by SQLAlchemy
+                        'gallery_urls': item.gallery_urls,
                         'council_name': item.council_obj.name if item.council_obj else None,
                         'council_logo_url': item.council_obj.logo_url if item.council_obj else None,
                         'created_at': item.created_at.isoformat() if item.created_at else None,
                         'updated_at': item.updated_at.isoformat() if item.updated_at else None,
-                        'type': 'animal' # Add a type identifier for frontend
+                        'type': 'animal'
                     } for item in items]
+                elif category == "Waste":
+                    # Fetch waste collection data for the user's council
+                    # Assuming user has a property, and we can get their council_id from there.
+                    # This is a simplification; a more robust solution might involve user's primary property.
+                    user_properties = Property.query.filter_by(resident_id=user_id).first()
+                    council_id = user_properties.council_id if user_properties else None
+
+                    if council_id:
+                        items = WasteCollection.query.filter_by(council_id=council_id)\
+                                      .options(joinedload(WasteCollection.council)).all() # Eager load council object
+                        logging.info(f"[dashboard] Found {len(items)} waste collections for council_id {council_id}.")
+                        data[category] = [{
+                            'id': item.id,
+                            'council_id': item.council_id,
+                            'collection_type': item.collection_type,
+                            'collection_day': item.collection_day,
+                            'collection_frequency': item.collection_frequency,
+                            'next_collection_date': item.next_collection_date.isoformat() if item.next_collection_date else None,
+                            'route_geojson': item.route_geojson,
+                            'notes': item.notes,
+                            'council_name': item.council.name if item.council else None, # Access council name via relationship
+                            'type': 'waste_collection'
+                        } for item in items]
+                    else:
+                        logging.info(f"[dashboard] No properties found for user {user_id}, so no waste collection data fetched.")
+                        data[category] = [] # No properties, no waste data
                 else:
                     # Fetch processes for other categories
                     items = Process.query.filter_by(resident_id=user_id, category=category).all()
@@ -112,7 +136,7 @@ def get_dashboard():
                         'submitted_at': item.submitted_at.isoformat() if item.submitted_at else None,
                         'updated_at': item.updated_at.isoformat() if item.updated_at else None,
                         'form_data': item.form_data,
-                        'type': 'process' # Add a type identifier for frontend
+                        'type': 'process'
                     } for item in items]
 
             except Exception as db_e:
