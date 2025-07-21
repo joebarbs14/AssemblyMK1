@@ -13,7 +13,7 @@ const categories = [
 // Helper function to get emoji for each category
 const getCategoryEmoji = (category) => {
   switch (category) {
-    case "Rates": return "🏠";
+    case "Rates": return "�";
     case "Water": return "💧";
     case "Development": return "🏗️";
     case "Community": return "🤝";
@@ -241,7 +241,7 @@ function DashboardPage() {
               ) : selectedCategory === 'Water' ? (
                 <WaterDetails properties={selectedCategoryItems} />
               ) : selectedCategory === 'Animals' ? (
-                <AnimalDetails animals={selectedCategoryItems} /> {/* Pass animals data to AnimalDetails */}
+                <AnimalDetails animals={selectedCategoryItems} /> 
               ) : (
                 <ul>
                   {selectedCategoryItems.map((item) => (
@@ -276,3 +276,4 @@ function DashboardPage() {
 }
 
 export default DashboardPage;
+�
