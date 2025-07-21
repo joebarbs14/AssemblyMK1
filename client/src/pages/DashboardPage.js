@@ -14,7 +14,7 @@ const categories = [
 // Helper function to get emoji for each category
 const getCategoryEmoji = (category) => {
   switch (category) {
-    case "Rates": return "�";
+    case "Rates": return "🏠";
     case "Water": return "💧";
     case "Development": return "🏗️";
     case "Community": return "🤝";
@@ -22,7 +22,7 @@ const getCategoryEmoji = (category) => {
     case "Waste": return "🗑️";
     case "Animals": return "🐾";
     case "Public Health": return "⚕️";
-    case "Environment": return "🌳"; // Changed from '?' to '🌳' to fix syntax error
+    case "Environment": return "🌲"; // Changed from '?' to '🌳' to fix syntax error
     default: return "✨";
   }
 };
