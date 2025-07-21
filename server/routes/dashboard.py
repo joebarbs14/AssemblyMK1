@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
-# Import all necessary models: Process, Property, Council, Animal, WaterConsumption
-from models import Process, Property, Council, Animal, WaterConsumption
+# Import all necessary models: Process, Property, Council, Animal
+from models import Process, Property, Council, Animal, WaterConsumption # Ensure WaterConsumption is imported if used
 import traceback
 import logging
 from routes.decorators import auth_required
