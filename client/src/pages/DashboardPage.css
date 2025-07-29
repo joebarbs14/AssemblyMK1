@@ -89,7 +89,7 @@
   cursor: pointer;
   transition: all 0.3s ease-in-out; /* Smoother transition for all properties */
   display: flex;
-  flex-direction: column; /* Stack emoji and text vertically */
+  flex-direction: column; /* Stack icon and text vertically */
   align-items: center;
   justify-content: center;
   width: 70px; /* Reduced fixed width for compactness */
@@ -114,19 +114,30 @@
   margin: 0; /* Remove default h3 margin */
   font-size: 0.8em; /* Slightly smaller font size for category name */
   display: flex;
-  flex-direction: column; /* Stack emoji and text vertically */
+  flex-direction: column; /* Stack icon and text vertically */
   align-items: center;
-  gap: 3px; /* Reduced space between emoji and text */
+  gap: 3px; /* Reduced space between icon and text */
   line-height: 1.1; /* Adjust line height for better spacing */
   white-space: nowrap; /* Prevent text from wrapping inside tile */
   color: #495057; /* Slightly softer text color */
   font-weight: 500; /* Medium font weight */
 }
 
-.tile h3 .emoji {
-  font-size: 1.5em; /* Slightly smaller emoji size */
-  margin-bottom: 3px; /* Space between emoji and text */
+/* Updated styles for the new .icon class (replaces .emoji) */
+.tile h3 .icon { /* Target the span wrapping the SVG */
+  font-size: 1.5em; /* Controls the overall size of the icon container */
+  margin-bottom: 3px; /* Space between icon and text */
+  display: flex; /* Ensure flex for centering SVG */
+  align-items: center;
+  justify-content: center;
 }
+
+.tile h3 .icon svg { /* Target the SVG directly within the .icon span */
+  width: 100%; /* Make SVG fill its parent span */
+  height: 100%; /* Make SVG fill its parent span */
+  /* 'fill: currentColor' in JS handles the color, but you can override here if needed */
+}
+
 
 .no-items {
   color: #888;
@@ -436,7 +447,7 @@
   color: #003366;
 }
 
-.animal-action-tile .emoji {
+.animal-action-tile .emoji { /* Keep this for now, but it's not used by the new SVG icons */
   font-size: 1.2em;
 }
 
@@ -600,7 +611,7 @@
   border: 2px solid #0056b3;
 }
 
-.waste-action-tile .emoji {
+.waste-action-tile .emoji { /* Keep this for now, but it's not used by the new SVG icons */
   font-size: 2em;
   margin-bottom: 5px;
 }
