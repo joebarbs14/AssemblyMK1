@@ -14,16 +14,16 @@ const categories = [
 // Helper function to get emoji for each category
 const getCategoryEmoji = (category) => {
   switch (category) {
-    case "Rates": return "🏠";
-    case "Water": return "�";
-    case "Development": return "🏗️";
-    case "Community": return "🤝";
-    case "Roads": return "🛣️";
-    case "Waste": return "🗑️";
-    case "Animals": return "🐾";
-    case "Public Health": return "⚕️";
-    case "Environment": return "ENV"; // Changed from '🌳' to 'ENV'
-    default: return "✨";
+    case "Rates": return "RTS"; // Changed to text
+    case "Water": return "WTR"; // Changed to text
+    case "Development": return "DEV"; // Changed to text
+    case "Community": return "COM"; // Changed to text
+    case "Roads": return "RDS"; // Changed to text
+    case "Waste": return "WST"; // Changed to text
+    case "Animals": return "ANM"; // Changed to text
+    case "Public Health": return "PHL"; // Changed to text
+    case "Environment": return "ENV"; // Changed to text
+    default: return "GEN"; // Changed to text
   }
 };
 
