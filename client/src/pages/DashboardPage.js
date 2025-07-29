@@ -5,9 +5,10 @@ import RatesDetails from './RatesDetails'; // Import the RatesDetails component
 import WaterDetails from './WaterDetails'; // Import the WaterDetails component
 import AnimalDetails from './AnimalDetails'; // Import the new AnimalDetails component
 import WasteDetails from './WasteDetails'; // Import the new WasteDetails component
+import DevelopmentDetails from './DevelopmentDetails'; // NEW: Import the DevelopmentDetails component
 
-// DashboardPage.js - Version 1.0.9 - Cleaned to fix persistent build issues (import order fix)
-console.log("DashboardPage.js - Version 1.0.9 - Loading...");
+// DashboardPage.js - Version 1.0.10 - Development Portal Integration
+console.log("DashboardPage.js - Version 1.0.10 - Loading...");
 
 const categories = [
   "Rates", "Water", "Development", "Community",
@@ -292,7 +293,7 @@ function DashboardPage() {
         <div className="selected-category-details-container">
           <div className="selected-category-details">
             <h2>Details for {selectedCategory}</h2>
-            {selectedCategoryItems.length > 0 || selectedCategory === 'Animals' || selectedCategory === 'Waste' ? (
+            {selectedCategoryItems.length > 0 || selectedCategory === 'Animals' || selectedCategory === 'Waste' || selectedCategory === 'Development' ? (
               selectedCategory === 'Rates' ? (
                 <RatesDetails properties={selectedCategoryItems} />
               ) : selectedCategory === 'Water' ? (
@@ -300,7 +301,9 @@ function DashboardPage() {
               ) : selectedCategory === 'Animals' ? (
                 <AnimalDetails animals={selectedCategoryItems} />
               ) : selectedCategory === 'Waste' ? (
-                <WasteDetails wasteData={selectedCategoryItems} /> {/* Pass wasteData to WasteDetails */}
+                <WasteDetails wasteData={selectedCategoryItems} />
+              ) : selectedCategory === 'Development' ? ( // NEW: Render DevelopmentDetails for 'Development' category
+                <DevelopmentDetails applications={selectedCategoryItems} />
               ) : (
                 <ul>
                   {selectedCategoryItems.map((item) => (
