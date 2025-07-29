@@ -35,7 +35,7 @@ def get_dashboard():
                 if category == "Rates":
                     # Fetch properties for the 'Rates' category, joining with Council for logo/name
                     items = Property.query.filter_by(resident_id=user_id)\
-                                  .options(joinedload(Property.council_obj)).all()
+                                    .options(joinedload(Property.council_obj)).all()
                     logging.info(f"[dashboard] Found {len(items)} properties for 'Rates' for user {user_id}.")
                     data[category] = [{
                         'id': item.id,
@@ -56,8 +56,8 @@ def get_dashboard():
                 elif category == "Water":
                     # Fetch properties for 'Water' category, eager-loading WaterConsumption and Council
                     items = Property.query.filter_by(resident_id=user_id)\
-                                  .options(joinedload(Property.water_consumptions))\
-                                  .options(joinedload(Property.council_obj)).all()
+                                    .options(joinedload(Property.water_consumptions))\
+                                    .options(joinedload(Property.council_obj)).all()
                     logging.info(f"[dashboard] Found {len(items)} properties for 'Water' for user {user_id}.")
                     data[category] = [{
                         'id': item.id,
@@ -79,7 +79,7 @@ def get_dashboard():
                 elif category == "Animals":
                     # Fetch animals available for adoption, joining with Council for logo/name
                     items = Animal.query.filter_by(status='available_for_adoption')\
-                                  .options(joinedload(Animal.council_obj)).all()
+                                    .options(joinedload(Animal.council_obj)).all()
                     logging.info(f"[dashboard] Found {len(items)} animals for 'Animals' category.")
                     data[category] = [{
                         'id': item.id,
@@ -108,7 +108,7 @@ def get_dashboard():
 
                     if council_id:
                         items = WasteCollection.query.filter_by(council_id=council_id)\
-                                      .options(joinedload(WasteCollection.council)).all() # Eager load council object
+                                        .options(joinedload(WasteCollection.council)).all() # Eager load council object
                         logging.info(f"[dashboard] Found {len(items)} waste collections for council_id {council_id}.")
                         data[category] = [{
                             'id': item.id,
