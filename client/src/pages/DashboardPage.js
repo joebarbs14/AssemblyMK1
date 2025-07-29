@@ -11,24 +11,63 @@ const categories = [
   "Roads", "Waste", "Animals", "Public Health", "Environment"
 ];
 
-// Helper function to get emoji for each category
-const getCategoryEmoji = (category) => {
+// Helper function to get SVG icon for each category
+const getCategoryIcon = (category) => {
+  const iconStyle = { width: '24px', height: '24px', fill: 'currentColor' }; // Common style for icons
+
   switch (category) {
-    case "Rates": return "RTS"; // Changed to text
-    case "Water": return "WTR"; // Changed to text
-    case "Development": return "DEV"; // Changed to text
-    case "Community": return "COM"; // Changed to text
-    case "Roads": return "RDS"; // Changed to text
-    case "Waste": return "WST"; // Changed to text
-    case "Animals": return "ANM"; // Changed to text
-    case "Public Health": return "PHL"; // Changed to text
-    case "Environment": return "ENV"; // Changed to text
-    default: return "GEN"; // Changed to text
+    case "Rates": return (
+      <svg style={iconStyle} viewBox="0 0 24 24">
+        <path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3zm0 2.382L19.618 12H17v6h-4v-6h-2v6H7v-6H4.382L12 5.382z"/>
+      </svg>
+    );
+    case "Water": return (
+      <svg style={iconStyle} viewBox="0 0 24 24">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 17c-3.87 0-7-3.13-7-7 0-2.22 1.03-4.2 2.65-5.59L12 4.38l4.35 4.03C14.97 9.8 14 11.78 14 14c0 3.87-3.13 7-7 7z"/>
+      </svg>
+    );
+    case "Development": return (
+      <svg style={iconStyle} viewBox="0 0 24 24">
+        <path d="M17 17h-2v-4h-2v4h-2V7h2V3h2v4h2v10zm-6 0H9v-4H7v4H5V7h2V3h2v4h2v10z"/>
+      </svg>
+    );
+    case "Community": return (
+      <svg style={iconStyle} viewBox="0 0 24 24">
+        <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-4 0c1.66 0 2.99-1.34 2.99-3S13.66 5 12 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-4 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm8 2h-2c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4z"/>
+      </svg>
+    );
+    case "Roads": return (
+      <svg style={iconStyle} viewBox="0 0 24 24">
+        <path d="M18 4h-2v2h2V4zm-2 4h-2v2h2V8zm-2 4h-2v2h2v-2zm-2 4h-2v2h2v-2zM4 22h16V2H4v20zm2-4h12V6H6v12z"/>
+      </svg>
+    );
+    case "Waste": return (
+      <svg style={iconStyle} viewBox="0 0 24 24">
+        <path d="M16 9h-3V5h-2v4H8l-4 4v2h16v-2l-4-4zM9 16H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2z"/>
+      </svg>
+    );
+    case "Animals": return (
+      <svg style={iconStyle} viewBox="0 0 24 24">
+        <path d="M12 2c-3.87 0-7 3.13-7 7 0 2.22 1.03 4.2 2.65 5.59L12 22l4.35-7.41C14.97 13.2 14 11.22 14 9c0-3.87-3.13-7-7-7zM8 10c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm8 0c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
+      </svg>
+    );
+    case "Public Health": return (
+      <svg style={iconStyle} viewBox="0 0 24 24">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>
+      </svg>
+    );
+    case "Environment": return (
+      <svg style={iconStyle} viewBox="0 0 24 24">
+        <path d="M17.66 17.66C15.9 19.42 13.45 20 12 20s-3.9-1.58-5.66-3.34C4.58 14.9 4 12.45 4 11c0-1.45.58-3.9 2.34-5.66C8.1 3.58 10.55 3 12 3s3.9 1.58 5.66 3.34C19.42 8.1 20 10.55 20 12c0 1.45-.58 3.9-2.34 5.66zM12 5c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5z"/>
+      </svg>
+    );
+    default: return (
+      <svg style={iconStyle} viewBox="0 0 24 24">
+        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+      </svg>
+    );
   }
 };
-
-// REMOVED: Mock council logos (will now come from backend)
-// const councilLogos = { ... };
 
 
 function DashboardPage() {
@@ -229,7 +268,7 @@ function DashboardPage() {
                 onClick={() => handleTileClick(category)}
               >
                 <h3>
-                  <span className="emoji">{getCategoryEmoji(category)}</span>
+                  <span className="icon">{getCategoryIcon(category)}</span> {/* Changed class to 'icon' */}
                   {category}
                 </h3>
               </div>
