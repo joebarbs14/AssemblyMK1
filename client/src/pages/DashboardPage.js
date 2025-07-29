@@ -301,7 +301,7 @@ function DashboardPage() {
               ) : selectedCategory === 'Animals' ? (
                 <AnimalDetails animals={selectedCategoryItems} />
               ) : selectedCategory === 'Waste' ? (
-                <WasteDetails wasteData={selectedCategoryItems} /> {/* Pass wasteData to WasteDetails */}
+                <WasteDetails wasteData={selectedCategoryItems} />
               ) : (
                 <ul>
                   {selectedCategoryItems.map((item) => (
