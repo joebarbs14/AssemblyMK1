@@ -34,12 +34,9 @@ class Policy(db.Model):
 class Process(db.Model):
     __tablename__ = 'processes'
     id = db.Column(db.Integer, primary_key=True)
-    # FIX: The foreign key references the table name, not the model name.
-    # It should be 'resident.id' (lowercase) because __tablename__ = 'resident'
     resident_id = db.Column(db.Integer, db.ForeignKey('resident.id'), nullable=False)
     category = db.Column(db.String(100), nullable=False) # Added length and nullable
     title = db.Column(db.String(200), nullable=False) # Added length and nullable
-    # Use JSONB if you installed `sqlalchemy.dialects.postgresql.JSONB`
     form_data = db.Column(JSONB) # Changed from db.JSON to JSONB
     status = db.Column(db.String(50), default='pending', nullable=False) # Added length, default, and nullable
     submitted_at = db.Column(db.DateTime, default=datetime.datetime.utcnow, nullable=False) # Added default and nullable
@@ -48,7 +45,28 @@ class Process(db.Model):
     def __repr__(self):
         return f'<Process {self.title}>'
 
-# Property Model
+# Council Model
+class Council(db.Model):
+    __tablename__ = 'council'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(200), unique=True, nullable=False) # e.g., "City of Sydney"
+    shire_name = db.Column(db.String(200), nullable=True) # e.g., "Sydney" (if different from name)
+    logo_url = db.Column(db.String(500), nullable=True)
+    population = db.Column(db.Integer, nullable=True)
+    lga_shape_file = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    updated_at = db.Column(db.DateTime, onupdate=datetime.datetime.utcnow)
+
+    # Relationships
+    properties = db.relationship('Property', backref='council_obj', lazy=True)
+    animals = db.relationship('Animal', backref='council_obj', lazy=True) # Relationship to Animal
+    waste_collections = db.relationship('WasteCollection', backref='council', lazy=True) # Relationship for WasteCollection
+    development_applications = db.relationship('DevelopmentApplication', backref='council', lazy=True) # Relationship to DevelopmentApplication
+
+    def __repr__(self):
+        return f'<Council {self.name}>'
+
+# Property Model (Updated to include relationship to WaterConsumption)
 class Property(db.Model):
     __tablename__ = 'property' # Explicitly define table name
     id = db.Column(db.Integer, primary_key=True)
@@ -64,37 +82,16 @@ class Property(db.Model):
     zone = db.Column(db.String(100), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     updated_at = db.Column(db.DateTime, onupdate=datetime.datetime.utcnow)
-
-    # Relationship to Council
-    council_obj = db.relationship('Council', backref='properties', lazy=True)
+    
+    # New relationship to WaterConsumption
+    water_consumptions = db.relationship('WaterConsumption', backref='property', lazy=True)
     # Relationship to DevelopmentApplications
     development_applications = db.relationship('DevelopmentApplication', backref='property', lazy=True) # New relationship
 
     def __repr__(self):
         return f'<Property {self.address}>'
 
-# Council Model
-class Council(db.Model):
-    __tablename__ = 'council'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(200), unique=True, nullable=False) # e.g., "City of Sydney"
-    shire_name = db.Column(db.String(200), nullable=True) # e.g., "Sydney" (if different from name)
-    logo_url = db.Column(db.String(500), nullable=True)
-    population = db.Column(db.Integer, nullable=True)
-    lga_shape_file = db.Column(db.Text, nullable=True)
-    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    updated_at = db.Column(db.DateTime, onupdate=datetime.datetime.utcnow)
-
-    # Relationships
-    development_applications = db.relationship('DevelopmentApplication', backref='council', lazy=True) # New relationship
-    animals = db.relationship('Animal', backref='council_obj', lazy=True) # Existing relationship to Animal
-    waste_collections = db.relationship('WasteCollection', backref='council', lazy=True) # Existing relationship for WasteCollection
-
-
-    def __repr__(self):
-        return f'<Council {self.name}>'
-
-# WaterConsumption Model (Existing)
+# WaterConsumption Model
 class WaterConsumption(db.Model):
     __tablename__ = 'water_consumption'
     id = db.Column(db.Integer, primary_key=True)
@@ -110,7 +107,7 @@ class WaterConsumption(db.Model):
     def __repr__(self):
         return f'<WaterConsumption Property:{self.property_id} Quarter:{self.quarter_start_date.year}-Q{((self.quarter_start_date.month-1)//3)+1}>'
 
-# Animal Model (Existing)
+# New Animal Model
 class Animal(db.Model):
     __tablename__ = 'animal'
     id = db.Column(db.Integer, primary_key=True)
@@ -131,7 +128,7 @@ class Animal(db.Model):
     def __repr__(self):
         return f'<Animal {self.name} ({self.type})>'
 
-# WasteCollection Model (Existing)
+# WasteCollection Model (Ensuring this is present)
 class WasteCollection(db.Model):
     __tablename__ = 'waste_collection'
     id = db.Column(db.Integer, primary_key=True)
