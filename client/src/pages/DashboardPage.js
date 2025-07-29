@@ -1,6 +1,3 @@
-// DashboardPage.js - Version 1.0.7 - Cleaned to fix persistent build issues
-console.log("DashboardPage.js - Version 1.0.7 - Loading...");
-
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './DashboardPage.css';
@@ -8,6 +5,9 @@ import RatesDetails from './RatesDetails'; // Import the RatesDetails component
 import WaterDetails from './WaterDetails'; // Import the WaterDetails component
 import AnimalDetails from './AnimalDetails'; // Import the new AnimalDetails component
 import WasteDetails from './WasteDetails'; // Import the new WasteDetails component
+
+// DashboardPage.js - Version 1.0.9 - Cleaned to fix persistent build issues (import order fix)
+console.log("DashboardPage.js - Version 1.0.9 - Loading...");
 
 const categories = [
   "Rates", "Water", "Development", "Community",
@@ -292,7 +292,6 @@ function DashboardPage() {
         <div className="selected-category-details-container">
           <div className="selected-category-details">
             <h2>Details for {selectedCategory}</h2>
-            {/* Conditional rendering for category details */}
             {selectedCategoryItems.length > 0 || selectedCategory === 'Animals' || selectedCategory === 'Waste' ? (
               selectedCategory === 'Rates' ? (
                 <RatesDetails properties={selectedCategoryItems} />
@@ -301,7 +300,7 @@ function DashboardPage() {
               ) : selectedCategory === 'Animals' ? (
                 <AnimalDetails animals={selectedCategoryItems} />
               ) : selectedCategory === 'Waste' ? (
-                <WasteDetails wasteData={selectedCategoryItems} />
+                <WasteDetails wasteData={selectedCategoryItems} /> {/* Pass wasteData to WasteDetails */}
               ) : (
                 <ul>
                   {selectedCategoryItems.map((item) => (
