@@ -1,5 +1,5 @@
-// DashboardPage.js - Version 1.0.6 - Attempting to fix persistent build issues with inline SVGs and bad characters
-console.log("DashboardPage.js - Version 1.0.6 - Loading...");
+// DashboardPage.js - Version 1.0.7 - Cleaned to fix persistent build issues
+console.log("DashboardPage.js - Version 1.0.7 - Loading...");
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -271,7 +271,7 @@ function DashboardPage() {
                 onClick={() => handleTileClick(category)}
               >
                 <h3>
-                  <span className="icon">{getCategoryIcon(category)}</span> {/* Changed class to 'icon' */}
+                  <span className="icon">{getCategoryIcon(category)}</span>
                   {category}
                 </h3>
               </div>
@@ -292,7 +292,7 @@ function DashboardPage() {
         <div className="selected-category-details-container">
           <div className="selected-category-details">
             <h2>Details for {selectedCategory}</h2>
-            {/* THIS IS LINE 300: Conditional rendering for category details */}
+            {/* Conditional rendering for category details */}
             {selectedCategoryItems.length > 0 || selectedCategory === 'Animals' || selectedCategory === 'Waste' ? (
               selectedCategory === 'Rates' ? (
                 <RatesDetails properties={selectedCategoryItems} />
