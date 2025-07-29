@@ -15,14 +15,14 @@ const categories = [
 const getCategoryEmoji = (category) => {
   switch (category) {
     case "Rates": return "🏠";
-    case "Water": return "💧";
+    case "Water": return "�";
     case "Development": return "🏗️";
-    case "Community": return "🤝"; // Changed from '?' to '🤝' to fix syntax error
+    case "Community": return "🤝";
     case "Roads": return "🛣️";
     case "Waste": return "🗑️";
     case "Animals": return "🐾";
     case "Public Health": return "⚕️";
-    case "Environment": return "🌳";
+    case "Environment": return "ENV"; // Changed from '🌳' to 'ENV'
     default: return "✨";
   }
 };
