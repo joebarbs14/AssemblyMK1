@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
-# Import all necessary models: Process, Property, Council, Animal, WaterConsumption, WasteCollection
-from models import Process, Property, Council, Animal, WaterConsumption, WasteCollection
+# Import all necessary models: Process, Property, Council, Animal, WaterConsumption, WasteCollection, DevelopmentApplication
+from models import Process, Property, Council, Animal, WaterConsumption, WasteCollection, DevelopmentApplication
 import traceback
 import logging
 from routes.decorators import auth_required
@@ -101,8 +101,6 @@ def get_dashboard():
                     } for item in items]
                 elif category == "Waste":
                     # Fetch waste collection data for the user's council
-                    # Assuming user has a property, and we can get their council_id from there.
-                    # This is a simplification; a more robust solution might involve user's primary property.
                     user_properties = Property.query.filter_by(resident_id=user_id).first()
                     council_id = user_properties.council_id if user_properties else None
 
@@ -125,6 +123,29 @@ def get_dashboard():
                     else:
                         logging.info(f"[dashboard] No properties found for user {user_id}, so no waste collection data fetched.")
                         data[category] = [] # No properties, no waste data
+                elif category == "Development":
+                    # Fetch development applications for the user, eager-loading Property and Council
+                    items = DevelopmentApplication.query.filter_by(resident_id=user_id)\
+                                    .options(joinedload(DevelopmentApplication.property))\
+                                    .options(joinedload(DevelopmentApplication.council)).all()
+                    logging.info(f"[dashboard] Found {len(items)} development applications for user {user_id}.")
+                    data[category] = [{
+                        'id': item.id,
+                        'application_type': item.application_type,
+                        'status': item.status,
+                        'submission_date': item.submission_date.isoformat() if item.submission_date else None,
+                        'approval_date': item.approval_date.isoformat() if item.approval_date else None,
+                        'estimated_cost': item.estimated_cost,
+                        'description': item.description,
+                        'documents_url': item.documents_url,
+                        'gps_coordinates': item.gps_coordinates,
+                        'property_address': item.property.address if item.property else None,
+                        'council_name': item.council.name if item.council else None,
+                        'council_logo_url': item.council.logo_url if item.council else None,
+                        'created_at': item.created_at.isoformat() if item.created_at else None,
+                        'updated_at': item.updated_at.isoformat() if item.updated_at else None,
+                        'type': 'development_application'
+                    } for item in items]
                 else:
                     # Fetch processes for other categories
                     items = Process.query.filter_by(resident_id=user_id, category=category).all()
