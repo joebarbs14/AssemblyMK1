@@ -5,10 +5,10 @@ import RatesDetails from './RatesDetails'; // Import the RatesDetails component
 import WaterDetails from './WaterDetails'; // Import the WaterDetails component
 import AnimalDetails from './AnimalDetails'; // Import the new AnimalDetails component
 import WasteDetails from './WasteDetails'; // Import the new WasteDetails component
-import DevelopmentDetails from './DevelopmentDetails'; // NEW: Import the DevelopmentDetails component
+import DevelopmentDetails from './DevelopmentDetails'; // Import the DevelopmentDetails component
 
-// DashboardPage.js - Version 1.0.13 - Public Health Sub-tiles
-console.log("DashboardPage.js - Version 1.0.13 - Loading...");
+// DashboardPage.js - Version 1.0.14 - Environment Sub-tiles
+console.log("DashboardPage.js - Version 1.0.14 - Loading...");
 
 const categories = [
   "Rates", "Water", "Development", "Community",
@@ -25,6 +25,10 @@ const roadSubCategories = [
 
 const publicHealthSubCategories = [
   "Medical Services", "Resources", "Mental Health"
+];
+
+const environmentSubCategories = [
+  "Nature", "Walking Tracks", "National Parks", "Weed Spotting", "Wildlife", "Trees", "Water"
 ];
 
 // Helper function to get SVG icon for each category and sub-category
@@ -114,9 +118,40 @@ const getCategoryIcon = (category) => {
         <path d="M12 2c-4.97 0-9 4.03-9 9 0 4.17 2.84 7.67 6.67 8.67V22l-1.42-1.42c-2.42-2.42-3.58-5.74-3.25-9.15.3-3.23 2.92-5.91 6.13-6.19 3.2-.28 6.2 1.54 7.6 4.48 1.4 2.94.94 6.32-1.28 8.64L19 22v-1.33c3.83-1 6.67-4.5 6.67-8.67C21 6.03 16.97 2 12 2zm0 18c-3.1 0-5.65-2.22-6.57-5.18-.8-2.58-.2-5.46 1.77-7.43 1.97-1.97 4.85-2.57 7.43-1.77C18.15 12.35 20 15.68 20 19H12zm-2.5-3.5h5v2h-5v-2z"/>
       </svg>
     );
-    case "Environment": return (
+    case "Environment":
+    case "Nature": return (
       <svg style={iconStyle} viewBox="0 0 24 24">
         <path d="M17.66 17.66C15.9 19.42 13.45 20 12 20s-3.9-1.58-5.66-3.34C4.58 14.9 4 12.45 4 11c0-1.45.58-3.9 2.34-5.66C8.1 3.58 10.55 3 12 3s3.9 1.58 5.66 3.34C19.42 8.1 20 10.55 20 12c0 1.45-.58 3.9-2.34 5.66zM12 5c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5z"/>
+      </svg>
+    );
+    case "Walking Tracks": return (
+      <svg style={iconStyle} viewBox="0 0 24 24">
+        <path d="M12 2c-1.1 0-2 .9-2 2v10c0 1.1-.9 2-2 2H6v-2h2V4c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v14h16V4c0-1.1-.9-2-2-2h-2zm-6 16h-2v-2h2v2z"/>
+      </svg>
+    );
+    case "National Parks": return (
+      <svg style={iconStyle} viewBox="0 0 24 24">
+        <path d="M12 2c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9-4.03-9-9-9zM7 13l3 3 5-5-1.41-1.41-3.59 3.59-1.59-1.59L7 13z"/>
+      </svg>
+    );
+    case "Weed Spotting": return (
+      <svg style={iconStyle} viewBox="0 0 24 24">
+        <path d="M12 2c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9-4.03-9-9-9zm-1 15h-2v-6h2v6zm0-8h-2V7h2v2zm4 8h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+      </svg>
+    );
+    case "Wildlife": return (
+      <svg style={iconStyle} viewBox="0 0 24 24">
+        <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-4 0c1.66 0 2.99-1.34 2.99-3S13.66 5 12 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-4 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm8 2h-2c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4z"/>
+      </svg>
+    );
+    case "Trees": return (
+      <svg style={iconStyle} viewBox="0 0 24 24">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 17c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/>
+      </svg>
+    );
+    case "Water": return (
+      <svg style={iconStyle} viewBox="0 0 24 24">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 17c-3.87 0-7-3.13-7-7 0-2.22 1.03-4.2 2.65-5.59L12 4.38l4.35 4.03C14.97 9.8 14 11.78 14 14c0 3.87-3.13 7-7 7z"/>
       </svg>
     );
     default: return (
@@ -138,7 +173,8 @@ function DashboardPage() {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedCommunitySubCategory, setSelectedCommunitySubCategory] = useState(null);
   const [selectedRoadSubCategory, setSelectedRoadSubCategory] = useState(null);
-  const [selectedPublicHealthSubCategory, setSelectedPublicHealthSubCategory] = useState(null); // New state for public health sub-tiles
+  const [selectedPublicHealthSubCategory, setSelectedPublicHealthSubCategory] = useState(null);
+  const [selectedEnvironmentSubCategory, setSelectedEnvironmentSubCategory] = useState(null); // New state for environment sub-tiles
   const navigate = useNavigate();
 
   const fetchUserProfileAndDashboardData = useCallback(async (token) => {
@@ -275,7 +311,8 @@ function DashboardPage() {
     setSelectedCategory(category);
     setSelectedCommunitySubCategory(null);
     setSelectedRoadSubCategory(null);
-    setSelectedPublicHealthSubCategory(null); // Reset public health sub-category
+    setSelectedPublicHealthSubCategory(null);
+    setSelectedEnvironmentSubCategory(null); // Reset environment sub-category
   };
 
   const handleCommunitySubTileClick = (subCategory) => {
@@ -288,6 +325,10 @@ function DashboardPage() {
 
   const handlePublicHealthSubTileClick = (subCategory) => {
     setSelectedPublicHealthSubCategory(subCategory);
+  };
+
+  const handleEnvironmentSubTileClick = (subCategory) => {
+    setSelectedEnvironmentSubCategory(subCategory);
   };
 
 
@@ -417,6 +458,34 @@ function DashboardPage() {
       </div>
     </>
   );
+  
+  // Helper component to render environment sub-tiles and details
+  const renderEnvironmentContent = () => (
+    <>
+      <div className="environment-sub-tiles-container">
+        {environmentSubCategories.map(subCategory => (
+          <div
+            key={subCategory}
+            className={`tile ${selectedEnvironmentSubCategory === subCategory ? 'selected-tile' : ''}`}
+            onClick={() => handleEnvironmentSubTileClick(subCategory)}
+          >
+            <h3>
+              <span className="icon">{getCategoryIcon(subCategory)}</span>
+              {subCategory}
+            </h3>
+          </div>
+        ))}
+      </div>
+      <div className="environment-sub-category-details">
+        {selectedEnvironmentSubCategory ? (
+          <p className="no-entries">No entries found for {selectedEnvironmentSubCategory}.</p>
+        ) : (
+          <p className="no-entries">Please select an environment sub-category to view details.</p>
+        )}
+      </div>
+    </>
+  );
+
 
   return (
     <div className="dashboard">
@@ -470,6 +539,8 @@ function DashboardPage() {
               renderRoadsContent()
             ) : selectedCategory === 'Public Health' ? (
               renderPublicHealthContent()
+            ) : selectedCategory === 'Environment' ? (
+              renderEnvironmentContent()
             ) : (
               selectedCategoryItems.length > 0 || selectedCategory === 'Animals' || selectedCategory === 'Waste' || selectedCategory === 'Development' ? (
                 selectedCategory === 'Rates' ? (
