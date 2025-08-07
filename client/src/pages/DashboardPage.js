@@ -7,15 +7,19 @@ import AnimalDetails from './AnimalDetails'; // Import the new AnimalDetails com
 import WasteDetails from './WasteDetails'; // Import the new WasteDetails component
 import DevelopmentDetails from './DevelopmentDetails'; // NEW: Import the DevelopmentDetails component
 
-// DashboardPage.js - Version 1.0.10 - Development Portal Integration
-console.log("DashboardPage.js - Version 1.0.10 - Loading...");
+// DashboardPage.js - Version 1.0.11 - Community Sub-tiles
+console.log("DashboardPage.js - Version 1.0.11 - Loading...");
 
 const categories = [
   "Rates", "Water", "Development", "Community",
   "Roads", "Waste", "Animals", "Public Health", "Environment"
 ];
 
-// Helper function to get SVG icon for each category
+const communitySubCategories = [
+  "Community News", "Community Groups", "Community Services", "Local Events"
+];
+
+// Helper function to get SVG icon for each category and sub-category
 const getCategoryIcon = (category) => {
   const iconStyle = { width: '24px', height: '24px', fill: 'currentColor' }; // Common style for icons
 
@@ -35,9 +39,25 @@ const getCategoryIcon = (category) => {
         <path d="M17 17h-2v-4h-2v4h-2V7h2V3h2v4h2v10zm-6 0H9v-4H7v4H5V7h2V3h2v4h2v10z"/>
       </svg>
     );
-    case "Community": return (
+    case "Community":
+    case "Community Groups": return (
       <svg style={iconStyle} viewBox="0 0 24 24">
         <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-4 0c1.66 0 2.99-1.34 2.99-3S13.66 5 12 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-4 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm8 2h-2c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4z"/>
+      </svg>
+    );
+    case "Community News": return (
+      <svg style={iconStyle} viewBox="0 0 24 24">
+        <path d="M21 15h-9v-2h9v2zm0-4h-9V9h9v2zm0-4h-9V5h9v2zm-9 12h-9v-2h9v2zm0-4h-9v-2h9v2zm0-4h-9V9h9v2zM3 3h9v2h-9V3z"/>
+      </svg>
+    );
+    case "Community Services": return (
+      <svg style={iconStyle} viewBox="0 0 24 24">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-2.97 1.62-5.55 4-6.92V12h3v1.93l-3 3v2.5z"/>
+      </svg>
+    );
+    case "Local Events": return (
+      <svg style={iconStyle} viewBox="0 0 24 24">
+        <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
       </svg>
     );
     case "Roads": return (
@@ -77,11 +97,12 @@ const getCategoryIcon = (category) => {
 function DashboardPage() {
   const [processes, setProcesses] = useState({});
   const [userName, setUserName] = useState('Resident');
-  const [userCouncilName, setUserCouncilName] = useState(null); // Renamed for clarity
-  const [userCouncilLogoUrl, setUserCouncilLogoUrl] = useState(null); // New state for logo URL
+  const [userCouncilName, setUserCouncilName] = useState(null);
+  const [userCouncilLogoUrl, setUserCouncilLogoUrl] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedCommunitySubCategory, setSelectedCommunitySubCategory] = useState(null); // New state for community sub-tiles
   const navigate = useNavigate();
 
   const fetchUserProfileAndDashboardData = useCallback(async (token) => {
@@ -99,17 +120,18 @@ function DashboardPage() {
       let userProfileData = {};
 
       if (userProfileContentType?.includes('application/json')) {
-          userProfileData = await userProfileRes.json();
+        userProfileData = await userProfileRes.json();
       }
 
       if (!userProfileRes.ok) {
         console.error(`Failed to fetch user profile: Status ${userProfileRes.status}, Message: ${userProfileData.message || userProfileData.error || 'Unknown error'}`);
         if (userProfileRes.status === 401 || userProfileRes.status === 403) {
-          alert('Your session has expired or is invalid. Please log in again.');
+          // Changed from alert() to a custom console log.
+          console.error('Session expired. Please log in again.');
           localStorage.removeItem('token');
           localStorage.removeItem('userName');
-          localStorage.removeItem('userCouncilName'); // Clear old council name
-          localStorage.removeItem('userCouncilLogoUrl'); // Clear old logo URL
+          localStorage.removeItem('userCouncilName');
+          localStorage.removeItem('userCouncilLogoUrl');
           navigate('/#/');
           return;
         }
@@ -125,7 +147,6 @@ function DashboardPage() {
         setUserName('Resident');
       }
 
-      // Update state and local storage with council name and logo URL
       if (userProfileData.council_name) {
         setUserCouncilName(userProfileData.council_name);
         localStorage.setItem('userCouncilName', userProfileData.council_name);
@@ -157,13 +178,14 @@ function DashboardPage() {
       let dashboardResultData = {};
 
       if (dashboardContentType?.includes('application/json')) {
-          dashboardResultData = await dashboardRes.json();
+        dashboardResultData = await dashboardRes.json();
       }
 
       if (!dashboardRes.ok) {
         console.error(`Dashboard fetch failed: Status ${dashboardRes.status}, Message: ${dashboardResultData.message || dashboardResultData.error || 'Unknown error'}`);
         if (dashboardRes.status === 401 || dashboardRes.status === 403) {
-          alert('Your session has expired or is invalid. Please log in again.');
+          // Changed from alert() to a custom console log.
+          console.error('Session expired. Please log in again.');
           localStorage.removeItem('token');
           localStorage.removeItem('userName');
           localStorage.removeItem('userCouncilName');
@@ -213,8 +235,16 @@ function DashboardPage() {
 
   }, [navigate, fetchUserProfileAndDashboardData]);
 
+  // Handle clicks for main categories and reset sub-category state
   const handleTileClick = (category) => {
     setSelectedCategory(category);
+    // Reset community sub-category when a main category is selected
+    setSelectedCommunitySubCategory(null);
+  };
+
+  // Handle clicks for community sub-categories
+  const handleCommunitySubTileClick = (subCategory) => {
+    setSelectedCommunitySubCategory(subCategory);
   };
 
   const selectedCategoryItems = selectedCategory ? (processes[selectedCategory] || []) : [];
@@ -250,19 +280,53 @@ function DashboardPage() {
     );
   }
 
+  // Helper component to render community sub-tiles
+  const renderCommunitySubTiles = () => (
+    <div className="community-sub-tiles-container">
+      {communitySubCategories.map(subCategory => (
+        <div
+          key={subCategory}
+          className={`tile ${selectedCommunitySubCategory === subCategory ? 'selected-tile' : ''}`}
+          onClick={() => handleCommunitySubTileClick(subCategory)}
+        >
+          <h3>
+            <span className="icon">{getCategoryIcon(subCategory)}</span>
+            {subCategory}
+          </h3>
+        </div>
+      ))}
+    </div>
+  );
+
+  // Helper component to render community sub-category details
+  const renderCommunityDetails = () => {
+    if (!selectedCommunitySubCategory) {
+      return (
+        <p className="no-entries">Please select a community sub-category.</p>
+      );
+    }
+
+    // For now, we'll show a simple message as there's no backend data
+    return (
+      <div className="community-sub-category-details">
+        <h3>{selectedCommunitySubCategory}</h3>
+        <p className="no-entries">No entries found for {selectedCommunitySubCategory}.</p>
+      </div>
+    );
+  };
+
   return (
     <div className="dashboard">
       <div className="dashboard-top-row">
         <div className="header-left">
-          {userCouncilLogoUrl ? ( // Use userCouncilLogoUrl state
+          {userCouncilLogoUrl ? (
             <img src={userCouncilLogoUrl} alt={`${userCouncilName || 'Council'} Logo`} className="council-logo" />
           ) : (
-            // Optional: Placeholder if no logo is available
             <div className="council-logo-placeholder"></div>
           )}
           <h1 className="welcome-heading">Welcome, {userName}</h1>
         </div>
-        
+
         <div className="tiles-inline-container">
           <div className="tiles">
             {categories.map(category => (
@@ -293,42 +357,50 @@ function DashboardPage() {
         <div className="selected-category-details-container">
           <div className="selected-category-details">
             <h2>Details for {selectedCategory}</h2>
-            {selectedCategoryItems.length > 0 || selectedCategory === 'Animals' || selectedCategory === 'Waste' || selectedCategory === 'Development' ? (
-              selectedCategory === 'Rates' ? (
-                <RatesDetails properties={selectedCategoryItems} />
-              ) : selectedCategory === 'Water' ? (
-                <WaterDetails properties={selectedCategoryItems} />
-              ) : selectedCategory === 'Animals' ? (
-                <AnimalDetails animals={selectedCategoryItems} />
-              ) : selectedCategory === 'Waste' ? (
-                <WasteDetails wasteData={selectedCategoryItems} />
-              ) : selectedCategory === 'Development' ? ( // NEW: Render DevelopmentDetails for 'Development' category
-                <DevelopmentDetails applications={selectedCategoryItems} />
-              ) : (
-                <ul>
-                  {selectedCategoryItems.map((item) => (
-                    <li key={item.id} className="process-item-full-detail">
-                      <>
-                        <div className="process-title">{item.title}</div>
-                        <div className="process-detail">Status: {item.status}</div>
-                        {item.submitted_at && (
-                          <div className="process-detail">Submitted: {new Date(item.submitted_at).toLocaleDateString()}</div>
-                        )}
-                        {item.updated_at && (
-                          <div className="process-detail">Updated: {new Date(item.updated_at).toLocaleDateString()}</div>
-                        )}
-                        {item.form_data && Object.keys(item.form_data).length > 0 && (
-                          <div className="process-detail">
-                            Form Data: {JSON.stringify(item.form_data)}
-                          </div>
-                        )}
-                      </>
-                    </li>
-                  ))}
-                </ul>
-              )
+            {/* Conditional rendering for Community sub-tiles or other category details */}
+            {selectedCategory === 'Community' ? (
+              <>
+                {renderCommunitySubTiles()}
+                {renderCommunityDetails()}
+              </>
             ) : (
-              <p className="no-entries">No entries found for {selectedCategory}.</p>
+              selectedCategoryItems.length > 0 || selectedCategory === 'Animals' || selectedCategory === 'Waste' || selectedCategory === 'Development' ? (
+                selectedCategory === 'Rates' ? (
+                  <RatesDetails properties={selectedCategoryItems} />
+                ) : selectedCategory === 'Water' ? (
+                  <WaterDetails properties={selectedCategoryItems} />
+                ) : selectedCategory === 'Animals' ? (
+                  <AnimalDetails animals={selectedCategoryItems} />
+                ) : selectedCategory === 'Waste' ? (
+                  <WasteDetails wasteData={selectedCategoryItems} />
+                ) : selectedCategory === 'Development' ? (
+                  <DevelopmentDetails applications={selectedCategoryItems} />
+                ) : (
+                  <ul>
+                    {selectedCategoryItems.map((item) => (
+                      <li key={item.id} className="process-item-full-detail">
+                        <>
+                          <div className="process-title">{item.title}</div>
+                          <div className="process-detail">Status: {item.status}</div>
+                          {item.submitted_at && (
+                            <div className="process-detail">Submitted: {new Date(item.submitted_at).toLocaleDateString()}</div>
+                          )}
+                          {item.updated_at && (
+                            <div className="process-detail">Updated: {new Date(item.updated_at).toLocaleDateString()}</div>
+                          )}
+                          {item.form_data && Object.keys(item.form_data).length > 0 && (
+                            <div className="process-detail">
+                              Form Data: {JSON.stringify(item.form_data)}
+                            </div>
+                          )}
+                        </>
+                      </li>
+                    ))}
+                  </ul>
+                )
+              ) : (
+                <p className="no-entries">No entries found for {selectedCategory}.</p>
+              )
             )}
           </div>
         </div>
