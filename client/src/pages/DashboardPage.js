@@ -7,8 +7,8 @@ import AnimalDetails from './AnimalDetails'; // Import the new AnimalDetails com
 import WasteDetails from './WasteDetails'; // Import the new WasteDetails component
 import DevelopmentDetails from './DevelopmentDetails'; // NEW: Import the DevelopmentDetails component
 
-// DashboardPage.js - Version 1.0.12 - Roads Sub-tiles and Map
-console.log("DashboardPage.js - Version 1.0.12 - Loading...");
+// DashboardPage.js - Version 1.0.13 - Public Health Sub-tiles
+console.log("DashboardPage.js - Version 1.0.13 - Loading...");
 
 const categories = [
   "Rates", "Water", "Development", "Community",
@@ -21,6 +21,10 @@ const communitySubCategories = [
 
 const roadSubCategories = [
   "Current Road works", "Upcoming Roadworks", "Report a problem"
+];
+
+const publicHealthSubCategories = [
+  "Medical Services", "Resources", "Mental Health"
 ];
 
 // Helper function to get SVG icon for each category and sub-category
@@ -94,9 +98,20 @@ const getCategoryIcon = (category) => {
         <path d="M12 2c-3.87 0-7 3.13-7 7 0 2.22 1.03 4.2 2.65 5.59L12 22l4.35-7.41C14.97 13.2 14 11.22 14 9c0-3.87-3.13-7-7-7zM8 10c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm8 0c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
       </svg>
     );
-    case "Public Health": return (
+    case "Public Health":
+    case "Medical Services": return (
       <svg style={iconStyle} viewBox="0 0 24 24">
         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>
+      </svg>
+    );
+    case "Resources": return (
+      <svg style={iconStyle} viewBox="0 0 24 24">
+        <path d="M12 11.55l-5.63 2.81 1.07-6.23-4.54-4.41 6.26-.91L12 0l2.84 5.67 6.26.91-4.54 4.41 1.07 6.23z"/>
+      </svg>
+    );
+    case "Mental Health": return (
+      <svg style={iconStyle} viewBox="0 0 24 24">
+        <path d="M12 2c-4.97 0-9 4.03-9 9 0 4.17 2.84 7.67 6.67 8.67V22l-1.42-1.42c-2.42-2.42-3.58-5.74-3.25-9.15.3-3.23 2.92-5.91 6.13-6.19 3.2-.28 6.2 1.54 7.6 4.48 1.4 2.94.94 6.32-1.28 8.64L19 22v-1.33c3.83-1 6.67-4.5 6.67-8.67C21 6.03 16.97 2 12 2zm0 18c-3.1 0-5.65-2.22-6.57-5.18-.8-2.58-.2-5.46 1.77-7.43 1.97-1.97 4.85-2.57 7.43-1.77C18.15 12.35 20 15.68 20 19H12zm-2.5-3.5h5v2h-5v-2z"/>
       </svg>
     );
     case "Environment": return (
@@ -122,7 +137,8 @@ function DashboardPage() {
   const [error, setError] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedCommunitySubCategory, setSelectedCommunitySubCategory] = useState(null);
-  const [selectedRoadSubCategory, setSelectedRoadSubCategory] = useState(null); // New state for roads sub-tiles
+  const [selectedRoadSubCategory, setSelectedRoadSubCategory] = useState(null);
+  const [selectedPublicHealthSubCategory, setSelectedPublicHealthSubCategory] = useState(null); // New state for public health sub-tiles
   const navigate = useNavigate();
 
   const fetchUserProfileAndDashboardData = useCallback(async (token) => {
@@ -255,23 +271,25 @@ function DashboardPage() {
 
   }, [navigate, fetchUserProfileAndDashboardData]);
 
-  // Handle clicks for main categories and reset sub-category state
   const handleTileClick = (category) => {
     setSelectedCategory(category);
-    // Reset community and roads sub-category when a main category is selected
     setSelectedCommunitySubCategory(null);
     setSelectedRoadSubCategory(null);
+    setSelectedPublicHealthSubCategory(null); // Reset public health sub-category
   };
 
-  // Handle clicks for community sub-categories
   const handleCommunitySubTileClick = (subCategory) => {
     setSelectedCommunitySubCategory(subCategory);
   };
 
-  // Handle clicks for roads sub-categories
   const handleRoadSubTileClick = (subCategory) => {
     setSelectedRoadSubCategory(subCategory);
   };
+
+  const handlePublicHealthSubTileClick = (subCategory) => {
+    setSelectedPublicHealthSubCategory(subCategory);
+  };
+
 
   const selectedCategoryItems = selectedCategory ? (processes[selectedCategory] || []) : [];
 
@@ -373,6 +391,33 @@ function DashboardPage() {
     </>
   );
 
+  // Helper component to render public health sub-tiles and details
+  const renderPublicHealthContent = () => (
+    <>
+      <div className="public-health-sub-tiles-container">
+        {publicHealthSubCategories.map(subCategory => (
+          <div
+            key={subCategory}
+            className={`tile ${selectedPublicHealthSubCategory === subCategory ? 'selected-tile' : ''}`}
+            onClick={() => handlePublicHealthSubTileClick(subCategory)}
+          >
+            <h3>
+              <span className="icon">{getCategoryIcon(subCategory)}</span>
+              {subCategory}
+            </h3>
+          </div>
+        ))}
+      </div>
+      <div className="public-health-sub-category-details">
+        {selectedPublicHealthSubCategory ? (
+          <p className="no-entries">No entries found for {selectedPublicHealthSubCategory}.</p>
+        ) : (
+          <p className="no-entries">Please select a public health sub-category to view details.</p>
+        )}
+      </div>
+    </>
+  );
+
   return (
     <div className="dashboard">
       <div className="dashboard-top-row">
@@ -423,6 +468,8 @@ function DashboardPage() {
               </>
             ) : selectedCategory === 'Roads' ? (
               renderRoadsContent()
+            ) : selectedCategory === 'Public Health' ? (
+              renderPublicHealthContent()
             ) : (
               selectedCategoryItems.length > 0 || selectedCategory === 'Animals' || selectedCategory === 'Waste' || selectedCategory === 'Development' ? (
                 selectedCategory === 'Rates' ? (
