@@ -7,8 +7,8 @@ import AnimalDetails from './AnimalDetails'; // Import the new AnimalDetails com
 import WasteDetails from './WasteDetails'; // Import the new WasteDetails component
 import DevelopmentDetails from './DevelopmentDetails'; // NEW: Import the DevelopmentDetails component
 
-// DashboardPage.js - Version 1.0.11 - Community Sub-tiles
-console.log("DashboardPage.js - Version 1.0.11 - Loading...");
+// DashboardPage.js - Version 1.0.12 - Roads Sub-tiles and Map
+console.log("DashboardPage.js - Version 1.0.12 - Loading...");
 
 const categories = [
   "Rates", "Water", "Development", "Community",
@@ -17,6 +17,10 @@ const categories = [
 
 const communitySubCategories = [
   "Community News", "Community Groups", "Community Services", "Local Events"
+];
+
+const roadSubCategories = [
+  "Current Road works", "Upcoming Roadworks", "Report a problem"
 ];
 
 // Helper function to get SVG icon for each category and sub-category
@@ -65,6 +69,21 @@ const getCategoryIcon = (category) => {
         <path d="M18 4h-2v2h2V4zm-2 4h-2v2h2V8zm-2 4h-2v2h2v-2zm-2 4h-2v2h2v-2zM4 22h16V2H4v20zm2-4h12V6H6v12z"/>
       </svg>
     );
+    case "Current Road works": return (
+      <svg style={iconStyle} viewBox="0 0 24 24">
+        <path d="M10 18h4v-2h-4v2zM3 4v2h18V4H3zm3 7h12v2H6v-2z"/>
+      </svg>
+    );
+    case "Upcoming Roadworks": return (
+      <svg style={iconStyle} viewBox="0 0 24 24">
+        <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+      </svg>
+    );
+    case "Report a problem": return (
+      <svg style={iconStyle} viewBox="0 0 24 24">
+        <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+      </svg>
+    );
     case "Waste": return (
       <svg style={iconStyle} viewBox="0 0 24 24">
         <path d="M16 9h-3V5h-2v4H8l-4 4v2h16v-2l-4-4zM9 16H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2z"/>
@@ -102,7 +121,8 @@ function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [selectedCommunitySubCategory, setSelectedCommunitySubCategory] = useState(null); // New state for community sub-tiles
+  const [selectedCommunitySubCategory, setSelectedCommunitySubCategory] = useState(null);
+  const [selectedRoadSubCategory, setSelectedRoadSubCategory] = useState(null); // New state for roads sub-tiles
   const navigate = useNavigate();
 
   const fetchUserProfileAndDashboardData = useCallback(async (token) => {
@@ -238,13 +258,19 @@ function DashboardPage() {
   // Handle clicks for main categories and reset sub-category state
   const handleTileClick = (category) => {
     setSelectedCategory(category);
-    // Reset community sub-category when a main category is selected
+    // Reset community and roads sub-category when a main category is selected
     setSelectedCommunitySubCategory(null);
+    setSelectedRoadSubCategory(null);
   };
 
   // Handle clicks for community sub-categories
   const handleCommunitySubTileClick = (subCategory) => {
     setSelectedCommunitySubCategory(subCategory);
+  };
+
+  // Handle clicks for roads sub-categories
+  const handleRoadSubTileClick = (subCategory) => {
+    setSelectedRoadSubCategory(subCategory);
   };
 
   const selectedCategoryItems = selectedCategory ? (processes[selectedCategory] || []) : [];
@@ -305,7 +331,6 @@ function DashboardPage() {
         <p className="no-entries">Please select a community sub-category.</p>
       );
     }
-
     // For now, we'll show a simple message as there's no backend data
     return (
       <div className="community-sub-category-details">
@@ -314,6 +339,39 @@ function DashboardPage() {
       </div>
     );
   };
+
+  // Helper component to render roads sub-tiles and map
+  const renderRoadsContent = () => (
+    <>
+      <div className="roads-sub-tiles-container">
+        {roadSubCategories.map(subCategory => (
+          <div
+            key={subCategory}
+            className={`tile ${selectedRoadSubCategory === subCategory ? 'selected-tile' : ''}`}
+            onClick={() => handleRoadSubTileClick(subCategory)}
+          >
+            <h3>
+              <span className="icon">{getCategoryIcon(subCategory)}</span>
+              {subCategory}
+            </h3>
+          </div>
+        ))}
+      </div>
+      <div className="roads-map-and-details-container">
+        <div className="map-placeholder">
+          {/* A simple placeholder for the map */}
+          <p>Map showing road information will appear here.</p>
+        </div>
+        <div className="roads-sub-category-details">
+          {selectedRoadSubCategory ? (
+            <p className="no-entries">No entries found for {selectedRoadSubCategory}.</p>
+          ) : (
+            <p className="no-entries">Please select a road sub-category to view details.</p>
+          )}
+        </div>
+      </div>
+    </>
+  );
 
   return (
     <div className="dashboard">
@@ -357,12 +415,14 @@ function DashboardPage() {
         <div className="selected-category-details-container">
           <div className="selected-category-details">
             <h2>Details for {selectedCategory}</h2>
-            {/* Conditional rendering for Community sub-tiles or other category details */}
+            {/* Conditional rendering for different categories */}
             {selectedCategory === 'Community' ? (
               <>
                 {renderCommunitySubTiles()}
                 {renderCommunityDetails()}
               </>
+            ) : selectedCategory === 'Roads' ? (
+              renderRoadsContent()
             ) : (
               selectedCategoryItems.length > 0 || selectedCategory === 'Animals' || selectedCategory === 'Waste' || selectedCategory === 'Development' ? (
                 selectedCategory === 'Rates' ? (
