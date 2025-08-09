@@ -1,3 +1,4 @@
+/* ===== Dashboard layout ===== */
 .dashboard {
   padding: 1.5rem; /* Increased padding for more breathing room */
   text-align: center;
@@ -8,796 +9,49 @@
   background-color: #f8f9fa; /* Light background for the whole page */
 }
 
-.dashboard-top-row { /* Container for the entire top row: logo, welcome, tiles, logout */
-  display: flex;
-  justify-content: space-between; /* Distributes items along the main axis */
-  align-items: center; /* Vertically centers items in the flex container */
-  flex-wrap: wrap; /* Allows wrapping on smaller screens if content exceeds width */
-  margin-bottom: 2rem; /* Increased margin for more separation */
-  padding: 0 1.5rem; /* Increased padding to match overall page padding */
-  gap: 15px; /* Increased space between the three main sections (left, tiles, right) */
-  width: 100%; /* Ensure it takes full width */
-}
-
-.header-left { /* Container for logo and welcome */
-  display: flex;
-  align-items: center;
-  gap: 15px; /* Increased space between logo and welcome text */
-  flex-shrink: 0; /* Prevent this section from shrinking */
-}
-
-.dashboard-header h1, .welcome-heading { /* Combined for consistency */
-  font-size: clamp(1.5rem, 4vw, 2.2rem); /* More responsive and slightly larger font for welcome */
-  margin: 0; /* Remove default margin */
-  display: flex; /* Added for aligning logo with text */
-  align-items: center; /* Center logo vertically with text */
-  gap: 10px; /* Space between text and logo */
-  color: #212529; /* Darker, more prominent text */
-  white-space: nowrap; /* Prevent text from wrapping */
-  font-weight: 600; /* Slightly bolder for prominence */
-}
-
-.council-logo {
-  width: clamp(35px, 7vw, 60px); /* Slightly larger auto-size for main logo */
-  height: clamp(35px, 7vw, 60px); /* Slightly larger auto-size for main logo */
-  border-radius: 50%; /* Make it round */
-  object-fit: cover; /* Ensure image covers the area */
-  border: 2px solid #e9ecef; /* More prominent border */
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* Subtle shadow */
-  flex-shrink: 0; /* Prevent shrinking */
-}
-
-.logout-btn {
-  background-color: #dc3545;
-  color: white;
-  border: none;
-  padding: 0.6rem 1.2rem; /* Slightly larger padding */
-  border-radius: 8px; /* More rounded corners */
-  font-size: 1rem; /* Slightly larger font */
-  cursor: pointer;
-  transition: background-color 0.2s ease-in-out, transform 0.2s ease; /* Added transform for hover effect */
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Subtle shadow */
-  flex-shrink: 0; /* Prevent shrinking */
-}
-
-.logout-btn:hover {
-  background-color: #c82333;
-  transform: translateY(-1px); /* Slight lift on hover */
-}
-
-.tiles-inline-container { /* Container for tiles to align them */
-  flex-grow: 1; /* Allows tiles to take up available space */
-  display: flex;
-  justify-content: center; /* Center the tiles horizontally within their container */
-  min-width: 0; /* Allows flex item to shrink below content size */
-}
-
-.tiles {
-  display: flex; /* Ensures horizontal alignment */
-  flex-wrap: wrap; /* ALLOWS tiles to wrap to a new line if needed */
-  gap: 0.5rem; /* Reduced gap between tiles for compactness */
-  padding: 0 0.5rem; /* Reduced padding */
-  align-items: center; /* Align items vertically in the flex container */
-  justify-content: center; /* Center tiles horizontally if there's extra space */
-}
-
-.tile {
-  background: linear-gradient(145deg, #ffffff, #f0f0f0); /* Subtle gradient for depth */
-  padding: 0.5rem; /* Reduced padding for smaller tiles */
-  border-radius: 10px; /* Slightly less rounded for compactness */
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08); /* Slightly less pronounced shadow */
-  cursor: pointer;
-  transition: all 0.3s ease-in-out; /* Smoother transition for all properties */
-  display: flex;
-  flex-direction: column; /* Stack icon and text vertically */
-  align-items: center;
-  justify-content: center;
-  width: 70px; /* Reduced fixed width for compactness */
-  height: 70px; /* Reduced fixed height for compactness */
-  flex-shrink: 0; /* Prevent tiles from shrinking */
-  border: 1px solid #e0e0e0; /* Subtle border */
-}
-
-.tile:hover {
-  background-color: #e9ecef; /* Lighter hover background */
-  transform: translateY(-2px) scale(1.02); /* Less pronounced lift and scale on hover */
-  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.12); /* Enhanced shadow on hover */
-}
-
-.tile.selected-tile {
-  border: 3px solid #007bff; /* Thicker, more prominent border for selected state */
-  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3); /* Blue glowing effect for selected */
-  background: linear-gradient(145deg, #e0f2ff, #cce7ff); /* Subtle blue gradient for selected */
-}
-
-.tile h3 {
-  margin: 0; /* Remove default h3 margin */
-  font-size: 0.8em; /* Slightly smaller font size for category name */
-  display: flex;
-  flex-direction: column; /* Stack icon and text vertically */
-  align-items: center;
-  gap: 3px; /* Reduced space between icon and text */
-  line-height: 1.1; /* Adjust line height for better spacing */
-  white-space: nowrap; /* Prevent text from wrapping inside tile */
-  color: #495057; /* Slightly softer text color */
-  font-weight: 500; /* Medium font weight */
-}
-
-/* Updated styles for the new .icon class (replaces .emoji) */
-.tile h3 .icon { /* Target the span wrapping the SVG */
-  font-size: 1.5em; /* Controls the overall size of the icon container */
-  margin-bottom: 3px; /* Space between icon and text */
-  display: flex; /* Ensure flex for centering SVG */
-  align-items: center;
-  justify-content: center;
-}
-
-.tile h3 .icon svg { /* Target the SVG directly within the .icon span */
-  width: 100%; /* Make SVG fill its parent span */
-  height: 100%; /* Make SVG fill its parent span */
-  /* 'fill: currentColor' in JS handles the color, but you can override here if needed */
-}
-
-
-.no-items {
-  color: #888;
-  font-style: italic;
-  font-size: 0.8em;
-}
-
-/* New container for details and map to enable side-by-side */
-.selected-category-details-container {
-  display: flex; /* Use flexbox for side-by-side layout */
-  flex-direction: column; /* Default to column on small screens */
-  gap: 25px; /* Increased space between details and map */
-  margin-top: 30px;
-  width: 90%;
-  max-width: 1200px;
-  margin-left: auto;
-  margin-right: auto;
-  text-align: left;
-  flex-grow: 1; /* Allow this section to take remaining vertical space */
-  background-color: #ffffff; /* White background for the container */
-  border-radius: 15px; /* More rounded corners */
-  box-shadow: 0 6px 20px rgba(0,0,0,0.08); /* More subtle, elegant shadow */
-  padding: 25px; /* Increased padding */
-}
-
-/* Styles for larger screens to enable side-by-side */
-@media (min-width: 768px) {
-  .selected-category-details-container {
-    flex-direction: row; /* Row layout on larger screens */
-    align-items: flex-start; /* Align items to the top */
-  }
-}
-
-.selected-category-details {
-  background-color: #fff; /* Explicitly white */
-  border-radius: 12px; /* Consistent rounded corners */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* Lighter shadow */
-  padding: 20px;
-  flex: 1; /* Allow details to take up available space */
-  min-width: 300px; /* Ensure it doesn't get too small */
-  border: 1px solid #f0f0f0; /* Very light border */
-}
-
-.selected-category-details h2 {
-  color: #333;
-  margin-bottom: 20px;
-  text-align: center;
-  font-size: 1.6rem; /* Slightly larger heading */
-  font-weight: 600;
-}
-
-.selected-category-details ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-/* Styles for individual property item cards (used by RatesDetails and WaterDetails) */
-.property-item-card {
-  background-color: #ffffff;
-  border: 1px solid #e9ecef;
-  border-radius: 10px;
-  padding: 15px;
-  margin-bottom: 15px;
-  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
-  transition: all 0.2s ease-in-out;
-  display: flex; /* Use flexbox for details and mini-map side-by-side */
-  align-items: flex-start; /* Align items to the top */
-  gap: 15px; /* Space between details and mini-map */
-}
-
-.property-item-card:hover {
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-  transform: translateY(-2px);
-}
-
-.property-details-content { /* Container for the text details within the card */
-  flex-grow: 1; /* Allow text content to take available space */
-  text-align: left; /* Ensure text aligns left within its container */
-}
-
-.property-title {
-  font-size: 1.15em;
-  font-weight: bold;
-  color: #007bff;
-  margin-bottom: 8px;
-}
-
-.property-info {
-  font-size: 0.95em;
-  color: #555;
-  margin-bottom: 4px;
-}
-
-/* Styles for property header within property item cards */
-.property-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-  width: 100%; /* Ensure header takes full width within the item */
-}
-
-.property-address-council {
-  flex-grow: 1;
-}
-
-.council-logo-small {
-  width: 40px; /* Slightly larger for better visibility in details */
-  height: 40px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 1px solid #e0e0e0; /* Lighter border */
-  margin-left: 15px; /* Increased margin for better separation */
-  flex-shrink: 0;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.1); /* Subtle shadow */
-}
-
-/* Mini-map container styles for each property item (used by RatesDetails) */
-.mini-map-container {
-  width: 150px; /* Fixed width for the mini-map */
-  height: 100px; /* Fixed height for the mini-map */
-  border-radius: 8px; /* Rounded corners for the mini-map */
-  overflow: hidden; /* Ensure map content stays within bounds */
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for the mini-map */
-  flex-shrink: 0; /* Prevent mini-map from shrinking */
-  border: 1px solid #ddd; /* Light border for definition */
-}
-
-/* Ensure Leaflet map fills its container */
-.mini-map-container .leaflet-container { /* Target Leaflet's main container */
-  width: 100%;
-  height: 100%;
-}
-
-/* Hide the shape file data text display */
-.property-info:has(span.shape-file-data-label) { /* Target the div containing the specific label */
-  display: none;
-}
-
-/* --- STYLES FOR WATER DETAILS COMPONENT (Existing) --- */
-.water-details-content {
-  /* Inherits general styling from selected-category-details-container */
-}
-
-.water-section-title {
-  font-size: 1.2em;
-  font-weight: bold;
-  color: #0056b3; /* A shade of blue for water section */
-  margin-top: 15px;
-  margin-bottom: 10px;
-  padding-bottom: 5px;
-  border-bottom: 1px solid #eee; /* Subtle separator */
-}
-
-.water-consumption-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.water-quarter-card {
-  background-color: #fefefe; /* Very light background for quarters */
-  border: 1px solid #e0f2f7; /* Light blue border */
-  border-radius: 8px;
-  padding: 12px 15px;
-  margin-bottom: 10px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-  transition: all 0.2s ease-in-out;
-}
-
-.water-quarter-card:hover {
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  transform: translateY(-1px);
-}
-
-.quarter-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-  font-weight: 600;
-  color: #333;
-}
-
-.quarter-title {
-  font-size: 1em;
-}
-
-.bill-due-date {
-  font-size: 0.85em;
-  color: #666;
-  background-color: #ffe0b2; /* Light orange background */
-  padding: 3px 8px;
-  border-radius: 5px;
-}
-
-.consumption-details {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Responsive grid for details */
-  gap: 8px 15px; /* Row and column gap */
-  margin-bottom: 10px;
-}
-
-.consumption-item {
-  font-size: 0.9em;
-  color: #555;
-}
-
-.consumption-item .value {
-  font-weight: bold;
-  color: #212529;
-}
-
-.consumption-item.over-allocation .value {
-  color: #dc3545; /* Red for over allocation */
-}
-
-.progress-bar-container {
-  width: 100%;
-  background-color: #e9ecef;
-  border-radius: 5px;
-  height: 15px;
-  overflow: hidden;
-  position: relative;
-  margin-top: 5px;
-}
-
-.progress-bar {
-  height: 100%;
-  border-radius: 5px;
-  text-align: right;
-  color: white;
-  font-size: 0.75em;
-  line-height: 15px;
-  transition: width 0.5s ease-in-out, background-color 0.3s ease-in-out;
-}
-
-.progress-text {
-  position: absolute;
-  right: 5px;
-  top: 0;
-  color: #333; /* Dark text for contrast on lighter bar */
-  font-size: 0.75em;
-  line-height: 15px;
-  text-shadow: 0 0 2px rgba(255,255,255,0.5); /* Subtle shadow for readability */
-}
-
-/* --- NEW STYLES FOR ANIMAL DETAILS COMPONENT --- */
-.animal-details-content {
-  /* Inherits general styling from selected-category-details-container */
-}
-
-.animal-section-title {
-  font-size: 1.2em;
-  font-weight: bold;
-  color: #28a745; /* Green shade for animal section */
-  margin-top: 15px;
-  margin-bottom: 15px;
-  padding-bottom: 5px;
-  border-bottom: 1px solid #eee;
-}
-
-.animal-action-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px; /* Space between action tiles */
-  margin-bottom: 25px;
-}
-
-.animal-action-tile {
-  background: linear-gradient(145deg, #e6f7ff, #cceeff); /* Light blue gradient */
-  padding: 12px 15px;
-  border-radius: 10px;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
-  cursor: pointer;
-  transition: all 0.3s ease-in-out;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.95em;
-  font-weight: 500;
-  color: #0056b3; /* Darker blue text */
-  border: 1px solid #b3e0ff;
-  flex-basis: calc(50% - 10px); /* Two columns on larger screens */
-  max-width: 250px; /* Max width for individual tile */
-  text-align: left;
-}
-
-@media (min-width: 600px) {
-  .animal-action-tile {
-    flex-basis: calc(25% - 10px); /* Four columns on larger screens */
-  }
-}
-
-.animal-action-tile:hover {
-  background-color: #b3e0ff;
-  transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.12);
-}
-
-.animal-action-tile.selected-action-tile {
-  border: 2px solid #007bff;
-  box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
-  background: linear-gradient(145deg, #a0d9ff, #80c8ff);
-  color: #003366;
-}
-
-.animal-action-tile .emoji { /* Keep this for now, but it's not used by the new SVG icons */
-  font-size: 1.2em;
-}
-
-.adoptable-animals-listing {
-  margin-top: 20px;
-}
-
-.listing-title {
-  font-size: 1.3em;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-.animal-cards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Responsive grid for animal cards */
-  gap: 25px;
-  justify-content: center; /* Center cards in the grid */
-}
-
-.animal-card {
-  background-color: #ffffff;
-  border: 1px solid #e9ecef;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-  overflow: hidden; /* Ensures rounded corners apply to images */
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-  text-align: left;
-}
-
-.animal-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-}
-
-.animal-main-photo-container {
-  width: 100%;
-  height: 180px; /* Fixed height for main photo container */
-  overflow: hidden;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #f0f0f0; /* Placeholder background */
-}
-
-.animal-main-photo {
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* Ensures image covers the area, cropping if necessary */
-  display: block;
-}
-
-.animal-gallery {
-  display: flex;
-  justify-content: center;
-  gap: 5px;
-  padding: 10px;
-  background-color: #f8f9fa; /* Light background for gallery */
-  border-bottom: 1px solid #eee;
-}
-
-.animal-gallery-thumbnail {
-  width: 60px;
-  height: 45px;
-  object-fit: cover;
-  border-radius: 5px;
-  border: 1px solid #ddd;
-  cursor: pointer;
-  transition: transform 0.1s ease;
-}
-
-.animal-gallery-thumbnail:hover {
-  transform: scale(1.05);
-}
-
-.animal-details-text {
-  padding: 15px;
-}
-
-.animal-name {
-  font-size: 1.4em;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 8px;
-  text-align: center;
-}
-
-.animal-info {
-  font-size: 0.95em;
-  color: #555;
-  margin-bottom: 4px;
-}
-
-.animal-temperament {
-  font-size: 0.9em;
-  color: #666;
-  line-height: 1.4;
-  margin-top: 10px;
-  font-style: italic;
-}
-
-.action-info {
-  background-color: #f0f8ff; /* Light blue background for info sections */
-  border: 1px solid #b0e0e6;
-  border-radius: 10px;
-  padding: 20px;
-  margin-top: 20px;
-  color: #333;
-  font-size: 1em;
-  line-height: 1.5;
-  text-align: center;
-}
-
-/* --- New Styles for WasteDetails.js --- */
-.waste-details-content {
-  padding: 10px;
-}
-
-.waste-section-title {
-  font-size: 1.5rem;
-  color: #333;
-  margin-bottom: 15px;
-  text-align: center;
-}
-
-.waste-action-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.waste-action-tile {
-  background-color: #e9ecef;
-  padding: 15px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.2s ease, box-shadow 0.2s ease;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-weight: bold;
-  color: #495057;
-  min-width: 120px; /* Ensure buttons have a decent size */
-  text-align: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-}
-
-.waste-action-tile:hover {
-  background-color: #dee2e6;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.waste-action-tile.selected-action-tile {
-  background-color: #007bff;
-  color: white;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  border: 2px solid #0056b3;
-}
-
-.waste-action-tile .emoji { /* Keep this for now, but it's not used by the new SVG icons */
-  font-size: 2em;
-  margin-bottom: 5px;
-}
-
-.waste-type-details {
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
-}
-
-.waste-type-details .listing-title {
-  font-size: 1.3em;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 15px;
-  text-align: center;
-}
-
-.waste-type-details .collection-info,
-.waste-type-details .collection-notes {
-  font-size: 1em;
-  color: #555;
-  margin-bottom: 10px;
-  text-align: center;
-}
-
-.waste-map-container {
-  width: 100%;
-  height: 400px; /* Fixed height for the map */
-  border-radius: 8px;
-  overflow: hidden;
-  margin-top: 20px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-/* --- NEW STYLES FOR DEVELOPMENT DETAILS COMPONENT --- */
-.development-details-content {
-  /* Inherits general styling from selected-category-details-container */
-  padding: 10px; /* Consistent padding */
-}
-
-.development-applications-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.development-item-card {
-  background-color: #ffffff;
-  border: 1px solid #e9ecef;
-  border-radius: 10px;
-  padding: 15px;
-  margin-bottom: 15px;
-  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
-  transition: all 0.2s ease-in-out;
-  display: flex; /* Use flexbox for details and mini-map side-by-side */
-  align-items: flex-start;
-  gap: 15px;
-}
-
-.development-item-card:hover {
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-  transform: translateY(-2px);
-}
-
-.development-details-content { /* Container for the text details within the card */
-  flex-grow: 1;
-  text-align: left;
-}
-
-.development-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-  width: 100%;
-}
-
-.development-title-info {
-  flex-grow: 1;
-}
-
-.development-title {
-  font-size: 1.15em;
-  font-weight: bold;
-  color: #007bff; /* Blue for titles, consistent with property titles */
-  margin-bottom: 8px;
-}
-
-.development-info {
-  font-size: 0.95em;
-  color: #555;
-  margin-bottom: 4px;
-}
-
-.development-info ul { /* For document lists */
-  margin-top: 5px;
-  margin-left: 20px;
-  list-style: disc;
-}
-
-.development-info ul li {
-  margin-bottom: 3px;
-}
-
-.development-info a {
-  color: #007bff;
-  text-decoration: none;
-}
-
-.development-info a:hover {
-  text-decoration: underline;
-}
-
-/* Status styling for Development Applications */
-.status-submitted {
-  color: #ffc107; /* Yellow/Orange for Submitted */
-  font-weight: bold;
-}
-
-.status-under-review {
-  color: #17a2b8; /* Cyan for Under Review */
-  font-weight: bold;
-}
-
-.status-approved {
-  color: #28a745; /* Green for Approved */
-  font-weight: bold;
-}
-
-.status-rejected {
-  color: #dc3545; /* Red for Rejected */
-  font-weight: bold;
-}
-
-/* Re-using mini-map-container and its Leaflet styles for DevelopmentDetails */
-/* The .mini-map-container and .mini-map-container .leaflet-container styles are already defined above
-
-.dashboard {
-  padding: 1.5rem;
-  text-align: center;
-  font-family: 'Inter', sans-serif;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background-color: #f8f9fa;
-}
-
-/* --- TOP ROW --- */
+/* ===== Top row: logo + welcome | tiles | logout ===== */
 .dashboard-top-row {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 12px;                 /* tighter spacing */
   padding: 8px 12px;
   width: 100%;
   box-sizing: border-box;
-  flex-wrap: nowrap;
+  flex-wrap: nowrap;         /* keep in one line when possible */
 }
 
+/* Left: logo + welcome */
 .header-left {
   display: flex;
   align-items: center;
   gap: 10px;
-  min-width: 260px;
+  min-width: 260px;          /* keep logo + name together */
+  flex-shrink: 0;
 }
 
+.dashboard-header h1,
 .welcome-heading {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: 1.25rem;        /* compact to fit first row */
   line-height: 1.2;
   white-space: nowrap;
   font-weight: 600;
   color: #212529;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-/* --- LOGO --- */
+/* Bigger, rectangular council logo */
 .council-logo {
   width: 180px;
   height: 64px;
-  border-radius: 8px;
-  object-fit: contain;
+  border-radius: 8px;        /* rectangle (not circle) */
+  object-fit: contain;       /* don’t crop logos */
   background: #fff;
   padding: 6px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
   border: 2px solid #e9ecef;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
   flex-shrink: 0;
 }
 
@@ -808,47 +62,30 @@
   background: #e9ecef;
 }
 
-/* --- LOGOUT BUTTON --- */
-.logout-btn {
-  flex: 0 0 auto;
-  padding: 8px 12px;
-  font-size: 0.95rem;
-  background-color: #dc3545;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.2s ease-in-out, transform 0.2s ease;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-.logout-btn:hover {
-  background-color: #c82333;
-  transform: translateY(-1px);
-}
-
-/* --- TILE ROW --- */
+/* Middle: tiles row kept compact; scroll if overflow */
 .tiles-inline-container {
   flex: 1 1 auto;
   overflow-x: auto;
   min-width: 0;
+  display: flex;
+  justify-content: center;
 }
 
 .tiles {
   display: flex;
   align-items: center;
-  gap: 8px;
-  flex-wrap: nowrap;
+  gap: 8px;                  /* small gaps */
+  flex-wrap: nowrap;         /* one line */
   padding: 4px 0;
-  scrollbar-width: thin;
+  scrollbar-width: thin;     /* Firefox */
 }
 
 .tiles::-webkit-scrollbar {
   height: 6px;
 }
 
+/* Tile */
 .tile {
-  flex: 0 0 auto;
   background: linear-gradient(145deg, #ffffff, #f0f0f0);
   padding: 8px 10px;
   border-radius: 10px;
@@ -856,11 +93,12 @@
   width: 70px;
   height: 70px;
   display: flex;
-  flex-direction: column;
+  flex-direction: column;    /* icon above text */
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.3s ease-in-out;
+  flex: 0 0 auto;
 }
 
 .tile:hover {
@@ -889,7 +127,7 @@
 }
 
 .tile h3 .icon {
-  font-size: 1.5em;
+  font-size: 1.5em; /* controls SVG box size */
   margin-bottom: 3px;
   display: flex;
   align-items: center;
@@ -901,17 +139,29 @@
   height: 100%;
 }
 
-/* --- NO ITEMS --- */
-.no-items {
-  color: #888;
-  font-style: italic;
-  font-size: 0.8em;
+/* Right: logout */
+.logout-btn {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 8px 12px;         /* compact */
+  border-radius: 8px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out, transform 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  flex-shrink: 0;
 }
 
-/* --- CATEGORY DETAILS CONTAINER --- */
+.logout-btn:hover {
+  background-color: #c82333;
+  transform: translateY(-1px);
+}
+
+/* ===== Details container ===== */
 .selected-category-details-container {
-  display: flex;
-  flex-direction: column;
+  display: flex;             /* side-by-side on wide screens via media query */
+  flex-direction: column;    /* default for small screens */
   gap: 25px;
   margin-top: 30px;
   width: 90%;
@@ -928,7 +178,7 @@
 
 @media (min-width: 768px) {
   .selected-category-details-container {
-    flex-direction: row;
+    flex-direction: row;     /* side-by-side on larger screens */
     align-items: flex-start;
   }
 }
@@ -936,7 +186,7 @@
 .selected-category-details {
   background-color: #fff;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
   padding: 20px;
   flex: 1;
   min-width: 300px;
@@ -957,8 +207,237 @@
   margin: 0;
 }
 
-/* Keep your component-specific styles below this point unchanged from original */
+/* ===== Common pieces ===== */
+.no-items {
+  color: #888;
+  font-style: italic;
+  font-size: 0.8em;
+}
 
-/* (Place all your RatesDetails, WaterDetails, AnimalDetails, WasteDetails, DevelopmentDetails styles here exactly as before) */
+/* ===== Property cards (RatesDetails & WaterDetails) ===== */
+.property-item-card {
+  background-color: #ffffff;
+  border: 1px solid #e9ecef;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 15px;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease-in-out;
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+}
 
-   and will apply to the maps in DevelopmentDetails as well. */
+.property-item-card:hover {
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.property-details-content {
+  flex-grow: 1;
+  text-align: left;
+}
+
+.property-title {
+  font-size: 1.15em;
+  font-weight: bold;
+  color: #007bff;
+  margin-bottom: 8px;
+}
+
+.property-info {
+  font-size: 0.95em;
+  color: #555;
+  margin-bottom: 4px;
+}
+
+/* Property header */
+.property-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+.property-address-council {
+  flex-grow: 1;
+}
+
+.council-logo-small {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #e0e0e0;
+  margin-left: 15px;
+  flex-shrink: 0;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+/* Mini map */
+.mini-map-container {
+  width: 150px;
+  height: 100px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+  border: 1px solid #ddd;
+}
+
+/* Ensure Leaflet map fills its container */
+.mini-map-container .leaflet-container {
+  width: 100%;
+  height: 100%;
+}
+
+/* Hide the shape file data text display (if supported by your PostCSS) */
+.property-info:has(span.shape-file-data-label) {
+  display: none;
+}
+
+/* ===== WaterDetails ===== */
+.water-details-content { }
+.water-section-title {
+  font-size: 1.2em;
+  font-weight: bold;
+  color: #0056b3;
+  margin-top: 15px;
+  margin-bottom: 10px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #eee;
+}
+.water-consumption-list { list-style: none; padding: 0; margin: 0; }
+.water-quarter-card {
+  background-color: #fefefe;
+  border: 1px solid #e0f2f7;
+  border-radius: 8px;
+  padding: 12px 15px;
+  margin-bottom: 10px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  transition: all 0.2s ease-in-out;
+}
+.water-quarter-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); transform: translateY(-1px); }
+.quarter-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-weight: 600; color: #333; }
+.quarter-title { font-size: 1em; }
+.bill-due-date { font-size: 0.85em; color: #666; background-color: #ffe0b2; padding: 3px 8px; border-radius: 5px; }
+.consumption-details { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px 15px; margin-bottom: 10px; }
+.consumption-item { font-size: 0.9em; color: #555; }
+.consumption-item .value { font-weight: bold; color: #212529; }
+.consumption-item.over-allocation .value { color: #dc3545; }
+.progress-bar-container { width: 100%; background-color: #e9ecef; border-radius: 5px; height: 15px; overflow: hidden; position: relative; margin-top: 5px; }
+.progress-bar { height: 100%; border-radius: 5px; text-align: right; color: white; font-size: 0.75em; line-height: 15px; transition: width 0.5s ease-in-out, background-color 0.3s ease-in-out; }
+.progress-text { position: absolute; right: 5px; top: 0; color: #333; font-size: 0.75em; line-height: 15px; text-shadow: 0 0 2px rgba(255,255,255,0.5); }
+
+/* ===== AnimalDetails ===== */
+.animal-details-content { }
+.animal-section-title {
+  font-size: 1.2em;
+  font-weight: bold;
+  color: #28a745;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #eee;
+}
+.animal-action-buttons {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 25px;
+}
+.animal-action-tile {
+  background: linear-gradient(145deg, #e6f7ff, #cceeff);
+  padding: 12px 15px;
+  border-radius: 10px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.95em; font-weight: 500; color: #0056b3;
+  border: 1px solid #b3e0ff;
+  flex-basis: calc(50% - 10px);
+  max-width: 250px; text-align: left;
+}
+@media (min-width: 600px) {
+  .animal-action-tile { flex-basis: calc(25% - 10px); }
+}
+.animal-action-tile:hover { background-color: #b3e0ff; transform: translateY(-2px) scale(1.02); box-shadow: 0 5px 12px rgba(0, 0, 0, 0.12); }
+.animal-action-tile.selected-action-tile { border: 2px solid #007bff; box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2); background: linear-gradient(145deg, #a0d9ff, #80c8ff); color: #003366; }
+.animal-action-tile .emoji { font-size: 1.2em; }
+.adoptable-animals-listing { margin-top: 20px; }
+.listing-title { font-size: 1.3em; font-weight: bold; color: #333; margin-bottom: 20px; text-align: center; }
+.animal-cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; justify-content: center; }
+.animal-card {
+  background-color: #ffffff; border: 1px solid #e9ecef; border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); overflow: hidden;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; text-align: left;
+}
+.animal-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); }
+.animal-main-photo-container { width: 100%; height: 180px; overflow: hidden; display: flex; justify-content: center; align-items: center; background-color: #f0f0f0; }
+.animal-main-photo { width: 100%; height: 100%; object-fit: cover; display: block; }
+.animal-gallery { display: flex; justify-content: center; gap: 5px; padding: 10px; background-color: #f8f9fa; border-bottom: 1px solid #eee; }
+.animal-gallery-thumbnail { width: 60px; height: 45px; object-fit: cover; border-radius: 5px; border: 1px solid #ddd; cursor: pointer; transition: transform 0.1s ease; }
+.animal-gallery-thumbnail:hover { transform: scale(1.05); }
+.animal-details-text { padding: 15px; }
+.animal-name { font-size: 1.4em; font-weight: bold; color: #333; margin-bottom: 8px; text-align: center; }
+.animal-info { font-size: 0.95em; color: #555; margin-bottom: 4px; }
+.animal-temperament { font-size: 0.9em; color: #666; line-height: 1.4; margin-top: 10px; font-style: italic; }
+.action-info { background-color: #f0f8ff; border: 1px solid #b0e0e6; border-radius: 10px; padding: 20px; margin-top: 20px; color: #333; font-size: 1em; line-height: 1.5; text-align: center; }
+
+/* ===== WasteDetails ===== */
+.waste-details-content { padding: 10px; }
+.waste-section-title { font-size: 1.5rem; color: #333; margin-bottom: 15px; text-align: center; }
+.waste-action-buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 20px; }
+.waste-action-tile {
+  background-color: #e9ecef; padding: 15px 20px; border-radius: 8px; cursor: pointer;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  display: flex; flex-direction: column; align-items: center; font-weight: bold; color: #495057;
+  min-width: 120px; text-align: center; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+.waste-action-tile:hover { background-color: #dee2e6; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); }
+.waste-action-tile.selected-action-tile { background-color: #007bff; color: white; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); border: 2px solid #0056b3; }
+.waste-action-tile .emoji { font-size: 2em; margin-bottom: 5px; }
+.waste-type-details { background-color: #f8f9fa; border-radius: 8px; padding: 20px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08); }
+.waste-type-details .listing-title { font-size: 1.3em; font-weight: bold; color: #333; margin-bottom: 15px; text-align: center; }
+.waste-type-details .collection-info,
+.waste-type-details .collection-notes { font-size: 1em; color: #555; margin-bottom: 10px; text-align: center; }
+.waste-map-container { width: 100%; height: 400px; border-radius: 8px; overflow: hidden; margin-top: 20px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); }
+
+/* ===== DevelopmentDetails ===== */
+.development-details-content { padding: 10px; }
+.development-applications-list { list-style: none; padding: 0; margin: 0; }
+.development-item-card {
+  background-color: #ffffff; border: 1px solid #e9ecef; border-radius: 10px;
+  padding: 15px; margin-bottom: 15px; box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease-in-out; display: flex; align-items: flex-start; gap: 15px;
+}
+.development-item-card:hover { box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1); transform: translateY(-2px); }
+.development-details-content { flex-grow: 1; text-align: left; }
+.development-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; width: 100%; }
+.development-title-info { flex-grow: 1; }
+.development-title { font-size: 1.15em; font-weight: bold; color: #007bff; margin-bottom: 8px; }
+.development-info { font-size: 0.95em; color: #555; margin-bottom: 4px; }
+.development-info ul { margin-top: 5px; margin-left: 20px; list-style: disc; }
+.development-info ul li { margin-bottom: 3px; }
+.development-info a { color: #007bff; text-decoration: none; }
+.development-info a:hover { text-decoration: underline; }
+
+/* Status colours */
+.status-submitted { color: #ffc107; font-weight: bold; }
+.status-under-review { color: #17a2b8; font-weight: bold; }
+.status-approved { color: #28a745; font-weight: bold; }
+.status-rejected { color: #dc3545; font-weight: bold; }
+
+/* ===== Mobile fallback: stack top row if too narrow ===== */
+@media (max-width: 720px) {
+  .dashboard-top-row {
+    flex-wrap: wrap;          /* allow wrap on small screens */
+    gap: 10px 8px;
+  }
+  .tiles-inline-container {
+    order: 3;                 /* put tiles under logo + logout */
+    width: 100%;
+  }
+  .logout-btn {
+    order: 2;
+  }
+}
