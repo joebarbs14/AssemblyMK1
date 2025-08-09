@@ -8,43 +8,52 @@
   background-color: #f8f9fa;
 }
 
-/* --- TOP ROW --- */
+/* --- TOP ROW (reverted to the earlier "perfect" version) --- */
 .dashboard-top-row {
   display: flex;
+  justify-content: space-between;   /* back to distributed layout */
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 8px 12px;
+  flex-wrap: wrap;                  /* allow wrap on smaller screens */
+  margin-bottom: 2rem;
+  padding: 0 1.5rem;
+  gap: 15px;
   width: 100%;
-  box-sizing: border-box;
-  flex-wrap: nowrap; /* stay on one line until we hit media query */
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  background: #f8f9fa;
-  border-bottom: 1px solid rgba(0,0,0,0.06);
+  /* removed sticky/positioning/border to match earlier behavior */
 }
 
 .header-left {
   display: flex;
   align-items: center;
-  gap: 10px;
-  min-width: 0;
-  flex: 1 1 auto;
+  gap: 15px;        /* wider gap like before */
+  flex-shrink: 0;   /* don’t let logo/name shrink */
 }
 
 .welcome-heading {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: clamp(1.5rem, 4vw, 2.2rem);
   line-height: 1.2;
   white-space: nowrap;
   font-weight: 600;
   color: #212529;
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  flex: 1 1 auto;
-  transition: font-size 0.2s ease;
+}
+
+/* --- LOGO in the header (reverted look) --- */
+.council-logo {
+  width: clamp(35px, 7vw, 60px);
+  height: clamp(35px, 7vw, 60px);
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e9ecef;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  flex-shrink: 0;
+}
+
+/* optional: header logo placeholder (unchanged) */
+.council-logo-placeholder {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #e9ecef;
 }
 
 /* --- LOGO --- */
@@ -67,6 +76,22 @@
   height: 64px;
   border-radius: 8px;
   background: #e9ecef;
+}
+
+/* --- SMALL SCREEN tweaks (remove the custom re-ordering we added) --- */
+@media (max-width: 760px) {
+  .dashboard-top-row {
+    /* keep wrap, but no forced reordering */
+    gap: 12px;
+    padding-bottom: 0;
+  }
+  .council-logo {
+    width: 48px;
+    height: 48px;
+  }
+  .welcome-heading {
+    font-size: 1.1rem;
+  }
 }
 
 /* --- LOGOUT BUTTON --- */
