@@ -25,6 +25,7 @@
   z-index: 1000;
   background: #f8f9fa;
   border-bottom: 1px solid rgba(0,0,0,0.06);
+  flex-wrap: nowrap; /* always keep logo, welcome, logout in line */
 }
 
 /* Left cluster: logo + welcome */
@@ -82,18 +83,16 @@
   transform: translateY(-1px);
 }
 
-/* --- TILE ROW (desktop: inline between left + logout) --- */
+/* --- TILE ROW --- */
 .tiles-inline-container {
-  flex: 1 1 auto;
-  display: flex;
-  justify-content: center;
-  min-width: 0;
-  overflow: hidden; /* desktop: no scroll bar shown */
+  width: 100%;
+  overflow: hidden;
+  margin-top: 10px; /* space between top row and tiles */
 }
 
 .tiles {
   display: flex;
-  flex-wrap: wrap;                 /* desktop spacing as before */
+  flex-wrap: wrap;                 
   gap: 0.5rem;
   padding: 0 0.5rem;
   align-items: center;
@@ -199,31 +198,26 @@
 .selected-category-details ul { list-style: none; padding: 0; margin: 0; }
 
 /* ============== SMALL SCREENS ============== */
-/* On phones: keep logo + welcome + logout on the first row,
-   move tiles to a second row that scrolls horizontally,
-   and make tiles smaller. */
 @media (max-width: 760px) {
+  /* First row always has logo + welcome + logout in one line */
   .dashboard-top-row {
-    flex-wrap: wrap;          /* allow second line */
-    align-items: center;
+    flex-wrap: nowrap;
   }
 
-  /* First row: left cluster + logout */
-  .header-left { order: 1; min-width: 0; flex: 1 1 auto; }
-  .logout-btn { order: 2; }
-
-  /* Second row: tiles take full width and scroll horizontally */
-  .tiles-inline-container {
-    order: 3;
-    flex: 1 1 100%;
+  .header-left {
+    flex-shrink: 1;
     min-width: 0;
-    overflow-x: auto;         /* horizontal scroll */
+  }
+
+  /* Second row: tiles scroll horizontally */
+  .tiles-inline-container {
+    overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
   .tiles {
-    flex-wrap: nowrap;        /* no wrap so it scrolls left/right */
+    flex-wrap: nowrap;
     justify-content: flex-start;
-    gap: 8px;                 /* tidy spacing on mobile */
+    gap: 8px;
     padding: 6px 2px;
   }
 
