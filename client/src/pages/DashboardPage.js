@@ -1,8 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react';
-// The original code used `useNavigate` from `react-router-dom`.
-// For this self-contained example, we'll use a mock, but this shows
-// the correct usage for a real-world application.
-import { useNavigate } from 'react-router-dom';
 
 // =============================================================
 // LUCIDE-REACT ICON IMPORTS
@@ -326,12 +322,12 @@ const EnvironmentSection = ({ selectedSubCategory, setSelectedSubCategory }) => 
 };
 
 // =============================================================
-// MAIN DASHBOARD COMPONENT
+// MAIN APP COMPONENT
 // This is the core logic that orchestrates the entire page.
-// It's much cleaner now without the icon SVGs or detailed
-// sub-category rendering logic.
+// The react-router-dom dependencies have been removed and replaced
+// with simple state management to make the app self-contained.
 // =============================================================
-function Dashboard() {
+function App() {
   const [processes, setProcesses] = useState({});
   const [userName, setUserName] = useState('Resident');
   const [userCouncilName, setUserCouncilName] = useState(null);
@@ -343,14 +339,16 @@ function Dashboard() {
   const [selectedRoadSubCategory, setSelectedRoadSubCategory] = useState(null);
   const [selectedPublicHealthSubCategory, setSelectedPublicHealthSubCategory] = useState(null);
   const [selectedEnvironmentSubCategory, setSelectedEnvironmentSubCategory] = useState(null);
-  const navigate = useNavigate();
 
   const categories = [
     "Rates", "Water", "Development", "Community",
     "Roads", "Waste", "Animals", "Public Health", "Environment"
   ];
 
-  const fetchUserProfileAndDashboardData = useCallback(async (token) => {
+  // A mock "login" state to simulate the user being logged in
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
+
+  const fetchUserProfileAndDashboardData = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -386,14 +384,11 @@ function Dashboard() {
   }, []);
 
   useEffect(() => {
-    // We'll mock a token for this example
-    const token = 'mock_token';
-    if (!token) {
-      navigate('/#/');
-      return;
+    // In a real app, you would check for a valid session here.
+    if (isLoggedIn) {
+      fetchUserProfileAndDashboardData();
     }
-    fetchUserProfileAndDashboardData(token);
-  }, [navigate, fetchUserProfileAndDashboardData]);
+  }, [isLoggedIn, fetchUserProfileAndDashboardData]);
 
   const handleTileClick = (category) => {
     setSelectedCategory(category);
@@ -403,7 +398,27 @@ function Dashboard() {
     setSelectedEnvironmentSubCategory(null);
   };
 
-  const selectedCategoryItems = selectedCategory ? (processes[selectedCategory] || []) : [];
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setSelectedCategory(null);
+    // In a real application, you would clear the user's session from local storage or cookies.
+  };
+
+  if (!isLoggedIn) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="p-8 bg-white rounded-xl shadow-lg text-center">
+          <h2 className="text-2xl font-bold mb-4">You have been logged out.</h2>
+          <button
+            onClick={() => setIsLoggedIn(true)}
+            className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-full shadow-md hover:bg-indigo-700 transition-colors"
+          >
+            Login
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
@@ -428,6 +443,8 @@ function Dashboard() {
     );
   }
 
+  const selectedCategoryItems = selectedCategory ? (processes[selectedCategory] || []) : [];
+
   return (
     <div className="min-h-screen bg-gray-50 text-gray-800 font-sans p-8">
       {/* Dashboard Header */}
@@ -447,10 +464,7 @@ function Dashboard() {
         </div>
         <button
           className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-full shadow-md hover:bg-indigo-700 transition-colors"
-          onClick={() => {
-            localStorage.removeItem('token');
-            navigate('/#/');
-          }}
+          onClick={handleLogout}
         >
           Logout
         </button>
@@ -535,44 +549,6 @@ function Dashboard() {
           </div>
         </section>
       )}
-    </div>
-  );
-}
-
-// =============================================================
-// MAIN APP COMPONENT
-// This is a minimal wrapper to simulate a full React app setup.
-// You would typically have this in your App.js.
-// It includes a mock for react-router-dom's useNavigate hook.
-// =============================================================
-function App() {
-  // A mock router to make the code runnable in a self-contained environment.
-  // In a real application, you would use React Router.
-  const MockRouter = ({ children }) => {
-    const [path, setPath] = useState('/');
-    const navigate = (newPath) => {
-      console.log(`Navigating to ${newPath}`);
-      setPath(newPath);
-    };
-
-    const navContext = { navigate };
-
-    return (
-      <div className="font-sans antialiased text-gray-800 bg-gray-50">
-        <div className="p-4 bg-gray-200">
-          <p className="text-sm font-semibold">
-            Current Path: {path}
-            {path === '/#/' && <span className="ml-2 text-red-500">Redirected!</span>}
-          </p>
-        </div>
-        {children(navContext)}
-      </div>
-    );
-  };
-
-  return (
-    <div className="p-4 sm:p-6 md:p-8">
-      <MockRouter>{({ navigate }) => <Dashboard navigate={navigate} />}</MockRouter>
     </div>
   );
 }
