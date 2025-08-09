@@ -7,11 +7,15 @@
  * - Uniform transitions for a smoother user experience.
  * - Enhanced typography for better readability.
  * - Sticky top-row and clean card-like designs are maintained and refined.
+ *
+ * This version adds improved mobile responsiveness, better focus states for accessibility,
+ * and a few new utility classes for consistent layouts.
 */
 
 :root {
   /* --- Color Palette --- */
   --primary-color: #007bff; /* A vibrant blue for key elements */
+  --primary-light: #e6f7ff; /* A lighter shade for backgrounds */
   --secondary-color: #6c757d; /* A muted gray for secondary text */
   --background-light: #f8f9fa; /* The main background color */
   --background-card: #ffffff; /* Card background color */
@@ -34,6 +38,7 @@
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+  --shadow-inset: inset 0 2px 4px rgba(0, 0, 0, 0.06);
 
   /* --- Border Radius --- */
   --radius-sm: 8px;
@@ -51,8 +56,27 @@ body {
   background-color: var(--background-light);
   color: var(--text-dark);
   line-height: 1.6;
+  -webkit-font-smoothing: antialiased; /* Better font rendering */
+  -moz-osx-font-smoothing: grayscale;
 }
 
+/* --- UTILITY CLASSES --- */
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
+
+
+/* --- DASHBOARD LAYOUT --- */
 .dashboard {
   padding: var(--space-3);
   text-align: center;
@@ -63,6 +87,7 @@ body {
   transition: var(--transition-ease);
 }
 
+/* --- TOP ROW / HEADER --- */
 .dashboard-top-row {
   position: sticky;
   top: 0;
@@ -78,7 +103,7 @@ body {
   background-color: rgba(255, 255, 255, 0.9);
   box-shadow: var(--shadow-md);
   border-radius: var(--radius-md);
-  backdrop-filter: blur(8px); /* Slightly increased blur for more elegance */
+  backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 }
 
@@ -130,11 +155,14 @@ body {
   box-shadow: var(--shadow-md);
 }
 
-.logout-btn:active {
+.logout-btn:active, .logout-btn:focus {
   transform: translateY(0);
   box-shadow: var(--shadow-sm);
+  outline: 2px solid var(--danger-color);
+  outline-offset: 2px;
 }
 
+/* --- TILES / NAVIGATION --- */
 .tiles-inline-container {
   flex-grow: 1;
   display: flex;
@@ -174,9 +202,11 @@ body {
   box-shadow: var(--shadow-md);
 }
 
-.tile:active {
+.tile:active, .tile:focus {
   transform: translateY(1px);
   box-shadow: var(--shadow-sm);
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
 }
 
 .tile.selected-tile {
@@ -217,6 +247,7 @@ body {
   font-size: 0.8em;
 }
 
+/* --- CATEGORY DETAILS CONTAINER --- */
 .selected-category-details-container {
   display: flex;
   flex-direction: column;
@@ -257,6 +288,8 @@ body {
   text-align: center;
   font-size: 1.8rem;
   font-weight: 600;
+  border-bottom: 2px solid var(--border-light);
+  padding-bottom: 10px;
 }
 
 .selected-category-details ul {
@@ -265,6 +298,7 @@ body {
   margin: 0;
 }
 
+/* --- PROPERTY & DEVELOPMENT ITEM CARDS --- */
 .property-item-card, .development-item-card {
   background-color: var(--background-card);
   border: 1px solid #f0f0f0;
@@ -343,7 +377,7 @@ body {
   display: none;
 }
 
-/* --- STYLES FOR WATER DETAILS COMPONENT --- */
+/* --- WATER DETAILS COMPONENT --- */
 .water-details-content {
   /* Inherits general styling */
 }
@@ -453,7 +487,7 @@ body {
   text-shadow: 0 0 2px rgba(255, 255, 255, 0.7);
 }
 
-/* --- NEW STYLES FOR ANIMAL DETAILS COMPONENT --- */
+/* --- ANIMAL DETAILS COMPONENT --- */
 .animal-details-content {
   /* Inherits general styling */
 }
@@ -631,7 +665,7 @@ body {
   box-shadow: var(--shadow-sm);
 }
 
-/* --- NEW STYLES FOR WASTE DETAILS COMPONENT --- */
+/* --- WASTE DETAILS COMPONENT --- */
 .waste-details-content {
   padding: 10px;
 }
@@ -717,7 +751,7 @@ body {
   box-shadow: var(--shadow-sm);
 }
 
-/* --- NEW STYLES FOR DEVELOPMENT DETAILS COMPONENT --- */
+/* --- DEVELOPMENT DETAILS COMPONENT --- */
 .development-details-content {
   padding: 10px;
 }
@@ -790,4 +824,59 @@ body {
 .status-rejected {
   color: var(--danger-color);
   font-weight: bold;
+}
+
+/* --- MEDIA QUERIES FOR RESPONSIVENESS --- */
+@media (max-width: 768px) {
+  .dashboard-top-row {
+    flex-direction: column;
+    align-items: stretch;
+    padding: var(--space-2);
+  }
+
+  .header-left {
+    justify-content: center;
+    margin-bottom: var(--space-2);
+  }
+
+  .logout-btn {
+    width: 100%;
+  }
+
+  .tiles {
+    justify-content: space-around;
+    width: 100%;
+  }
+
+  .tile {
+    width: 80px;
+    height: 80px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard {
+    padding: var(--space-2);
+  }
+
+  .selected-category-details-container {
+    padding: 20px;
+  }
+
+  .property-item-card, .development-item-card {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .mini-map-container {
+    width: 100%;
+    height: 150px;
+    margin-top: 15px;
+  }
+
+  .council-logo-small {
+    margin: 0;
+    margin-top: 10px;
+  }
 }
