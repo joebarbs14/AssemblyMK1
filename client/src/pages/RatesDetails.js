@@ -83,7 +83,7 @@ function PropertyItem({ item }) {
 
     const map = miniMapInstance.current;
 
-    // Clear dynamic layers
+    // Clear dynamic layers (keep base tile layer)
     map.eachLayer((layer) => {
       if (layer instanceof L.Marker || layer instanceof L.Polygon || layer instanceof L.Polyline) {
         map.removeLayer(layer);
@@ -146,13 +146,20 @@ function PropertyItem({ item }) {
       <div className="property-details-content">
         <div className="property-header">
           <div className="property-address-council">
-            <div className="property-title">Address: {item.address}</div>
+            <div className="property-title">Address: {item.address || '—'}</div>
             {item.council_name && (
               <div className="property-info">Council: {item.council_name}</div>
             )}
           </div>
+
           {item.council_logo_url && (
-            <img src={item.council_logo_url} alt={`${item.council_name || 'Council'} Logo`} className="council-logo-small" />
+            <img
+              src={item.council_logo_url}
+              alt={`${item.council_name || 'Council'} Logo`}
+              className="council-logo-small"
+              width={48}
+              height={48}
+            />
           )}
         </div>
 
@@ -211,7 +218,7 @@ function RatesDetails({ properties }) {
       <div className="property-list-details">
         <ul>
           {properties.map((item) => (
-            <PropertyItem key={item.id ?? item.address} item={item} />
+            <PropertyItem key={item.id ?? item.address ?? Math.random()} item={item} />
           ))}
         </ul>
       </div>
