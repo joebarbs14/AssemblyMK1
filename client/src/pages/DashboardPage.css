@@ -107,6 +107,13 @@ body {
   -webkit-backdrop-filter: blur(8px);
 }
 
+/* IMPORTANT: Add this new `header-right` class to wrap the logout button */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
 .header-left {
   display: flex;
   align-items: center;
