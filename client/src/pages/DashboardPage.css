@@ -1,6 +1,6 @@
 /* ============== CORE LAYOUT ============== */
 .dashboard {
-  padding: 1.5rem;
+  padding: 1rem; /* less outer whitespace */
   text-align: center;
   font-family: 'Inter', sans-serif;
   min-height: 100vh;
@@ -14,45 +14,35 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 15px;
-  padding: 10px 14px;
+  gap: 12px;                 /* a bit tighter */
+  padding: 6px 10px;         /* less padding */
   width: 100%;
   box-sizing: border-box;
 
-  /* sticky */
   position: sticky;
   top: 0;
   z-index: 1000;
   background: #f8f9fa;
   border-bottom: 1px solid rgba(0,0,0,0.06);
-  flex-wrap: nowrap; /* always keep logo, welcome, logout in line */
 }
 
 /* Left cluster: logo + welcome */
 .header-left {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 12px;
   flex-shrink: 0;
 }
 
-.welcome-heading {
-  margin: 0;
-  font-size: clamp(1.1rem, 2.2vw, 1.6rem);
-  line-height: 1.2;
-  white-space: nowrap;
-  font-weight: 600;
-  color: #212529;
-}
-
-/* Logo auto-sizes to its box while keeping aspect */
+/* Logo acts as the white box. The image fills it (object-fit: contain). */
 .council-logo {
-  width: clamp(100px, 12vw, 180px);
-  height: clamp(40px, 7vw, 64px);
+  display: block;
+  width: clamp(120px, 12vw, 180px);   /* auto-size box width */
+  height: clamp(48px, 7vw, 64px);     /* auto-size box height */
   border-radius: 8px;
-  object-fit: contain;
+  object-fit: contain;                /* fit the white box */
   background: #fff;
-  padding: 6px;
+  padding: 4px;                       /* slightly tighter */
   box-shadow: 0 1px 3px rgba(0,0,0,0.06);
   border: 2px solid #e9ecef;
   flex-shrink: 0;
@@ -63,6 +53,17 @@
   height: 64px;
   border-radius: 8px;
   background: #e9ecef;
+}
+
+.welcome-heading {
+  margin: 0;
+  font-size: clamp(1.1rem, 2.2vw, 1.6rem);
+  line-height: 1.2;
+  white-space: nowrap;
+  font-weight: 600;
+  color: #212529;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Logout */
@@ -83,38 +84,37 @@
   transform: translateY(-1px);
 }
 
-/* --- TILE ROW --- */
+/* ============== TILES ============== */
 .tiles-inline-container {
   width: 100%;
+  margin-top: 8px; /* small space under top row */
   overflow: hidden;
-  margin-top: 10px; /* space between top row and tiles */
 }
 
 .tiles {
   display: flex;
-  flex-wrap: wrap;                 
+  flex-wrap: wrap;                 /* grid on desktop */
   gap: 0.5rem;
   padding: 0 0.5rem;
   align-items: center;
   justify-content: center;
 }
 
-/* Individual tile */
 .tile {
   background: linear-gradient(145deg, #ffffff, #f0f0f0);
   padding: 0.5rem;
   border-radius: 10px;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
-  cursor: pointer;
-  transition: all 0.3s ease-in-out;
+  border: 1px solid #e0e0e0;
+  width: 70px;
+  height: 70px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 70px;
-  height: 70px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
   flex-shrink: 0;
-  border: 1px solid #e0e0e0;
 }
 .tile:hover {
   background-color: #e9ecef;
@@ -148,19 +148,19 @@
 }
 .tile h3 .icon svg { width: 100%; height: 100%; }
 
-/* No items text */
+/* --- No items text --- */
 .no-items {
   color: #888;
   font-style: italic;
   font-size: 0.8em;
 }
 
-/* --- DETAILS CARD WRAPPER --- */
+/* ============== DETAILS CARD WRAPPER ============== */
 .selected-category-details-container {
   display: flex;
   flex-direction: column;
   gap: 25px;
-  margin-top: 30px;
+  margin-top: 20px;  /* a little tighter */
   width: 90%;
   max-width: 1200px;
   margin-left: auto;
@@ -170,7 +170,7 @@
   background-color: #ffffff;
   border-radius: 15px;
   box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-  padding: 25px;
+  padding: 22px;
 }
 @media (min-width: 768px) {
   .selected-category-details-container {
@@ -190,56 +190,51 @@
 }
 .selected-category-details h2 {
   color: #333;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
   text-align: center;
   font-size: 1.6rem;
   font-weight: 600;
 }
 .selected-category-details ul { list-style: none; padding: 0; margin: 0; }
 
-/* ============== SMALL SCREENS ============== */
-@media (max-width: 760px) {
-  /* First row always has logo + welcome + logout in one line */
+/* ============== RESPONSIVE BEHAVIOR ============== */
+/* On smaller screens:
+   - Keep logo + welcome + logout on the first line
+   - Move tiles to a second line and make them horizontally scrollable
+*/
+@media (max-width: 1024px) {
   .dashboard-top-row {
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
   }
 
   .header-left {
-    flex-shrink: 1;
     min-width: 0;
+    flex: 1 1 auto;  /* allow welcome text to shrink before wrapping */
   }
 
-  /* Second row: tiles scroll horizontally */
+  /* force tiles to its own full-width line under the first row */
   .tiles-inline-container {
+    flex: 1 1 100%;
+    order: 2;
+    margin-top: 8px;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
   .tiles {
-    flex-wrap: nowrap;
+    flex-wrap: nowrap;             /* horizontal scroll row */
     justify-content: flex-start;
     gap: 8px;
     padding: 6px 2px;
   }
 
-  .tile {
-    width: 60px;
-    height: 60px;
-    border-radius: 9px;
-    padding: 6px;
-  }
+  .tile { width: 60px; height: 60px; border-radius: 9px; padding: 6px; }
 
-  .council-logo {
-    height: 44px;
-    max-width: 140px;
-  }
-
-  .welcome-heading {
-    font-size: 1.05rem;
-  }
+  .council-logo { height: 44px; } /* logo auto-fits box still */
+  .welcome-heading { font-size: 1.05rem; }
 }
 
 @media (max-width: 480px) {
   .tile { width: 56px; height: 56px; }
-  .council-logo { height: 40px; max-width: 120px; }
+  .council-logo { height: 40px; }
   .welcome-heading { font-size: 0.98rem; }
 }
