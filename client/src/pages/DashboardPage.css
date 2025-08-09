@@ -8,57 +8,38 @@
   background-color: #f8f9fa;
 }
 
-/* --- TOP ROW (reverted to the earlier "perfect" version) --- */
+/* --- TOP ROW (perfect version) --- */
 .dashboard-top-row {
   display: flex;
-  justify-content: space-between;   /* back to distributed layout */
   align-items: center;
-  flex-wrap: wrap;                  /* allow wrap on smaller screens */
-  margin-bottom: 2rem;
-  padding: 0 1.5rem;
-  gap: 15px;
+  gap: 20px;
+  padding: 8px 12px;
   width: 100%;
-  /* removed sticky/positioning/border to match earlier behavior */
+  box-sizing: border-box;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: #f8f9fa;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
 }
 
 .header-left {
   display: flex;
   align-items: center;
-  gap: 15px;        /* wider gap like before */
-  flex-shrink: 0;   /* don’t let logo/name shrink */
+  gap: 12px;
 }
 
 .welcome-heading {
   margin: 0;
-  font-size: clamp(1.5rem, 4vw, 2.2rem);
+  font-size: 1.25rem;
   line-height: 1.2;
-  white-space: nowrap;
   font-weight: 600;
   color: #212529;
 }
 
-/* --- LOGO in the header (reverted look) --- */
-.council-logo {
-  width: clamp(35px, 7vw, 60px);
-  height: clamp(35px, 7vw, 60px);
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #e9ecef;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  flex-shrink: 0;
-}
-
-/* optional: header logo placeholder (unchanged) */
-.council-logo-placeholder {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: #e9ecef;
-}
-
 /* --- LOGO --- */
 .council-logo {
-  height: clamp(40px, 8vh, 64px); /* auto-sizes with viewport height */
+  height: 64px;
   width: auto;
   max-width: 180px;
   border-radius: 8px;
@@ -67,8 +48,6 @@
   padding: 6px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.06);
   border: 2px solid #e9ecef;
-  flex-shrink: 0;
-  transition: height 0.2s ease, max-width 0.2s ease;
 }
 
 .council-logo-placeholder {
@@ -78,25 +57,8 @@
   background: #e9ecef;
 }
 
-/* --- SMALL SCREEN tweaks (remove the custom re-ordering we added) --- */
-@media (max-width: 760px) {
-  .dashboard-top-row {
-    /* keep wrap, but no forced reordering */
-    gap: 12px;
-    padding-bottom: 0;
-  }
-  .council-logo {
-    width: 48px;
-    height: 48px;
-  }
-  .welcome-heading {
-    font-size: 1.1rem;
-  }
-}
-
 /* --- LOGOUT BUTTON --- */
 .logout-btn {
-  flex: 0 0 auto;
   padding: 8px 12px;
   font-size: 0.95rem;
   background-color: #dc3545;
@@ -113,34 +75,26 @@
   transform: translateY(-1px);
 }
 
-/* --- TILE ROW --- */
+/* --- TILE ROW (reverted perfect version) --- */
 .tiles-inline-container {
   flex: 1 1 auto;
-  overflow-x: auto;
-  min-width: 0;
+  width: 100%;
+  margin-top: 1rem;
 }
 
 .tiles {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: nowrap;
-  padding: 4px 0;
-  scrollbar-width: thin;
-}
-
-.tiles::-webkit-scrollbar {
-  height: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
 }
 
 .tile {
-  flex: 0 0 auto;
+  flex: 0 1 120px;
   background: linear-gradient(145deg, #ffffff, #f0f0f0);
-  padding: 8px 10px;
-  border-radius: 10px;
+  padding: 15px;
+  border-radius: 12px;
   border: 1px solid #e0e0e0;
-  width: 70px;
-  height: 70px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -163,28 +117,18 @@
 
 .tile h3 {
   margin: 0;
-  font-size: 0.8em;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  line-height: 1.1;
-  white-space: nowrap;
+  font-size: 0.9em;
+  text-align: center;
   color: #495057;
   font-weight: 500;
 }
 
 .tile h3 .icon {
-  font-size: 1.5em;
-  margin-bottom: 3px;
+  font-size: 2em;
+  margin-bottom: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.tile h3 .icon svg {
-  width: 100%;
-  height: 100%;
 }
 
 /* --- NO ITEMS --- */
@@ -246,54 +190,62 @@
 /* --- SMALL SCREEN LAYOUT --- */
 @media (max-width: 760px) {
   .dashboard-top-row {
-    flex-wrap: wrap; /* allow wrap only here */
-    gap: 8px 10px;
-    padding-bottom: 10px;
-  }
-
-  .header-left {
-    order: 1;
-    flex: 1 1 100%;
+    flex-wrap: wrap;
     justify-content: center;
-  }
-
-  .logout-btn {
-    order: 2;
-  }
-
-  .tiles-inline-container {
-    order: 3;
-    flex: 1 1 100%;
-  }
-
-  .tiles {
-    flex-wrap: wrap; /* tiles now wrap into multiple rows */
-    justify-content: center;
-  }
-
-  .tile {
-    width: 64px;
-    height: 64px;
+    gap: 12px;
   }
 
   .council-logo {
-    height: clamp(36px, 6vh, 48px);
+    height: 48px;
     max-width: 140px;
   }
 
   .welcome-heading {
     font-size: 1.05rem;
-    text-align: center;
+  }
+
+  .tiles {
+    justify-content: center;
+    gap: 15px;
+  }
+
+  .tile {
+    flex: 0 1 100px;
   }
 }
 
 @media (max-width: 500px) {
   .council-logo {
-    height: clamp(32px, 5vh, 40px);
+    height: 40px;
     max-width: 120px;
   }
 
   .welcome-heading {
     font-size: 0.95rem;
   }
+
+  .tile {
+    flex: 0 1 90px;
+  }
+}
+
+/* --- RATES ADJUSTMENT: keep council logos small in cards --- */
+.council-logo-small {
+  width: 48px;
+  height: 48px;
+  max-width: 48px;
+  max-height: 48px;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+  display: inline-block;
+  border-radius: 50%;
+  background: #fff;
+  padding: 2px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+.property-item-card img {
+  max-width: 100%;
+  height: auto;
 }
