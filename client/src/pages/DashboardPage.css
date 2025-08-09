@@ -239,3 +239,51 @@
   .council-logo { height: 40px; }
   .welcome-heading { font-size: 0.98rem; }
 }
+/* --- Keep Logout aligned with logo/welcome on all widths --- */
+.dashboard-top-row { flex-wrap: wrap; }              /* tiles can wrap to next line */
+.header-left{
+  order:0;
+  flex: 1 1 auto;
+  min-width: 0;                                      /* allows ellipsis */
+  max-width: calc(100% - 120px);                     /* always leave room for Logout */
+  gap: 10px;
+}
+.logout-btn{
+  order:1;
+  flex: 0 0 auto;                                    /* fixed width on first line */
+  margin-left: auto;                                 /* stick to the right of line 1 */
+}
+
+/* Tiles row always below, full width */
+.tiles-inline-container{
+  order:2;
+  flex: 1 1 100%;
+  margin-top: 8px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.tiles{
+  flex-wrap: nowrap;                                 /* horizontal scroll on small screens */
+  justify-content: flex-start;
+}
+
+/* Tighten logo & welcome so they can share line with Logout */
+.council-logo{
+  width: clamp(100px, 28vw, 170px);
+  height: clamp(40px, 7vw, 60px);
+  padding: 3px;
+}
+.welcome-heading{
+  font-size: clamp(1rem, 3.6vw, 1.4rem);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Extra squeeze for very narrow phones */
+@media (max-width: 420px){
+  .council-logo{ width: 92px; height: 36px; padding: 2px; }
+  .welcome-heading{ font-size: 0.98rem; }
+  .tile{ width: 56px; height: 56px; }
+}
