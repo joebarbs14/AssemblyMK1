@@ -446,7 +446,7 @@ function DashboardPage() {
               <span className="icon">{getCategoryIcon(subCategory)}</span>
               {subCategory}
             </h3>
-          </div>
+        </div>
         ))}
       </div>
       <div className="public-health-sub-category-details">
@@ -494,10 +494,10 @@ function DashboardPage() {
         <div className="header-left" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           {/* Updated logo style to be larger and rectangular */}
           {userCouncilLogoUrl ? (
-            <img 
-              src={userCouncilLogoUrl} 
-              alt={`${userCouncilName || 'Council'} Logo`} 
-              className="council-logo" 
+            <img 
+              src={userCouncilLogoUrl} 
+              alt={`${userCouncilName || 'Council'} Logo`} 
+              className="council-logo" 
               style={{ width: '120px', height: '60px', objectFit: 'contain' }}
             />
           ) : (
@@ -565,7 +565,7 @@ function DashboardPage() {
                   <ul>
                     {selectedCategoryItems.map((item) => (
                       <li key={item.id} className="process-item-full-detail">
-                        <>
+                        <div>
                           <div className="process-title">{item.title}</div>
                           <div className="process-detail">Status: {item.status}</div>
                           {item.submitted_at && (
@@ -579,6 +579,7 @@ function DashboardPage() {
                               Form Data: {JSON.stringify(item.form_data)}
                             </div>
                           )}
+                        </div>
                       </li>
                     ))}
                   </ul>
@@ -595,3 +596,4 @@ function DashboardPage() {
 }
 
 export default DashboardPage;
+
