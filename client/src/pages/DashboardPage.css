@@ -1,6 +1,6 @@
 /* ============== CORE LAYOUT ============== */
 .dashboard {
-  padding: 1rem; /* less outer whitespace */
+  padding: 0.9rem; /* slightly less outer whitespace */
   text-align: center;
   font-family: 'Inter', sans-serif;
   min-height: 100vh;
@@ -14,7 +14,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;                 /* a bit tighter */
+  gap: 12px;                 /* tighter */
   padding: 6px 10px;         /* less padding */
   width: 100%;
   box-sizing: border-box;
@@ -24,14 +24,19 @@
   z-index: 1000;
   background: #f8f9fa;
   border-bottom: 1px solid rgba(0,0,0,0.06);
+
+  /* Allow tiles to wrap to second line, but keep header-left + logout on first line */
+  flex-wrap: wrap;
 }
 
-/* Left cluster: logo + welcome */
+/* Left cluster: logo + welcome (always first line) */
 .header-left {
   display: flex;
   align-items: center;
   gap: 12px;
-  flex-shrink: 0;
+  flex: 0 0 auto;     /* don't stretch, don't wrap */
+  order: 0;           /* ensure comes before logout */
+  min-width: 0;       /* allow welcome to ellipsis */
 }
 
 /* Logo acts as the white box. The image fills it (object-fit: contain). */
@@ -40,17 +45,17 @@
   width: clamp(120px, 12vw, 180px);   /* auto-size box width */
   height: clamp(48px, 7vw, 64px);     /* auto-size box height */
   border-radius: 8px;
-  object-fit: contain;                /* fit the white box */
+  object-fit: contain;                /* fit inside the white box */
   background: #fff;
-  padding: 4px;                       /* slightly tighter */
+  padding: 4px;                       /* compact white box padding */
   box-shadow: 0 1px 3px rgba(0,0,0,0.06);
   border: 2px solid #e9ecef;
   flex-shrink: 0;
 }
 
 .council-logo-placeholder {
-  width: 180px;
-  height: 64px;
+  width: clamp(120px, 12vw, 180px);
+  height: clamp(48px, 7vw, 64px);
   border-radius: 8px;
   background: #e9ecef;
 }
@@ -66,9 +71,10 @@
   text-overflow: ellipsis;
 }
 
-/* Logout */
+/* Logout (always aligned with logo+welcome on first line) */
 .logout-btn {
-  flex: 0 0 auto;
+  flex: 0 0 auto;    /* keep on first line */
+  order: 1;          /* after header-left */
   padding: 8px 12px;
   font-size: 0.95rem;
   background-color: #dc3545;
@@ -85,15 +91,17 @@
 }
 
 /* ============== TILES ============== */
+/* The tiles row is a separate line that can wrap or scroll depending on width */
 .tiles-inline-container {
   width: 100%;
-  margin-top: 8px; /* small space under top row */
-  overflow: hidden;
+  order: 2;              /* always below header-left + logout */
+  margin-top: 8px;
+  overflow: hidden;      /* default - no scrollbar on wide screens */
 }
 
 .tiles {
   display: flex;
-  flex-wrap: wrap;                 /* grid on desktop */
+  flex-wrap: wrap;                 /* grid-ish on desktop */
   gap: 0.5rem;
   padding: 0 0.5rem;
   align-items: center;
@@ -159,8 +167,8 @@
 .selected-category-details-container {
   display: flex;
   flex-direction: column;
-  gap: 25px;
-  margin-top: 20px;  /* a little tighter */
+  gap: 22px;
+  margin-top: 16px;  /* slightly tighter */
   width: 90%;
   max-width: 1200px;
   margin-left: auto;
@@ -170,7 +178,7 @@
   background-color: #ffffff;
   border-radius: 15px;
   box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-  padding: 22px;
+  padding: 20px;
 }
 @media (min-width: 768px) {
   .selected-category-details-container {
@@ -190,7 +198,7 @@
 }
 .selected-category-details h2 {
   color: #333;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
   text-align: center;
   font-size: 1.6rem;
   font-weight: 600;
@@ -203,25 +211,18 @@
    - Move tiles to a second line and make them horizontally scrollable
 */
 @media (max-width: 1024px) {
-  .dashboard-top-row {
-    flex-wrap: wrap;
-  }
+  /* keep first-line items compact */
+  .header-left { flex: 0 1 auto; }
+  .logout-btn { flex: 0 0 auto; }
 
-  .header-left {
-    min-width: 0;
-    flex: 1 1 auto;  /* allow welcome text to shrink before wrapping */
-  }
-
-  /* force tiles to its own full-width line under the first row */
+  /* tiles take full width on their own line and scroll */
   .tiles-inline-container {
     flex: 1 1 100%;
-    order: 2;
-    margin-top: 8px;
-    overflow-x: auto;
+    overflow-x: auto;                 /* horizontal scroll */
     -webkit-overflow-scrolling: touch;
   }
   .tiles {
-    flex-wrap: nowrap;             /* horizontal scroll row */
+    flex-wrap: nowrap;                /* single horizontal row */
     justify-content: flex-start;
     gap: 8px;
     padding: 6px 2px;
@@ -229,7 +230,7 @@
 
   .tile { width: 60px; height: 60px; border-radius: 9px; padding: 6px; }
 
-  .council-logo { height: 44px; } /* logo auto-fits box still */
+  .council-logo { height: 44px; }    /* logo still auto-fits box */
   .welcome-heading { font-size: 1.05rem; }
 }
 
