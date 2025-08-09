@@ -236,7 +236,7 @@ function DashboardPage() {
   const [selectedCommunitySubCategory, setSelectedCommunitySubCategory] = useState(null);
   const [selectedRoadSubCategory, setSelectedRoadSubCategory] = useState(null);
   const [selectedPublicHealthSubCategory, setSelectedPublicHealthSubCategory] = useState(null);
-  const [selectedEnvironmentSubCategory, setSelectedEnvironmentSubCategory] = useState(null); // New state for environment sub-tiles
+  const [selectedEnvironmentSubCategory, setSelectedEnvironmentSubCategory] = useState(null);
   const navigate = useNavigate();
 
   const fetchUserProfileAndDashboardData = useCallback(async (token) => {
@@ -260,7 +260,6 @@ function DashboardPage() {
       if (!userProfileRes.ok) {
         console.error(`Failed to fetch user profile: Status ${userProfileRes.status}, Message: ${userProfileData.message || userProfileData.error || 'Unknown error'}`);
         if (userProfileRes.status === 401 || userProfileRes.status === 403) {
-          // Changed from alert() to a custom console log.
           console.error('Session expired. Please log in again.');
           localStorage.removeItem('token');
           localStorage.removeItem('userName');
@@ -318,7 +317,6 @@ function DashboardPage() {
       if (!dashboardRes.ok) {
         console.error(`Dashboard fetch failed: Status ${dashboardRes.status}, Message: ${dashboardResultData.message || dashboardResultData.error || 'Unknown error'}`);
         if (dashboardRes.status === 401 || dashboardRes.status === 403) {
-          // Changed from alert() to a custom console log.
           console.error('Session expired. Please log in again.');
           localStorage.removeItem('token');
           localStorage.removeItem('userName');
@@ -541,18 +539,26 @@ function DashboardPage() {
     <div className="dashboard-container">
       {/* Dashboard Header */}
       <header className="dashboard-header">
+        {/* Header Left: Logo and Welcome Text */}
         <div className="header-left">
           {userCouncilLogoUrl ? (
             <img 
               src={userCouncilLogoUrl} 
               alt={`${userCouncilName || 'Council'} Logo`} 
               className="council-logo"
+              // Fallback for image loading errors
+              onError={(e) => {
+                e.target.onerror = null; // prevents infinite loop
+                e.target.style.display = 'none'; // hide the broken image icon
+              }}
             />
           ) : (
             <div className="council-logo-placeholder"></div>
           )}
           <h1 className="welcome-heading">Welcome, {userName}</h1>
         </div>
+        
+        {/* Logout Button */}
         <button className="logout-btn" onClick={() => {
           localStorage.removeItem('token');
           localStorage.removeItem('userName');
