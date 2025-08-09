@@ -5,9 +5,9 @@ import {
   Droplet as DropletIcon,
   Building as BuildingIcon,
   Users as UsersIcon,
-  Road as RoadIcon,
+  Route as RoadIcon, // Corrected: 'Road' is not an icon, 'Route' is.
   Trash as TrashIcon,
-  PawPrint as PawPrintIcon,
+  PawPrint, // Corrected: Imported once and used directly
   HeartPulse as HeartPulseIcon,
   TreePine as TreePineIcon,
   Newspaper as NewspaperIcon,
@@ -19,11 +19,10 @@ import {
   HandPlatter as HandPlatterIcon,
   Bug as BugIcon,
   Tractor as TractorIcon,
-  PawPrint as PawPrintSvg,
   Map as MapIcon,
   Heart as HeartIcon,
   TreeDeciduous as TreeDeciduousIcon,
-  Water as WaterSvg,
+  Water as WaterIcon, // Corrected: Use the more semantically correct 'Water' icon.
   Mountain as MountainIcon
 } from 'lucide-react';
 
@@ -36,12 +35,12 @@ const Icons = ({ category }) => {
   const iconStyle = "w-6 h-6";
   switch (category) {
     case "Rates": return <HomeIcon className={iconStyle} />;
-    case "Water": return <DropletIcon className={iconStyle} />;
+    case "Water": return <WaterIcon className={iconStyle} />; // Using the corrected 'Water' icon
     case "Development": return <BuildingIcon className={iconStyle} />;
     case "Community": return <UsersIcon className={iconStyle} />;
-    case "Roads": return <RoadIcon className={iconStyle} />;
+    case "Roads": return <RoadIcon className={iconStyle} />; // Using the corrected 'RoadIcon' alias for 'Route'
     case "Waste": return <TrashIcon className={iconStyle} />;
-    case "Animals": return <PawPrintIcon className={iconStyle} />;
+    case "Animals": return <PawPrint className={iconStyle} />; // Using the single 'PawPrint' import
     case "Public Health": return <HeartPulseIcon className={iconStyle} />;
     case "Environment": return <TreePineIcon className={iconStyle} />;
     case "Community News": return <NewspaperIcon className={iconStyle} />;
@@ -58,7 +57,7 @@ const Icons = ({ category }) => {
     case "Walking Tracks": return <MapIcon className={iconStyle} />;
     case "National Parks": return <MountainIcon className={iconStyle} />;
     case "Weed Spotting": return <BugIcon className={iconStyle} />;
-    case "Wildlife": return <PawPrintSvg className={iconStyle} />;
+    case "Wildlife": return <PawPrint className={iconStyle} />; // Using the single 'PawPrint' import
     case "Trees": return <TreeDeciduousIcon className={iconStyle} />;
     default: return <HomeIcon className={iconStyle} />;
   }
