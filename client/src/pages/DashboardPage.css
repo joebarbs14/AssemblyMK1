@@ -12,11 +12,12 @@
 .dashboard-top-row {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
   padding: 8px 12px;
   width: 100%;
   box-sizing: border-box;
-  flex-wrap: nowrap;
+  flex-wrap: nowrap; /* stay on one line until we hit media query */
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -28,7 +29,8 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  min-width: 200px;
+  min-width: 0;
+  flex: 1 1 auto;
 }
 
 .welcome-heading {
@@ -47,8 +49,8 @@
 
 /* --- LOGO --- */
 .council-logo {
+  height: clamp(40px, 8vh, 64px); /* auto-sizes with viewport height */
   width: auto;
-  height: 64px;
   max-width: 180px;
   border-radius: 8px;
   object-fit: contain;
@@ -219,32 +221,29 @@
 /* --- SMALL SCREEN LAYOUT --- */
 @media (max-width: 760px) {
   .dashboard-top-row {
-    flex-wrap: wrap;
+    flex-wrap: wrap; /* allow wrap only here */
     gap: 8px 10px;
     padding-bottom: 10px;
   }
 
   .header-left {
     order: 1;
-    min-width: 0;
-    flex: 1 1 auto;
+    flex: 1 1 100%;
+    justify-content: center;
   }
 
   .logout-btn {
     order: 2;
-    flex: 0 0 auto;
   }
 
   .tiles-inline-container {
     order: 3;
     flex: 1 1 100%;
-    min-width: 0;
-    overflow-x: auto;
   }
 
   .tiles {
-    flex-wrap: nowrap;
-    justify-content: flex-start;
+    flex-wrap: wrap; /* tiles now wrap into multiple rows */
+    justify-content: center;
   }
 
   .tile {
@@ -252,21 +251,20 @@
     height: 64px;
   }
 
-  /* Logo shrinks proportionally on small screens */
   .council-logo {
-    height: 48px;
+    height: clamp(36px, 6vh, 48px);
     max-width: 140px;
   }
 
-  /* Welcome text shrinks a bit to fit */
   .welcome-heading {
     font-size: 1.05rem;
+    text-align: center;
   }
 }
 
 @media (max-width: 500px) {
   .council-logo {
-    height: 40px;
+    height: clamp(32px, 5vh, 40px);
     max-width: 120px;
   }
 
