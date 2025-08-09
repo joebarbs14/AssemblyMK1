@@ -750,4 +750,215 @@
 
 /* Re-using mini-map-container and its Leaflet styles for DevelopmentDetails */
 /* The .mini-map-container and .mini-map-container .leaflet-container styles are already defined above
+
+.dashboard {
+  padding: 1.5rem;
+  text-align: center;
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f8f9fa;
+}
+
+/* --- TOP ROW --- */
+.dashboard-top-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  width: 100%;
+  box-sizing: border-box;
+  flex-wrap: nowrap;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 260px;
+}
+
+.welcome-heading {
+  margin: 0;
+  font-size: 1.25rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  font-weight: 600;
+  color: #212529;
+}
+
+/* --- LOGO --- */
+.council-logo {
+  width: 180px;
+  height: 64px;
+  border-radius: 8px;
+  object-fit: contain;
+  background: #fff;
+  padding: 6px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  border: 2px solid #e9ecef;
+  flex-shrink: 0;
+}
+
+.council-logo-placeholder {
+  width: 180px;
+  height: 64px;
+  border-radius: 8px;
+  background: #e9ecef;
+}
+
+/* --- LOGOUT BUTTON --- */
+.logout-btn {
+  flex: 0 0 auto;
+  padding: 8px 12px;
+  font-size: 0.95rem;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out, transform 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.logout-btn:hover {
+  background-color: #c82333;
+  transform: translateY(-1px);
+}
+
+/* --- TILE ROW --- */
+.tiles-inline-container {
+  flex: 1 1 auto;
+  overflow-x: auto;
+  min-width: 0;
+}
+
+.tiles {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+  padding: 4px 0;
+  scrollbar-width: thin;
+}
+
+.tiles::-webkit-scrollbar {
+  height: 6px;
+}
+
+.tile {
+  flex: 0 0 auto;
+  background: linear-gradient(145deg, #ffffff, #f0f0f0);
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid #e0e0e0;
+  width: 70px;
+  height: 70px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.tile:hover {
+  background-color: #e9ecef;
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.12);
+}
+
+.tile.selected-tile {
+  border: 3px solid #007bff;
+  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+  background: linear-gradient(145deg, #e0f2ff, #cce7ff);
+}
+
+.tile h3 {
+  margin: 0;
+  font-size: 0.8em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  line-height: 1.1;
+  white-space: nowrap;
+  color: #495057;
+  font-weight: 500;
+}
+
+.tile h3 .icon {
+  font-size: 1.5em;
+  margin-bottom: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tile h3 .icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* --- NO ITEMS --- */
+.no-items {
+  color: #888;
+  font-style: italic;
+  font-size: 0.8em;
+}
+
+/* --- CATEGORY DETAILS CONTAINER --- */
+.selected-category-details-container {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  margin-top: 30px;
+  width: 90%;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: left;
+  flex-grow: 1;
+  background-color: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  padding: 25px;
+}
+
+@media (min-width: 768px) {
+  .selected-category-details-container {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+}
+
+.selected-category-details {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  padding: 20px;
+  flex: 1;
+  min-width: 300px;
+  border: 1px solid #f0f0f0;
+}
+
+.selected-category-details h2 {
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
+  font-size: 1.6rem;
+  font-weight: 600;
+}
+
+.selected-category-details ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Keep your component-specific styles below this point unchanged from original */
+
+/* (Place all your RatesDetails, WaterDetails, AnimalDetails, WasteDetails, DevelopmentDetails styles here exactly as before) */
+
    and will apply to the maps in DevelopmentDetails as well. */
