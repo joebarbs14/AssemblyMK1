@@ -1,83 +1,87 @@
 /* ===== Dashboard layout ===== */
 .dashboard {
-  padding: 1.5rem; /* Increased padding for more breathing room */
+  padding: 1.5rem;
   text-align: center;
-  font-family: 'Inter', sans-serif; /* Apple-like font */
-  min-height: 100vh; /* Ensure dashboard takes full viewport height */
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
   display: flex;
-  flex-direction: column; /* Stack main sections vertically */
-  background-color: #f8f9fa; /* Light background for the whole page */
+  flex-direction: column;
+  background-color: #f8f9fa;
 }
 
-/* ===== Top row: logo + welcome | tiles | logout ===== */
+/* ===== Top row: logo + welcome | tiles | logout (single line always) ===== */
 .dashboard-top-row {
   display: flex;
   align-items: center;
-  gap: 12px;                 /* tighter spacing */
+  gap: 8px;                 /* tight spacing */
   padding: 8px 12px;
   width: 100%;
   box-sizing: border-box;
-  flex-wrap: nowrap;         /* keep in one line when possible */
+  flex-wrap: nowrap;        /* never wrap */
 }
 
 /* Left: logo + welcome */
 .header-left {
   display: flex;
   align-items: center;
-  gap: 10px;
-  min-width: 260px;          /* keep logo + name together */
-  flex-shrink: 0;
+  gap: 8px;
+  min-width: 0;             /* allow internal text to shrink */
+  flex: 0 1 auto;
+}
+
+/* Auto-sizing rectangular logo that fits its box */
+.council-logo {
+  /* Box auto-sizes with viewport but stays within limits */
+  width: clamp(120px, 24vw, 180px);
+  height: clamp(40px, 8vw, 64px);
+  border-radius: 8px;
+  object-fit: contain;      /* keep proportions, no cropping */
+  background: #fff;
+  padding: 6px;
+  border: 2px solid #e9ecef;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  flex: 0 0 auto;           /* fixed box; won’t squish */
+}
+
+.council-logo-placeholder {
+  width: clamp(120px, 24vw, 180px);
+  height: clamp(40px, 8vw, 64px);
+  border-radius: 8px;
+  background: #e9ecef;
+  flex: 0 0 auto;
 }
 
 .dashboard-header h1,
 .welcome-heading {
   margin: 0;
-  font-size: 1.25rem;        /* compact to fit first row */
+  font-size: clamp(1rem, 3.2vw, 1.25rem); /* scales down on small screens */
   line-height: 1.2;
-  white-space: nowrap;
+  white-space: nowrap;       /* keep on one line */
+  overflow: hidden;          /* and truncate if needed */
+  text-overflow: ellipsis;
   font-weight: 600;
   color: #212529;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  min-width: 0;              /* enable text truncation */
 }
 
-/* Bigger, rectangular council logo */
-.council-logo {
-  width: 180px;
-  height: 64px;
-  border-radius: 8px;        /* rectangle (not circle) */
-  object-fit: contain;       /* don’t crop logos */
-  background: #fff;
-  padding: 6px;
-  border: 2px solid #e9ecef;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-  flex-shrink: 0;
-}
-
-.council-logo-placeholder {
-  width: 180px;
-  height: 64px;
-  border-radius: 8px;
-  background: #e9ecef;
-}
-
-/* Middle: tiles row kept compact; scroll if overflow */
+/* Middle: tiles row stays one line and scrolls if needed */
 .tiles-inline-container {
-  flex: 1 1 auto;
+  flex: 1 1 auto;            /* takes remaining space */
+  min-width: 0;              /* allow horizontal scroll */
   overflow-x: auto;
-  min-width: 0;
-  display: flex;
-  justify-content: center;
+  overflow-y: hidden;
 }
 
 .tiles {
   display: flex;
   align-items: center;
-  gap: 8px;                  /* small gaps */
-  flex-wrap: nowrap;         /* one line */
+  gap: 8px;
+  flex-wrap: nowrap;         /* single line */
   padding: 4px 0;
-  scrollbar-width: thin;     /* Firefox */
+  scrollbar-width: thin;
 }
 
 .tiles::-webkit-scrollbar {
@@ -93,7 +97,7 @@
   width: 70px;
   height: 70px;
   display: flex;
-  flex-direction: column;    /* icon above text */
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   cursor: pointer;
@@ -127,7 +131,7 @@
 }
 
 .tile h3 .icon {
-  font-size: 1.5em; /* controls SVG box size */
+  font-size: 1.5em;
   margin-bottom: 3px;
   display: flex;
   align-items: center;
@@ -139,18 +143,18 @@
   height: 100%;
 }
 
-/* Right: logout */
+/* Right: logout stays on the same row */
 .logout-btn {
   background-color: #dc3545;
   color: white;
   border: none;
-  padding: 8px 12px;         /* compact */
+  padding: 6px 10px;         /* compact for small screens */
   border-radius: 8px;
   font-size: 0.95rem;
   cursor: pointer;
   transition: background-color 0.2s ease-in-out, transform 0.2s ease;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  flex-shrink: 0;
+  flex: 0 0 auto;            /* fixed size */
 }
 
 .logout-btn:hover {
@@ -160,8 +164,8 @@
 
 /* ===== Details container ===== */
 .selected-category-details-container {
-  display: flex;             /* side-by-side on wide screens via media query */
-  flex-direction: column;    /* default for small screens */
+  display: flex;
+  flex-direction: column;
   gap: 25px;
   margin-top: 30px;
   width: 90%;
@@ -178,7 +182,7 @@
 
 @media (min-width: 768px) {
   .selected-category-details-container {
-    flex-direction: row;     /* side-by-side on larger screens */
+    flex-direction: row;
     align-items: flex-start;
   }
 }
@@ -186,7 +190,7 @@
 .selected-category-details {
   background-color: #fff;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   padding: 20px;
   flex: 1;
   min-width: 300px;
@@ -233,89 +237,42 @@
   transform: translateY(-2px);
 }
 
-.property-details-content {
-  flex-grow: 1;
-  text-align: left;
-}
+.property-details-content { flex-grow: 1; text-align: left; }
+.property-title { font-size: 1.15em; font-weight: bold; color: #007bff; margin-bottom: 8px; }
+.property-info { font-size: 0.95em; color: #555; margin-bottom: 4px; }
 
-.property-title {
-  font-size: 1.15em;
-  font-weight: bold;
-  color: #007bff;
-  margin-bottom: 8px;
-}
-
-.property-info {
-  font-size: 0.95em;
-  color: #555;
-  margin-bottom: 4px;
-}
-
-/* Property header */
 .property-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-  width: 100%;
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 10px; width: 100%;
 }
-
-.property-address-council {
-  flex-grow: 1;
-}
+.property-address-council { flex-grow: 1; }
 
 .council-logo-small {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 1px solid #e0e0e0;
-  margin-left: 15px;
-  flex-shrink: 0;
+  width: 40px; height: 40px; border-radius: 50%;
+  object-fit: cover; border: 1px solid #e0e0e0; margin-left: 15px; flex-shrink: 0;
   box-shadow: 0 1px 4px rgba(0,0,0,0.1);
 }
 
 /* Mini map */
 .mini-map-container {
-  width: 150px;
-  height: 100px;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  flex-shrink: 0;
-  border: 1px solid #ddd;
+  width: 150px; height: 100px; border-radius: 8px; overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1); flex-shrink: 0; border: 1px solid #ddd;
 }
+.mini-map-container .leaflet-container { width: 100%; height: 100%; }
 
-/* Ensure Leaflet map fills its container */
-.mini-map-container .leaflet-container {
-  width: 100%;
-  height: 100%;
-}
-
-/* Hide the shape file data text display (if supported by your PostCSS) */
-.property-info:has(span.shape-file-data-label) {
-  display: none;
-}
+/* Hide the shape file data text display (may require PostCSS support for :has) */
+.property-info:has(span.shape-file-data-label) { display: none; }
 
 /* ===== WaterDetails ===== */
 .water-details-content { }
 .water-section-title {
-  font-size: 1.2em;
-  font-weight: bold;
-  color: #0056b3;
-  margin-top: 15px;
-  margin-bottom: 10px;
-  padding-bottom: 5px;
-  border-bottom: 1px solid #eee;
+  font-size: 1.2em; font-weight: bold; color: #0056b3;
+  margin-top: 15px; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid #eee;
 }
 .water-consumption-list { list-style: none; padding: 0; margin: 0; }
 .water-quarter-card {
-  background-color: #fefefe;
-  border: 1px solid #e0f2f7;
-  border-radius: 8px;
-  padding: 12px 15px;
-  margin-bottom: 10px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  background-color: #fefefe; border: 1px solid #e0f2f7; border-radius: 8px;
+  padding: 12px 15px; margin-bottom: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.04);
   transition: all 0.2s ease-in-out;
 }
 .water-quarter-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); transform: translateY(-1px); }
@@ -333,45 +290,30 @@
 /* ===== AnimalDetails ===== */
 .animal-details-content { }
 .animal-section-title {
-  font-size: 1.2em;
-  font-weight: bold;
-  color: #28a745;
-  margin-top: 15px;
-  margin-bottom: 15px;
-  padding-bottom: 5px;
-  border-bottom: 1px solid #eee;
+  font-size: 1.2em; font-weight: bold; color: #28a745;
+  margin-top: 15px; margin-bottom: 15px; padding-bottom: 5px; border-bottom: 1px solid #eee;
 }
-.animal-action-buttons {
-  display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 25px;
-}
+.animal-action-buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 25px; }
 .animal-action-tile {
   background: linear-gradient(145deg, #e6f7ff, #cceeff);
-  padding: 12px 15px;
-  border-radius: 10px;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
-  cursor: pointer;
-  transition: all 0.3s ease-in-out;
-  display: flex; align-items: center; gap: 8px;
-  font-size: 0.95em; font-weight: 500; color: #0056b3;
-  border: 1px solid #b3e0ff;
-  flex-basis: calc(50% - 10px);
-  max-width: 250px; text-align: left;
+  padding: 12px 15px; border-radius: 10px; box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+  cursor: pointer; transition: all 0.3s ease-in-out;
+  display: flex; align-items: center; gap: 8px; font-size: 0.95em; font-weight: 500; color: #0056b3;
+  border: 1px solid #b3e0ff; flex-basis: calc(50% - 10px); max-width: 250px; text-align: left;
 }
-@media (min-width: 600px) {
-  .animal-action-tile { flex-basis: calc(25% - 10px); }
-}
-.animal-action-tile:hover { background-color: #b3e0ff; transform: translateY(-2px) scale(1.02); box-shadow: 0 5px 12px rgba(0, 0, 0, 0.12); }
-.animal-action-tile.selected-action-tile { border: 2px solid #007bff; box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2); background: linear-gradient(145deg, #a0d9ff, #80c8ff); color: #003366; }
+@media (min-width: 600px) { .animal-action-tile { flex-basis: calc(25% - 10px); } }
+.animal-action-tile:hover { background-color: #b3e0ff; transform: translateY(-2px) scale(1.02); box-shadow: 0 5px 12px rgba(0,0,0,0.12); }
+.animal-action-tile.selected-action-tile { border: 2px solid #007bff; box-shadow: 0 4px 10px rgba(0,123,255,0.2); background: linear-gradient(145deg, #a0d9ff, #80c8ff); color: #003366; }
 .animal-action-tile .emoji { font-size: 1.2em; }
 .adoptable-animals-listing { margin-top: 20px; }
 .listing-title { font-size: 1.3em; font-weight: bold; color: #333; margin-bottom: 20px; text-align: center; }
 .animal-cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; justify-content: center; }
 .animal-card {
   background-color: #ffffff; border: 1px solid #e9ecef; border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08); overflow: hidden;
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; text-align: left;
 }
-.animal-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); }
+.animal-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
 .animal-main-photo-container { width: 100%; height: 180px; overflow: hidden; display: flex; justify-content: center; align-items: center; background-color: #f0f0f0; }
 .animal-main-photo { width: 100%; height: 100%; object-fit: cover; display: block; }
 .animal-gallery { display: flex; justify-content: center; gap: 5px; padding: 10px; background-color: #f8f9fa; border-bottom: 1px solid #eee; }
@@ -396,11 +338,11 @@
 .waste-action-tile:hover { background-color: #dee2e6; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); }
 .waste-action-tile.selected-action-tile { background-color: #007bff; color: white; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); border: 2px solid #0056b3; }
 .waste-action-tile .emoji { font-size: 2em; margin-bottom: 5px; }
-.waste-type-details { background-color: #f8f9fa; border-radius: 8px; padding: 20px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08); }
+.waste-type-details { background-color: #f8f9fa; border-radius: 8px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.08); }
 .waste-type-details .listing-title { font-size: 1.3em; font-weight: bold; color: #333; margin-bottom: 15px; text-align: center; }
 .waste-type-details .collection-info,
 .waste-type-details .collection-notes { font-size: 1em; color: #555; margin-bottom: 10px; text-align: center; }
-.waste-map-container { width: 100%; height: 400px; border-radius: 8px; overflow: hidden; margin-top: 20px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); }
+.waste-map-container { width: 100%; height: 400px; border-radius: 8px; overflow: hidden; margin-top: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
 
 /* ===== DevelopmentDetails ===== */
 .development-details-content { padding: 10px; }
@@ -421,23 +363,9 @@
 .development-info a { color: #007bff; text-decoration: none; }
 .development-info a:hover { text-decoration: underline; }
 
-/* Status colours */
-.status-submitted { color: #ffc107; font-weight: bold; }
-.status-under-review { color: #17a2b8; font-weight: bold; }
-.status-approved { color: #28a745; font-weight: bold; }
-.status-rejected { color: #dc3545; font-weight: bold; }
-
-/* ===== Mobile fallback: stack top row if too narrow ===== */
-@media (max-width: 720px) {
-  .dashboard-top-row {
-    flex-wrap: wrap;          /* allow wrap on small screens */
-    gap: 10px 8px;
-  }
-  .tiles-inline-container {
-    order: 3;                 /* put tiles under logo + logout */
-    width: 100%;
-  }
-  .logout-btn {
-    order: 2;
-  }
+/* ===== Tiny screens polish (keep single row without wrapping) ===== */
+@media (max-width: 480px) {
+  .logout-btn { padding: 5px 8px; font-size: 0.9rem; }
+  .tile { width: 64px; height: 64px; }
+  .tiles { gap: 6px; }
 }
