@@ -63,12 +63,14 @@ body {
 }
 
 .sidebar nav ul li a {
-  display: block;
+  display: flex;
+  align-items: center;
   padding: 10px 15px;
   text-decoration: none;
   color: var(--text-secondary);
   border-radius: 8px;
   transition: all 0.2s ease-in-out;
+  gap: 10px;
 }
 
 .sidebar nav ul li a:hover,
@@ -76,6 +78,12 @@ body {
   background-color: var(--primary-color);
   color: #ffffff;
 }
+
+.sidebar .icon {
+  width: 20px;
+  height: 20px;
+}
+
 
 /*
  * Main Content Area
