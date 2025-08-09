@@ -44,12 +44,12 @@ const EnvironmentDetails = ({ selectedSubCategory, data }) => {
   const selectedData = mockData[selectedSubCategory] || [];
 
   return (
-    <div className="environment-details-container">
+    <div className="sub-details-content">
       {selectedSubCategory ? (
         <>
-          <h3>{selectedSubCategory}</h3>
+          <h3 className="sub-details-title">{selectedSubCategory}</h3>
           {selectedData.length > 0 ? (
-            <ul>
+            <ul className="sub-details-list">
               {selectedData.map((item) => (
                 <li key={item.id} className="process-item-full-detail">
                   <div className="process-title">{item.title}</div>
@@ -371,10 +371,11 @@ function DashboardPage() {
 
   const handleTileClick = (category) => {
     setSelectedCategory(category);
+    // Reset all sub-category selections when a new main category is clicked
     setSelectedCommunitySubCategory(null);
     setSelectedRoadSubCategory(null);
     setSelectedPublicHealthSubCategory(null);
-    setSelectedEnvironmentSubCategory(null); // Reset environment sub-category
+    setSelectedEnvironmentSubCategory(null);
   };
 
   const handleCommunitySubTileClick = (subCategory) => {
@@ -398,7 +399,7 @@ function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="dashboard">
+      <div className="dashboard-loading">
         <h1>Loading Dashboard...</h1>
         <p>Please wait while we fetch your data.</p>
       </div>
@@ -407,7 +408,7 @@ function DashboardPage() {
 
   if (error) {
     return (
-      <div className="dashboard">
+      <div className="dashboard-error">
         <h1>Error Loading Dashboard</h1>
         <p className="error-message">{error}</p>
         <button onClick={() => window.location.reload()}>Retry</button>
@@ -429,17 +430,15 @@ function DashboardPage() {
 
   // Helper component to render community sub-tiles
   const renderCommunitySubTiles = () => (
-    <div className="community-sub-tiles-container">
+    <div className="sub-tiles-container">
       {communitySubCategories.map(subCategory => (
         <div
           key={subCategory}
-          className={`tile ${selectedCommunitySubCategory === subCategory ? 'selected-tile' : ''}`}
+          className={`sub-tile ${selectedCommunitySubCategory === subCategory ? 'sub-tile-selected' : ''}`}
           onClick={() => handleCommunitySubTileClick(subCategory)}
         >
-          <h3>
-            <span className="icon">{getCategoryIcon(subCategory)}</span>
-            {subCategory}
-          </h3>
+          <div className="sub-tile-icon">{getCategoryIcon(subCategory)}</div>
+          <span className="sub-tile-text">{subCategory}</span>
         </div>
       ))}
     </div>
@@ -449,13 +448,15 @@ function DashboardPage() {
   const renderCommunityDetails = () => {
     if (!selectedCommunitySubCategory) {
       return (
-        <p className="no-entries">Please select a community sub-category.</p>
+        <div className="sub-details-content">
+          <p className="no-entries">Please select a community sub-category.</p>
+        </div>
       );
     }
     // For now, we'll show a simple message as there's no backend data
     return (
-      <div className="community-sub-category-details">
-        <h3>{selectedCommunitySubCategory}</h3>
+      <div className="sub-details-content">
+        <h3 className="sub-details-title">{selectedCommunitySubCategory}</h3>
         <p className="no-entries">No entries found for {selectedCommunitySubCategory}.</p>
       </div>
     );
@@ -463,24 +464,21 @@ function DashboardPage() {
 
   // Helper component to render roads sub-tiles and map
   const renderRoadsContent = () => (
-    <>
-      <div className="roads-sub-tiles-container">
+    <div className="sub-content-container">
+      <div className="sub-tiles-container">
         {roadSubCategories.map(subCategory => (
           <div
             key={subCategory}
-            className={`tile ${selectedRoadSubCategory === subCategory ? 'selected-tile' : ''}`}
+            className={`sub-tile ${selectedRoadSubCategory === subCategory ? 'sub-tile-selected' : ''}`}
             onClick={() => handleRoadSubTileClick(subCategory)}
           >
-            <h3>
-              <span className="icon">{getCategoryIcon(subCategory)}</span>
-              {subCategory}
-            </h3>
+            <div className="sub-tile-icon">{getCategoryIcon(subCategory)}</div>
+            <span className="sub-tile-text">{subCategory}</span>
           </div>
         ))}
       </div>
-      <div className="roads-map-and-details-container">
+      <div className="sub-details-content">
         <div className="map-placeholder">
-          {/* A simple placeholder for the map */}
           <p>Map showing road information will appear here.</p>
         </div>
         <div className="roads-sub-category-details">
@@ -491,161 +489,156 @@ function DashboardPage() {
           )}
         </div>
       </div>
-    </>
+    </div>
   );
 
   // Helper component to render public health sub-tiles and details
   const renderPublicHealthContent = () => (
-    <>
-      <div className="public-health-sub-tiles-container">
+    <div className="sub-content-container">
+      <div className="sub-tiles-container">
         {publicHealthSubCategories.map(subCategory => (
           <div
             key={subCategory}
-            className={`tile ${selectedPublicHealthSubCategory === subCategory ? 'selected-tile' : ''}`}
+            className={`sub-tile ${selectedPublicHealthSubCategory === subCategory ? 'sub-tile-selected' : ''}`}
             onClick={() => handlePublicHealthSubTileClick(subCategory)}
           >
-            <h3>
-              <span className="icon">{getCategoryIcon(subCategory)}</span>
-              {subCategory}
-            </h3>
+            <div className="sub-tile-icon">{getCategoryIcon(subCategory)}</div>
+            <span className="sub-tile-text">{subCategory}</span>
           </div>
         ))}
       </div>
-      <div className="public-health-sub-category-details">
+      <div className="sub-details-content">
         {selectedPublicHealthSubCategory ? (
           <p className="no-entries">No entries found for {selectedPublicHealthSubCategory}.</p>
         ) : (
           <p className="no-entries">Please select a public health sub-category to view details.</p>
         )}
       </div>
-    </>
+    </div>
   );
   
   // Helper component to render environment sub-tiles and details
   const renderEnvironmentContent = () => (
-    <>
-      <div className="environment-sub-tiles-container">
+    <div className="sub-content-container">
+      <div className="sub-tiles-container">
         {environmentSubCategories.map(subCategory => (
           <div
             key={subCategory}
-            className={`tile ${selectedEnvironmentSubCategory === subCategory ? 'selected-tile' : ''}`}
+            className={`sub-tile ${selectedEnvironmentSubCategory === subCategory ? 'sub-tile-selected' : ''}`}
             onClick={() => handleEnvironmentSubTileClick(subCategory)}
           >
-            <h3>
-              <span className="icon">{getCategoryIcon(subCategory)}</span>
-              {subCategory}
-            </h3>
+            <div className="sub-tile-icon">{getCategoryIcon(subCategory)}</div>
+            <span className="sub-tile-text">{subCategory}</span>
           </div>
         ))}
       </div>
       <EnvironmentDetails selectedSubCategory={selectedEnvironmentSubCategory} />
-    </>
+    </div>
   );
 
 
   return (
-    <div className="dashboard">
-      <div className="dashboard-top-row">
-        {/* Re-arranged the header layout to move the logout button */}
-        <div className="header-left" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          {/* Updated logo style to be larger and rectangular */}
+    <div className="dashboard-container">
+      {/* Dashboard Header */}
+      <header className="dashboard-header">
+        <div className="header-left">
           {userCouncilLogoUrl ? (
             <img 
               src={userCouncilLogoUrl} 
               alt={`${userCouncilName || 'Council'} Logo`} 
-              className="council-logo" 
-              style={{ width: '120px', height: '60px', objectFit: 'contain' }}
+              className="council-logo"
             />
           ) : (
-            <div className="council-logo-placeholder" style={{ width: '120px', height: '60px' }}></div>
+            <div className="council-logo-placeholder"></div>
           )}
           <h1 className="welcome-heading">Welcome, {userName}</h1>
-          {/* Moved logout button here, next to the user's name */}
-          <button className="logout-btn" onClick={() => {
-            localStorage.removeItem('token');
-            localStorage.removeItem('userName');
-            localStorage.removeItem('userCouncilName');
-            localStorage.removeItem('userCouncilLogoUrl');
-            navigate('/#/');
-          }}>Logout</button>
         </div>
+        <button className="logout-btn" onClick={() => {
+          localStorage.removeItem('token');
+          localStorage.removeItem('userName');
+          localStorage.removeItem('userCouncilName');
+          localStorage.removeItem('userCouncilLogoUrl');
+          navigate('/#/');
+        }}>Logout</button>
+      </header>
 
-        <div className="tiles-inline-container">
-          <div className="tiles">
-            {categories.map(category => (
-              <div
-                key={category}
-                className={`tile ${selectedCategory === category ? 'selected-tile' : ''}`}
-                onClick={() => handleTileClick(category)}
-              >
-                <h3>
-                  <span className="icon">{getCategoryIcon(category)}</span>
-                  {category}
-                </h3>
-              </div>
-            ))}
-          </div>
+      {/* Main Categories Section */}
+      <section className="main-categories-section">
+        <div className="main-tiles-container">
+          {categories.map(category => (
+            <div
+              key={category}
+              className={`main-tile ${selectedCategory === category ? 'main-tile-selected' : ''}`}
+              onClick={() => handleTileClick(category)}
+            >
+              <div className="main-tile-icon-container">{getCategoryIcon(category)}</div>
+              <span className="main-tile-text">{category}</span>
+            </div>
+          ))}
         </div>
+      </section>
 
-      </div>
-
+      {/* Dynamic Content Section */}
       {selectedCategory && (
-        <div className="selected-category-details-container">
-          <div className="selected-category-details">
-            <h2>Details for {selectedCategory}</h2>
-            {/* Conditional rendering for different categories */}
-            {selectedCategory === 'Community' ? (
-              <>
-                {renderCommunitySubTiles()}
-                {renderCommunityDetails()}
-              </>
-            ) : selectedCategory === 'Roads' ? (
-              renderRoadsContent()
-            ) : selectedCategory === 'Public Health' ? (
-              renderPublicHealthContent()
-            ) : selectedCategory === 'Environment' ? (
-              renderEnvironmentContent()
-            ) : (
-              selectedCategoryItems.length > 0 || selectedCategory === 'Animals' || selectedCategory === 'Waste' || selectedCategory === 'Development' ? (
-                selectedCategory === 'Rates' ? (
-                  <RatesDetails properties={selectedCategoryItems} />
-                ) : selectedCategory === 'Water' ? (
-                  <WaterDetails properties={selectedCategoryItems} />
-                ) : selectedCategory === 'Animals' ? (
-                  <AnimalDetails animals={selectedCategoryItems} />
-                ) : selectedCategory === 'Waste' ? (
-                  <WasteDetails wasteData={selectedCategoryItems} />
-                ) : selectedCategory === 'Development' ? (
-                  <DevelopmentDetails applications={selectedCategoryItems} />
+        <section className="dynamic-content-section">
+          <h2 className="section-title">Details for {selectedCategory}</h2>
+          
+          {/* Conditional rendering for different categories */}
+          {selectedCategory === 'Community' ? (
+            <div className="sub-content-container">
+              {renderCommunitySubTiles()}
+              {renderCommunityDetails()}
+            </div>
+          ) : selectedCategory === 'Roads' ? (
+            renderRoadsContent()
+          ) : selectedCategory === 'Public Health' ? (
+            renderPublicHealthContent()
+          ) : selectedCategory === 'Environment' ? (
+            renderEnvironmentContent()
+          ) : (
+            <div className="sub-content-container single-column-details">
+              <div className="sub-details-content">
+                {selectedCategoryItems.length > 0 || selectedCategory === 'Animals' || selectedCategory === 'Waste' || selectedCategory === 'Development' ? (
+                  selectedCategory === 'Rates' ? (
+                    <RatesDetails properties={selectedCategoryItems} />
+                  ) : selectedCategory === 'Water' ? (
+                    <WaterDetails properties={selectedCategoryItems} />
+                  ) : selectedCategory === 'Animals' ? (
+                    <AnimalDetails animals={selectedCategoryItems} />
+                  ) : selectedCategory === 'Waste' ? (
+                    <WasteDetails wasteData={selectedCategoryItems} />
+                  ) : selectedCategory === 'Development' ? (
+                    <DevelopmentDetails applications={selectedCategoryItems} />
+                  ) : (
+                    <ul>
+                      {selectedCategoryItems.map((item) => (
+                        <li key={item.id} className="process-item-full-detail">
+                          <div>
+                            <div className="process-title">{item.title}</div>
+                            <div className="process-detail">Status: {item.status}</div>
+                            {item.submitted_at && (
+                              <div className="process-detail">Submitted: {new Date(item.submitted_at).toLocaleDateString()}</div>
+                            )}
+                            {item.updated_at && (
+                              <div className="process-detail">Updated: {new Date(item.updated_at).toLocaleDateString()}</div>
+                            )}
+                            {item.form_data && Object.keys(item.form_data).length > 0 && (
+                              <div className="process-detail">
+                                Form Data: {JSON.stringify(item.form_data)}
+                              </div>
+                            )}
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  )
                 ) : (
-                  <ul>
-                    {selectedCategoryItems.map((item) => (
-                      <li key={item.id} className="process-item-full-detail">
-                        <div>
-                          <div className="process-title">{item.title}</div>
-                          <div className="process-detail">Status: {item.status}</div>
-                          {item.submitted_at && (
-                            <div className="process-detail">Submitted: {new Date(item.submitted_at).toLocaleDateString()}</div>
-                          )}
-                          {item.updated_at && (
-                            <div className="process-detail">Updated: {new Date(item.updated_at).toLocaleDateString()}</div>
-                          )}
-                          {item.form_data && Object.keys(item.form_data).length > 0 && (
-                            <div className="process-detail">
-                              Form Data: {JSON.stringify(item.form_data)}
-                            </div>
-                          )}
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                )
-              ) : (
-                <p className="no-entries">No entries found for {selectedCategory}.</p>
-              )
-            )}
-          </div>
-        </div>
+                  <p className="no-entries">No entries found for {selectedCategory}.</p>
+                )}
+              </div>
+            </div>
+          )}
+        </section>
       )}
     </div>
   );
