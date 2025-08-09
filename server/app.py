@@ -8,14 +8,15 @@ from routes.dashboard import dashboard
 from routes.process import process
 from routes.admin import admin
 from routes.user import user_bp
+from routes.rates import rates_bp  # <-- NEW: Rates blueprint
 from dotenv import load_dotenv
 import os
 from datetime import timedelta, datetime
 import logging
 # REMOVED: from authlib.integrations.flask_client import OAuth # Not directly used for JWTs
-from authlib.jose import JsonWebToken, util # Keep this for JWT encoding/decoding
-from routes.decorators import auth_required, jwt_instance # Import auth_required and jwt_instance
-import authlib # <<< ADDED THIS LINE: Import the top-level Authlib module
+from authlib.jose import JsonWebToken, util  # Keep this for JWT encoding/decoding
+from routes.decorators import auth_required, jwt_instance  # Import auth_required and jwt_instance
+import authlib  # <<< keep: top-level Authlib module
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -33,7 +34,7 @@ if secret_key is None or secret_key == 'changeme':
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
 app.config['SECRET_KEY'] = secret_key
-app.config['JWT_SECRET_KEY'] = app.config['SECRET_KEY'] # Used by Authlib for JWT signing
+app.config['JWT_SECRET_KEY'] = app.config['SECRET_KEY']  # Used by Authlib for JWT signing
 
 # CORS: Allow deployed + local dev frontends
 CORS(app, resources={r"/*": {"origins": [
@@ -49,8 +50,7 @@ with app.app_context():
     logging.info("Attempting to create all database tables if they don't exist...")
     db.create_all()
     logging.info("Database table creation process completed.")
-    # <<< FIXED THIS LINE: Now 'authlib' is defined >>>
-    logging.info(f"Authlib version: {authlib.__version__}") # Use authlib.__version__
+    logging.info(f"Authlib version: {authlib.__version__}")
 
 # --- Register Blueprints ---
 app.register_blueprint(auth, url_prefix='/auth')
@@ -58,6 +58,7 @@ app.register_blueprint(dashboard, url_prefix='/dashboard')
 app.register_blueprint(process, url_prefix='/process')
 app.register_blueprint(admin, url_prefix='/admin')
 app.register_blueprint(user_bp, url_prefix='/user')
+app.register_blueprint(rates_bp, url_prefix='/rates')  # <-- NEW: /rates endpoints
 
 @app.route('/')
 def index():
