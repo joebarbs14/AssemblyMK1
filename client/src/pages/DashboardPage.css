@@ -1,3 +1,4 @@
+/* ============== CORE LAYOUT ============== */
 .dashboard {
   padding: 1.5rem;
   text-align: center;
@@ -8,14 +9,17 @@
   background-color: #f8f9fa;
 }
 
-/* --- TOP ROW (perfect version) --- */
+/* --- TOP ROW (sticky) --- */
 .dashboard-top-row {
   display: flex;
   align-items: center;
-  gap: 20px;
-  padding: 8px 12px;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 10px 14px;
   width: 100%;
   box-sizing: border-box;
+
+  /* sticky */
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -23,31 +27,34 @@
   border-bottom: 1px solid rgba(0,0,0,0.06);
 }
 
+/* Left cluster: logo + welcome */
 .header-left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 15px;
+  flex-shrink: 0;
 }
 
 .welcome-heading {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: clamp(1.1rem, 2.2vw, 1.6rem);
   line-height: 1.2;
+  white-space: nowrap;
   font-weight: 600;
   color: #212529;
 }
 
-/* --- LOGO --- */
+/* Logo auto-sizes to its box while keeping aspect */
 .council-logo {
-  height: 64px;
-  width: auto;
-  max-width: 180px;
+  width: clamp(100px, 12vw, 180px);
+  height: clamp(40px, 7vw, 64px);
   border-radius: 8px;
   object-fit: contain;
   background: #fff;
   padding: 6px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.06);
   border: 2px solid #e9ecef;
+  flex-shrink: 0;
 }
 
 .council-logo-placeholder {
@@ -57,8 +64,9 @@
   background: #e9ecef;
 }
 
-/* --- LOGOUT BUTTON --- */
+/* Logout */
 .logout-btn {
+  flex: 0 0 auto;
   padding: 8px 12px;
   font-size: 0.95rem;
   background-color: #dc3545;
@@ -69,46 +77,51 @@
   transition: background-color 0.2s ease-in-out, transform 0.2s ease;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
-
 .logout-btn:hover {
   background-color: #c82333;
   transform: translateY(-1px);
 }
 
-/* --- TILE ROW (reverted perfect version) --- */
+/* --- TILE ROW (desktop: inline between left + logout) --- */
 .tiles-inline-container {
   flex: 1 1 auto;
-  width: 100%;
-  margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+  overflow: hidden; /* desktop: no scroll bar shown */
 }
 
 .tiles {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: wrap;                 /* desktop spacing as before */
+  gap: 0.5rem;
+  padding: 0 0.5rem;
+  align-items: center;
   justify-content: center;
-  gap: 20px;
 }
 
+/* Individual tile */
 .tile {
-  flex: 0 1 120px;
   background: linear-gradient(145deg, #ffffff, #f0f0f0);
-  padding: 15px;
-  border-radius: 12px;
-  border: 1px solid #e0e0e0;
+  padding: 0.5rem;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s ease-in-out;
+  width: 70px;
+  height: 70px;
+  flex-shrink: 0;
+  border: 1px solid #e0e0e0;
 }
-
 .tile:hover {
   background-color: #e9ecef;
   transform: translateY(-2px) scale(1.02);
   box-shadow: 0 5px 14px rgba(0, 0, 0, 0.12);
 }
-
 .tile.selected-tile {
   border: 3px solid #007bff;
   box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
@@ -117,28 +130,33 @@
 
 .tile h3 {
   margin: 0;
-  font-size: 0.9em;
-  text-align: center;
+  font-size: 0.8em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  line-height: 1.1;
+  white-space: nowrap;
   color: #495057;
   font-weight: 500;
 }
-
 .tile h3 .icon {
-  font-size: 2em;
-  margin-bottom: 8px;
+  font-size: 1.5em;
+  margin-bottom: 3px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
+.tile h3 .icon svg { width: 100%; height: 100%; }
 
-/* --- NO ITEMS --- */
+/* No items text */
 .no-items {
   color: #888;
   font-style: italic;
   font-size: 0.8em;
 }
 
-/* --- SELECTED CATEGORY DETAILS CONTAINER --- */
+/* --- DETAILS CARD WRAPPER --- */
 .selected-category-details-container {
   display: flex;
   flex-direction: column;
@@ -155,7 +173,6 @@
   box-shadow: 0 6px 20px rgba(0,0,0,0.08);
   padding: 25px;
 }
-
 @media (min-width: 768px) {
   .selected-category-details-container {
     flex-direction: row;
@@ -172,7 +189,6 @@
   min-width: 300px;
   border: 1px solid #f0f0f0;
 }
-
 .selected-category-details h2 {
   color: #333;
   margin-bottom: 20px;
@@ -180,72 +196,56 @@
   font-size: 1.6rem;
   font-weight: 600;
 }
+.selected-category-details ul { list-style: none; padding: 0; margin: 0; }
 
-.selected-category-details ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-/* --- SMALL SCREEN LAYOUT --- */
+/* ============== SMALL SCREENS ============== */
+/* On phones: keep logo + welcome + logout on the first row,
+   move tiles to a second row that scrolls horizontally,
+   and make tiles smaller. */
 @media (max-width: 760px) {
   .dashboard-top-row {
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 12px;
+    flex-wrap: wrap;          /* allow second line */
+    align-items: center;
+  }
+
+  /* First row: left cluster + logout */
+  .header-left { order: 1; min-width: 0; flex: 1 1 auto; }
+  .logout-btn { order: 2; }
+
+  /* Second row: tiles take full width and scroll horizontally */
+  .tiles-inline-container {
+    order: 3;
+    flex: 1 1 100%;
+    min-width: 0;
+    overflow-x: auto;         /* horizontal scroll */
+    -webkit-overflow-scrolling: touch;
+  }
+  .tiles {
+    flex-wrap: nowrap;        /* no wrap so it scrolls left/right */
+    justify-content: flex-start;
+    gap: 8px;                 /* tidy spacing on mobile */
+    padding: 6px 2px;
+  }
+
+  .tile {
+    width: 60px;
+    height: 60px;
+    border-radius: 9px;
+    padding: 6px;
   }
 
   .council-logo {
-    height: 48px;
+    height: 44px;
     max-width: 140px;
   }
 
   .welcome-heading {
     font-size: 1.05rem;
   }
-
-  .tiles {
-    justify-content: center;
-    gap: 15px;
-  }
-
-  .tile {
-    flex: 0 1 100px;
-  }
 }
 
-@media (max-width: 500px) {
-  .council-logo {
-    height: 40px;
-    max-width: 120px;
-  }
-
-  .welcome-heading {
-    font-size: 0.95rem;
-  }
-
-  .tile {
-    flex: 0 1 90px;
-  }
-}
-
-/* --- RATES ADJUSTMENT: keep council logos small in cards --- */
-.council-logo-small {
-  width: 48px;
-  height: 48px;
-  max-width: 48px;
-  max-height: 48px;
-  aspect-ratio: 1 / 1;
-  object-fit: contain;
-  display: inline-block;
-  border-radius: 50%;
-  background: #fff;
-  padding: 2px;
-  border: 1px solid #e0e0e0;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-}
-
-.property-item-card img {
-  max-width: 100%;
-  height: auto;
+@media (max-width: 480px) {
+  .tile { width: 56px; height: 56px; }
+  .council-logo { height: 40px; max-width: 120px; }
+  .welcome-heading { font-size: 0.98rem; }
 }
