@@ -8,8 +8,10 @@ import AnimalDetails from './AnimalDetails';
 import WasteDetails from './WasteDetails';
 import DevelopmentDetails from './DevelopmentDetails';
 
-// DashboardPage.js - Version 1.0.14 - Environment Sub-tiles
-console.log('DashboardPage.js - Version 1.0.14 - Loading...');
+// DashboardPage.js - Version 1.1.0 - Fetch /rates/properties when Rates is opened
+console.log('DashboardPage.js - Version 1.1.0 - Loading...');
+
+const API_BASE = 'https://assemblymk1-backend.onrender.com';
 
 const categories = [
   'Rates',
@@ -30,27 +32,9 @@ const communitySubCategories = [
   'Local Events',
 ];
 
-const roadSubCategories = [
-  'Current Road works',
-  'Upcoming Roadworks',
-  'Report a problem',
-];
-
-const publicHealthSubCategories = [
-  'Medical Services',
-  'Resources',
-  'Mental Health',
-];
-
-const environmentSubCategories = [
-  'Nature',
-  'Walking Tracks',
-  'National Parks',
-  'Weed Spotting',
-  'Wildlife',
-  'Trees',
-  'Water',
-];
+const roadSubCategories = ['Current Road works', 'Upcoming Roadworks', 'Report a problem'];
+const publicHealthSubCategories = ['Medical Services', 'Resources', 'Mental Health'];
+const environmentSubCategories = ['Nature', 'Walking Tracks', 'National Parks', 'Weed Spotting', 'Wildlife', 'Trees', 'Water'];
 
 // Helper: SVG icon per category/sub-category
 const getCategoryIcon = (category) => {
@@ -208,11 +192,19 @@ function DashboardPage() {
   const [userCouncilLogoUrl, setUserCouncilLogoUrl] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedCommunitySubCategory, setSelectedCommunitySubCategory] = useState(null);
   const [selectedRoadSubCategory, setSelectedRoadSubCategory] = useState(null);
   const [selectedPublicHealthSubCategory, setSelectedPublicHealthSubCategory] = useState(null);
   const [selectedEnvironmentSubCategory, setSelectedEnvironmentSubCategory] = useState(null);
+
+  // NEW: dedicated state for Rates API
+  const [ratesData, setRatesData] = useState(null);            // { properties: [...] }
+  const [ratesLoaded, setRatesLoaded] = useState(false);
+  const [ratesLoading, setRatesLoading] = useState(false);
+  const [ratesError, setRatesError] = useState(null);
+
   const navigate = useNavigate();
 
   const fetchUserProfileAndDashboardData = useCallback(
@@ -222,7 +214,7 @@ function DashboardPage() {
 
       try {
         // 1) Profile
-        const userProfileRes = await fetch('https://assemblymk1-backend.onrender.com/user/profile', {
+        const userProfileRes = await fetch(`${API_BASE}/user/profile`, {
           method: 'GET',
           headers: { Authorization: 'Bearer ' + token },
         });
@@ -234,51 +226,27 @@ function DashboardPage() {
         }
 
         if (!userProfileRes.ok) {
-          console.error(
-            `Failed to fetch user profile: Status ${userProfileRes.status}, Message: ${
-              userProfileData.message || userProfileData.error || 'Unknown error'
-            }`,
-          );
           if (userProfileRes.status === 401 || userProfileRes.status === 403) {
-            console.error('Session expired. Please log in again.');
-            localStorage.removeItem('token');
-            localStorage.removeItem('userName');
-            localStorage.removeItem('userCouncilName');
-            localStorage.removeItem('userCouncilLogoUrl');
+            localStorage.clear();
             navigate('/#/');
             return;
           }
-          throw new Error(`Server responded with status: ${userProfileRes.status} for user profile`);
+          throw new Error(userProfileData.message || userProfileData.error || `Profile HTTP ${userProfileRes.status}`);
         }
 
-        if (userProfileData.name) {
-          setUserName(userProfileData.name);
-          localStorage.setItem('userName', userProfileData.name);
-        } else {
-          setUserName('Resident');
-        }
+        setUserName(userProfileData.name || 'Resident');
+        if (userProfileData.name) localStorage.setItem('userName', userProfileData.name);
 
-        if (userProfileData.council_name) {
-          setUserCouncilName(userProfileData.council_name);
-          localStorage.setItem('userCouncilName', userProfileData.council_name);
-        } else {
-          setUserCouncilName(null);
-        }
+        setUserCouncilName(userProfileData.council_name || null);
+        if (userProfileData.council_name) localStorage.setItem('userCouncilName', userProfileData.council_name);
 
-        if (userProfileData.council_logo_url) {
-          setUserCouncilLogoUrl(userProfileData.council_logo_url);
-          localStorage.setItem('userCouncilLogoUrl', userProfileData.council_logo_url);
-        } else {
-          setUserCouncilLogoUrl(null);
-        }
+        setUserCouncilLogoUrl(userProfileData.council_logo_url || null);
+        if (userProfileData.council_logo_url) localStorage.setItem('userCouncilLogoUrl', userProfileData.council_logo_url);
 
-        // 2) Dashboard
-        const dashboardRes = await fetch('https://assemblymk1-backend.onrender.com/dashboard/', {
+        // 2) Dashboard (everything except Rates)
+        const dashboardRes = await fetch(`${API_BASE}/dashboard/`, {
           method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: 'Bearer ' + token,
-          },
+          headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
         });
 
         const dashboardContentType = dashboardRes.headers.get('content-type');
@@ -288,24 +256,15 @@ function DashboardPage() {
         }
 
         if (!dashboardRes.ok) {
-          console.error(
-            `Dashboard fetch failed: Status ${dashboardRes.status}, Message: ${
-              dashboardResultData.message || dashboardResultData.error || 'Unknown error'
-            }`,
-          );
           if (dashboardRes.status === 401 || dashboardRes.status === 403) {
-            console.error('Session expired. Please log in again.');
-            localStorage.removeItem('token');
-            localStorage.removeItem('userName');
-            localStorage.removeItem('userCouncilName');
-            localStorage.removeItem('userCouncilLogoUrl');
+            localStorage.clear();
             navigate('/#/');
             return;
           }
           throw new Error(
             dashboardResultData.error ||
               dashboardResultData.message ||
-              `Server responded with status: ${dashboardRes.status} for dashboard data`,
+              `Dashboard HTTP ${dashboardRes.status}`,
           );
         }
 
@@ -320,6 +279,45 @@ function DashboardPage() {
     [navigate],
   );
 
+  // NEW: fetcher for /rates/properties
+  const fetchRatesProperties = useCallback(async () => {
+    if (ratesLoaded || ratesLoading) return;
+    setRatesLoading(true);
+    setRatesError(null);
+
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error('Not authenticated');
+
+      const res = await fetch(`${API_BASE}/rates/properties`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+      });
+
+      const contentType = res.headers.get('content-type');
+      let data = {};
+      if (contentType?.includes('application/json')) data = await res.json();
+
+      if (!res.ok) {
+        if (res.status === 401 || res.status === 403) {
+          localStorage.clear();
+          navigate('/#/');
+          return;
+        }
+        throw new Error(data.error || data.message || `Rates HTTP ${res.status}`);
+      }
+
+      // Expecting { properties: [...] }
+      setRatesData(data);
+      setRatesLoaded(true);
+    } catch (e) {
+      console.error('Rates fetch failed:', e);
+      setRatesError(e.message || 'Failed to fetch rates.');
+    } finally {
+      setRatesLoading(false);
+    }
+  }, [navigate, ratesLoaded, ratesLoading]);
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     const storedUserName = localStorage.getItem('userName');
@@ -331,11 +329,9 @@ function DashboardPage() {
     if (storedUserCouncilLogoUrl) setUserCouncilLogoUrl(storedUserCouncilLogoUrl);
 
     if (!token) {
-      console.warn('No token found, redirecting to login.');
       navigate('/#/');
       return;
     }
-
     fetchUserProfileAndDashboardData(token);
   }, [navigate, fetchUserProfileAndDashboardData]);
 
@@ -345,6 +341,11 @@ function DashboardPage() {
     setSelectedRoadSubCategory(null);
     setSelectedPublicHealthSubCategory(null);
     setSelectedEnvironmentSubCategory(null);
+
+    // If the user opens Rates, fetch the rich data once
+    if (category === 'Rates') {
+      fetchRatesProperties();
+    }
   };
 
   const handleCommunitySubTileClick = (subCategory) => setSelectedCommunitySubCategory(subCategory);
@@ -352,7 +353,13 @@ function DashboardPage() {
   const handlePublicHealthSubTileClick = (subCategory) => setSelectedPublicHealthSubCategory(subCategory);
   const handleEnvironmentSubTileClick = (subCategory) => setSelectedEnvironmentSubCategory(subCategory);
 
-  const selectedCategoryItems = selectedCategory ? processes[selectedCategory] || [] : [];
+  // IMPORTANT: When "Rates" is selected, use ratesData.properties; otherwise use dashboard data
+  const selectedCategoryItems =
+    selectedCategory === 'Rates'
+      ? (ratesData?.properties || [])
+      : selectedCategory
+      ? processes[selectedCategory] || []
+      : [];
 
   if (loading) {
     return (
@@ -374,10 +381,7 @@ function DashboardPage() {
           <span
             className="link"
             onClick={() => {
-              localStorage.removeItem('token');
-              localStorage.removeItem('userName');
-              localStorage.removeItem('userCouncilName');
-              localStorage.removeItem('userCouncilLogoUrl');
+              localStorage.clear();
               navigate('/#/');
             }}
           >
@@ -503,15 +507,11 @@ function DashboardPage() {
 
   return (
     <div className="dashboard">
-      {/* Sticky top row (perfect version): logo + welcome + tiles + logout */}
+      {/* Sticky top row: logo + welcome + tiles + logout */}
       <div className="dashboard-top-row">
         <div className="header-left">
           {userCouncilLogoUrl ? (
-            <img
-              src={userCouncilLogoUrl}
-              alt={`${userCouncilName || 'Council'} Logo`}
-              className="council-logo"
-            />
+            <img src={userCouncilLogoUrl} alt={`${userCouncilName || 'Council'} Logo`} className="council-logo" />
           ) : (
             <div className="council-logo-placeholder"></div>
           )}
@@ -538,10 +538,7 @@ function DashboardPage() {
         <button
           className="logout-btn"
           onClick={() => {
-            localStorage.removeItem('token');
-            localStorage.removeItem('userName');
-            localStorage.removeItem('userCouncilName');
-            localStorage.removeItem('userCouncilLogoUrl');
+            localStorage.clear();
             navigate('/#/');
           }}
         >
@@ -565,13 +562,22 @@ function DashboardPage() {
               renderPublicHealthContent()
             ) : selectedCategory === 'Environment' ? (
               renderEnvironmentContent()
+            ) : selectedCategory === 'Rates' ? (
+              // Rates: show fetch status + details
+              ratesLoading ? (
+                <p className="no-entries">Loading rates...</p>
+              ) : ratesError ? (
+                <p className="error-message">Failed to load rates: {ratesError}</p>
+              ) : (ratesData?.properties || []).length > 0 ? (
+                <RatesDetails properties={ratesData.properties} />
+              ) : (
+                <p className="no-entries">No properties found for Rates.</p>
+              )
             ) : selectedCategoryItems.length > 0 ||
               selectedCategory === 'Animals' ||
               selectedCategory === 'Waste' ||
               selectedCategory === 'Development' ? (
-              selectedCategory === 'Rates' ? (
-                <RatesDetails properties={selectedCategoryItems} />
-              ) : selectedCategory === 'Water' ? (
+              selectedCategory === 'Water' ? (
                 <WaterDetails properties={selectedCategoryItems} />
               ) : selectedCategory === 'Animals' ? (
                 <AnimalDetails animals={selectedCategoryItems} />
