@@ -34,45 +34,53 @@ def _money_from_cents(v):
 
 def _current_resident():
     """
-    Find the current resident using the same fallbacks your /dashboard/ route effectively allows.
-    Avoids spurious 401 -> frontend logout.
+    Resolve the current Resident from whatever the auth decorator put on `g`.
+    Works with: g.user (Resident), g.user_id, g.identity, g.jwt_identity,
+    g.user_email, or raw JWT claims on g.jwt_claims / g.token_payload.
     """
-    # Decorator might have placed ORM object
-    if getattr(g, "user", None) and isinstance(g.user, Resident):
+    # Direct ORM user
+    if isinstance(getattr(g, "user", None), Resident):
         return g.user
 
-    # Or just the id
-    if getattr(g, "user_id", None):
-        try:
-            rid = int(g.user_id)
-            r = Resident.query.get(rid)
-            if r:
-                return r
-        except Exception:
-            pass
-
-    # Some stacks expose email on g
-    if getattr(g, "user_email", None):
-        r = Resident.query.filter_by(email=g.user_email).first()
-        if r:
-            return r
-
-    # Or raw JWT claims as dict
-    payload = getattr(g, "jwt_claims", None) or getattr(g, "token_payload", None)
-    if isinstance(payload, dict):
-        rid = payload.get("user_id") or payload.get("sub") or payload.get("id")
-        email = payload.get("email")
-        if rid:
+    # Common integer identity fields
+    for attr in ("user_id", "identity", "jwt_identity", "resident_id", "id"):
+        val = getattr(g, attr, None)
+        if val is not None:
             try:
-                r = Resident.query.get(int(rid))
+                rid = int(val)
+                r = Resident.query.get(rid)
                 if r:
                     return r
             except Exception:
                 pass
-        if email:
-            r = Resident.query.filter_by(email=email).first()
-            if r:
-                return r
+
+    # Email on g
+    email = getattr(g, "user_email", None)
+    if email:
+        r = Resident.query.filter_by(email=email).first()
+        if r:
+            return r
+
+    # JWT payload fallbacks
+    payload = getattr(g, "jwt_claims", None) or getattr(g, "token_payload", None)
+    if isinstance(payload, dict):
+        # id-like fields
+        for key in ("user_id", "resident_id", "sub", "id"):
+            val = payload.get(key)
+            if val is not None:
+                try:
+                    r = Resident.query.get(int(val))
+                    if r:
+                        return r
+                except Exception:
+                    pass
+        # email-like fields
+        for key in ("email", "user_email"):
+            val = payload.get(key)
+            if val:
+                r = Resident.query.filter_by(email=val).first()
+                if r:
+                    return r
 
     return None
 
