@@ -1,20 +1,21 @@
 # routes/rates.py
-from flask import Blueprint, jsonify, request, g
+from flask import Blueprint, jsonify, g
 from sqlalchemy import desc
 from models import (
     db,
     Resident,
     Property,
     Council,
-    RatesAccount,     # <- from your updated models.py
-    RatesInvoice,     # <- from your updated models.py
+    RatesAccount,
+    RatesInvoice,
 )
 from routes.decorators import auth_required
 
 rates_bp = Blueprint('rates', __name__)
 
+# ---------- helpers ----------
+
 def _money_from_cents(v):
-    """Return a float dollars value from an integer cents field (or None)."""
     if v is None:
         return None
     try:
@@ -22,70 +23,98 @@ def _money_from_cents(v):
     except Exception:
         return None
 
+def _money_line_items(items):
+    """
+    Convert line items like [{"label":"General rate","amount_cents":12345}, ...]
+    into [{"label":"General rate","amount":123.45}, ...]
+    """
+    if not items:
+        return []
+    out = []
+    for it in items:
+        label = it.get("label") or it.get("code") or "Item"
+        amount_cents = it.get("amount_cents")
+        out.append({
+            "label": label,
+            "amount": _money_from_cents(amount_cents),
+        })
+    return out
+
 def _serialize_invoice(inv: RatesInvoice):
     return {
         "id": inv.id,
-        "period_start": inv.period_start.isoformat() if inv.period_start else None,
-        "period_end": inv.period_end.isoformat() if inv.period_end else None,
+        "issue_date": inv.issue_date.isoformat() if inv.issue_date else None,
+        "due_date": inv.due_date.isoformat() if inv.due_date else None,
         "amount": _money_from_cents(inv.amount_cents),
-        "status": inv.status,             # e.g. "paid", "issued", "overdue"
-        "paid_at": inv.paid_at.isoformat() if inv.paid_at else None,
-        "method": inv.method,             # e.g. "Direct Debit", "Card", "BPAY"
-        "breakdown": inv.breakdown or {}, # { "general_rate": 123.45, "waste": 78.90, ... } (dollars)
+        "status": inv.status,  # issued | paid | overdue | cancelled
+        "payment_method_suggested": inv.payment_method_suggested,
+        "line_items": _money_line_items(inv.line_items),
     }
 
 def _serialize_rates_account(acc: RatesAccount):
+    """
+    Map the new richer RatesAccount into a frontend-friendly structure.
+    Compatible with the new RatesDetails component.
+    """
     if not acc:
         return {
             "balance": None,
             "next_due_date": None,
             "instalment_schedule": [],
             "concessions": {},
-            "rebates": {},
             "dd_active": False,
             "ebill_active": False,
             "valuation_history": [],
             "waste_entitlements": {},
             "overlays": [],
+            "contact_links": {},
             "last_bill": None,
             "recent_invoices": [],
         }
 
-    # Most recent invoice (for “last bill”)
-    last_inv = (
-        RatesInvoice.query
-        .filter_by(property_id=acc.property_id)
-        .order_by(desc(RatesInvoice.period_end))
-        .first()
-    )
+    # last bill = most recent by issue_date (fallback: due_date)
+    last = None
+    if acc.invoices:
+        last = sorted(
+            acc.invoices,
+            key=lambda x: (x.issue_date or x.due_date or None),
+            reverse=True
+        )[0]
 
-    # A few recent invoices for history
-    recent_invoices = (
-        RatesInvoice.query
-        .filter_by(property_id=acc.property_id)
-        .order_by(desc(RatesInvoice.period_end))
-        .limit(6)
-        .all()
-    )
+    # recent invoices (limit 6) ordered by issue_date desc (fallback due_date)
+    recent = []
+    if acc.invoices:
+        recent = sorted(
+            acc.invoices,
+            key=lambda x: (x.issue_date or x.due_date or None),
+            reverse=True
+        )[:6]
+
+    # direct debit: accept either boolean or {active: bool, ...}
+    dd_active = False
+    if isinstance(acc.direct_debit, dict):
+        dd_active = bool(acc.direct_debit.get("active"))
+    elif isinstance(acc.direct_debit, bool):
+        dd_active = acc.direct_debit
 
     return {
         "balance": _money_from_cents(acc.balance_cents),
         "next_due_date": acc.next_due_date.isoformat() if acc.next_due_date else None,
-        "instalment_schedule": acc.instalment_schedule or [],  # list of {due_date, amount}
-        "concessions": acc.concessions or {},                  # {eligible: bool, type: "...", link: "..."}
-        "rebates": acc.rebates or {},                          # arbitrary structure if needed
-        "dd_active": bool(acc.dd_active),
-        "ebill_active": bool(acc.ebill_active),
-        "valuation_history": acc.valuation_history or [],      # [{year, capital_value, land_value, percent_change}]
-        "waste_entitlements": acc.waste_entitlements or {},    # {general, recycling, green: sizes/fees}
-        "overlays": acc.overlays or [],                        # ["flood", "bushfire", ...]
-        "last_bill": _serialize_invoice(last_inv) if last_inv else None,
-        "recent_invoices": [_serialize_invoice(i) for i in recent_invoices],
+        "instalment_schedule": acc.instalment_plan or [],         # [{seq, due_date, amount_cents}] (frontend can format)
+        "concessions": acc.concessions or {},                      # arbitrary concessions payload
+        "dd_active": dd_active,
+        "ebill_active": bool(acc.ebilling_enabled),
+        "valuation_history": acc.valuation_history or [],          # [{year, land_value_cents, capital_value_cents}]
+        "waste_entitlements": acc.waste_entitlements or {},        # {"bin_size_l":240, ...}
+        "overlays": acc.overlays or [],                            # ["Flood","Heritage"]
+        "contact_links": acc.contact_links or {},                  # {"apply_concession": "...", ...}
+        "last_bill": _serialize_invoice(last) if last else None,
+        "recent_invoices": [_serialize_invoice(i) for i in recent],
     }
 
 def _serialize_property(p: Property):
     council: Council = p.council_obj
-    acc = RatesAccount.query.filter_by(property_id=p.id).first()
+    acc: RatesAccount = RatesAccount.query.filter_by(property_id=p.id).first()
 
     return {
         "id": p.id,
@@ -99,22 +128,49 @@ def _serialize_property(p: Property):
         "shape_file_data": p.shape_file_data or None,
         "council_name": council.name if council else None,
         "council_logo_url": council.logo_url if council else None,
-        # Rich rates block (new)
+        # rich rates block
         "rates": _serialize_rates_account(acc),
     }
+
+# ---------- routes ----------
 
 @rates_bp.route('/properties', methods=['GET'])
 @auth_required
 def get_rates_properties():
     """
-    Returns the calling resident's properties with enriched 'rates' details.
+    Returns the authenticated resident's properties with enriched 'rates' details.
+
     Response:
     {
-      "properties": [ { ...property fields..., "rates": {...} }, ... ]
+      "properties": [
+        {
+          "id": ...,
+          "address": "...",
+          "council_name": "...",
+          "council_logo_url": "...",
+          "gps_coordinates": {...} | null,
+          "shape_file_data": "...json..." | null,
+          ...basic property fields...,
+          "rates": {
+             "balance": 123.45,
+             "next_due_date": "YYYY-MM-DD",
+             "instalment_schedule": [...],
+             "concessions": {...},
+             "dd_active": true/false,
+             "ebill_active": true/false,
+             "valuation_history": [...],
+             "waste_entitlements": {...},
+             "overlays": [...],
+             "contact_links": {...},
+             "last_bill": {...} | null,
+             "recent_invoices": [...]
+          }
+        },
+        ...
+      ]
     }
     """
-    # The auth_required decorator typically sets g.user_id (or g.user).
-    # We support both patterns to be safe.
+    # The auth_required decorator typically sets g.user_id (int) or g.user (Resident)
     resident = None
     if getattr(g, "user_id", None):
         resident = Resident.query.get(int(g.user_id))
@@ -122,7 +178,6 @@ def get_rates_properties():
         resident = g.user
 
     if not resident:
-        # Fallback/defensive — should not happen if auth_required works correctly.
         return jsonify({"error": "Unauthorized"}), 401
 
     props = (
@@ -132,7 +187,4 @@ def get_rates_properties():
         .all()
     )
 
-    payload = {
-        "properties": [_serialize_property(p) for p in props]
-    }
-    return jsonify(payload), 200
+    return jsonify({"properties": [_serialize_property(p) for p in props]}), 200
