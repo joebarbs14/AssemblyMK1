@@ -384,3 +384,127 @@
     height: 200px;
   }
 }
+
+/* ========== RatesDetails layout & visual tweaks ========== */
+
+.property-item-card {
+  list-style: none;
+  background: #fff;
+  border: 1px solid #f0f0f0;
+  border-radius: 12px;
+  padding: 16px;
+  margin: 12px 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.property-item-inner {
+  display: grid;
+  grid-template-columns: 1fr 280px; /* text | map */
+  gap: 16px;
+  align-items: start;
+}
+
+.property-title {
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin-bottom: 2px;
+}
+
+.property-info {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  gap: 8px;
+  padding: 2px 0;
+}
+
+.property-info .label {
+  color: #6c757d;
+  font-weight: 600;
+}
+
+.property-info.muted,
+.muted {
+  color: #6c757d;
+  font-size: 0.93em;
+}
+
+.mini-map-container {
+  width: 100%;
+  height: 180px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #e9ecef;
+}
+
+.map-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+.council-logo-under-map {
+  max-width: 160px;
+  max-height: 40px;
+  object-fit: contain;
+  background: #fff;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 4px 6px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+/* rates block cards */
+.rates-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.rates-card {
+  border: 1px solid #eef0f3;
+  border-radius: 10px;
+  padding: 12px;
+  background: #fafbfc;
+}
+
+.section-title {
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.subhead {
+  margin-top: 8px;
+  font-weight: 600;
+}
+
+.kv {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 8px;
+  padding: 2px 0;
+}
+.kv .k { color: #6c757d; font-weight: 600; }
+.kv .v { font-weight: 600; }
+
+.simple-list { margin: 4px 0 0; padding-left: 16px; }
+.simple-list li { margin: 2px 0; }
+
+.chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.chip {
+  border: 1px solid #dde2e7;
+  background: #fff;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 0.85em;
+}
+.chip.ok { border-color: #28a74533; background: #eaf7ee; color: #2c7a3f; }
+.chip.badge { background: #eef5ff; border-color: #d4e4ff; color: #285ea8; }
+
+/* responsive */
+@media (max-width: 900px) {
+  .property-item-inner { grid-template-columns: 1fr; }
+  .mini-map-container { height: 160px; }
+  .rates-grid { grid-template-columns: 1fr; }
+}
