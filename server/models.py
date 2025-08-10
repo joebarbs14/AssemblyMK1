@@ -97,7 +97,7 @@ class Property(db.Model):
 
     # NEW: Rates domain relationships
     rates_account = db.relationship('RatesAccount', backref='property', uselist=False, lazy=True)     # 1‑to‑1
-    rates_bills = db.relationship('RatesBill', backref='property', lazy=True)                         # 1‑to‑many
+    rates_bills = db.relationship('RatesBill', backref='property', lazy=True)                         # legacy 1‑to‑many
     valuations = db.relationship('Valuation', backref='property', lazy=True)                          # 1‑to‑many
     rate_charges = db.relationship('RateCharge', backref='property', lazy=True)                       # 1‑to‑many
     waste_entitlement = db.relationship('WasteEntitlement', backref='property', uselist=False, lazy=True)  # 1‑to‑1
@@ -195,17 +195,38 @@ class RatesAccount(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     property_id = db.Column(db.Integer, db.ForeignKey('property.id'), nullable=False, unique=True)  # 1:1
     account_number = db.Column(db.String(64), unique=True, nullable=True)
+
+    # Core balances & schedules
     balance_cents = db.Column(db.BigInteger, nullable=False, default=0)
     next_due_date = db.Column(db.Date, nullable=True)
     instalment_plan = db.Column(JSONB, nullable=True)  # [{seq, due_date, amount_cents}, ...]
 
+    # Concessions / settings / overlays / links
+    concessions = db.Column(JSONB, nullable=True)       # {"pensioner": true, ...}
+    ebilling_enabled = db.Column(db.Boolean, default=False, nullable=False)
+    direct_debit = db.Column(JSONB, nullable=True)      # {"active": true, "bsb":"", "last4":""}
+    valuation_history = db.Column(JSONB, nullable=True) # [{year, land_value_cents, capital_value_cents}]
+    charge_breakdown = db.Column(JSONB, nullable=True)  # [{code, label, amount_cents}]
+    waste_entitlements = db.Column(JSONB, nullable=True)# {"red_bin":"140L",...}
+    overlays = db.Column(JSONB, nullable=True)          # ["Flood","Heritage"]
+    contact_links = db.Column(JSONB, nullable=True)     # {"apply_concession": "...", ...}
+
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     updated_at = db.Column(db.DateTime, onupdate=datetime.datetime.utcnow)
+
+    # NEW: invoices relationship (for new endpoint/logic)
+    invoices = db.relationship(
+        'RatesInvoice',
+        backref='account',
+        lazy=True,
+        cascade='all, delete-orphan'
+    )
 
     def __repr__(self):
         return f'<RatesAccount prop={self.property_id} bal_cents={self.balance_cents}>'
 
 
+# Legacy bills table kept for backward-compat
 class RatesBill(db.Model):
     __tablename__ = 'rates_bill'
     id = db.Column(db.Integer, primary_key=True)
@@ -226,6 +247,26 @@ class RatesBill(db.Model):
 
     def __repr__(self):
         return f'<RatesBill prop={self.property_id} {self.bill_date} {self.amount_cents}>'
+
+
+# NEW: invoice model used by /rates/properties
+class RatesInvoice(db.Model):
+    __tablename__ = 'rates_invoice'
+    id = db.Column(db.Integer, primary_key=True)
+    account_id = db.Column(db.Integer, db.ForeignKey('rates_account.id'), nullable=False)
+
+    issue_date = db.Column(db.Date, nullable=False)
+    due_date = db.Column(db.Date, nullable=True)
+    amount_cents = db.Column(db.BigInteger, nullable=False, default=0)
+    status = db.Column(db.String(32), nullable=False, default='issued')  # issued | paid | overdue | cancelled
+    line_items = db.Column(JSONB, nullable=True)         # [{label, amount_cents}, ...]
+    payment_method_suggested = db.Column(db.String(32), nullable=True)  # 'direct_debit','bpay','card'
+
+    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    updated_at = db.Column(db.DateTime, onupdate=datetime.datetime.utcnow)
+
+    def __repr__(self):
+        return f'<RatesInvoice account_id={self.account_id} amount_cents={self.amount_cents} status={self.status}>'
 
 
 class Valuation(db.Model):
@@ -251,7 +292,7 @@ class RateCharge(db.Model):
     __tablename__ = 'rate_charge'
     id = db.Column(db.Integer, primary_key=True)
     property_id = db.Column(db.Integer, db.ForeignKey('property.id'), nullable=False, index=True)
-    period_start = db.Column(db.Date, nullable=True)  # if you want daterange, split into start/end
+    period_start = db.Column(db.Date, nullable=True)
     period_end = db.Column(db.Date, nullable=True)
     category = db.Column(db.String(50), nullable=False)  # 'general_rate','waste','stormwater','levy'
     description = db.Column(db.String(255), nullable=True)
@@ -329,7 +370,7 @@ class BillingSetting(db.Model):
 class CouncilContact(db.Model):
     __tablename__ = 'council_contact'
     id = db.Column(db.Integer, primary_key=True)
-    council_id = db.Column(db.Integer, db.ForeignKey('council.id'), nullable=False, unique=True)  # one row per council (expand if you need multiple)
+    council_id = db.Column(db.Integer, db.ForeignKey('council.id'), nullable=False, unique=True)  # one row per council
     query_valuation_url = db.Column(db.String(500), nullable=True)
     apply_concession_url = db.Column(db.String(500), nullable=True)
     change_address_url = db.Column(db.String(500), nullable=True)
