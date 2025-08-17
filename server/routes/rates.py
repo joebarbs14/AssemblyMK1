@@ -1,6 +1,7 @@
 # routes/rates.py
-from flask import Blueprint, jsonify, g
+from flask import Blueprint, jsonify, g, request
 from sqlalchemy import desc
+from sqlalchemy.orm import joinedload
 from models import (
     db,
     Resident,
@@ -34,15 +35,25 @@ def _money_from_cents(v):
 
 def _current_resident():
     """
-    Resolve the current Resident from whatever the auth decorator put on `g`.
-    Works with: g.user (Resident), g.user_id, g.identity, g.jwt_identity,
-    g.user_email, or raw JWT claims on g.jwt_claims / g.token_payload.
+    Resolve the current Resident from whatever the auth decorator put on request/g.
+    First, prefer request.current_identity (set by @auth_required), then fall back to g.*
+    and JWT payloads.
     """
-    # Direct ORM user
+    # 0) Prefer request.current_identity set by the decorator
+    try:
+        rid = int(getattr(request, "current_identity", None))
+        if rid:
+            r = Resident.query.get(rid)
+            if r:
+                return r
+    except Exception:
+        pass
+
+    # 1) Direct ORM user on g
     if isinstance(getattr(g, "user", None), Resident):
         return g.user
 
-    # Common integer identity fields
+    # 2) Common integer identity fields
     for attr in ("user_id", "identity", "jwt_identity", "resident_id", "id"):
         val = getattr(g, attr, None)
         if val is not None:
@@ -54,14 +65,14 @@ def _current_resident():
             except Exception:
                 pass
 
-    # Email on g
+    # 3) Email on g
     email = getattr(g, "user_email", None)
     if email:
         r = Resident.query.filter_by(email=email).first()
         if r:
             return r
 
-    # JWT payload fallbacks
+    # 4) JWT payload fallbacks
     payload = getattr(g, "jwt_claims", None) or getattr(g, "token_payload", None)
     if isinstance(payload, dict):
         # id-like fields
@@ -217,19 +228,26 @@ def _serialize_property(p: Property):
 
 # ---------- routes ----------
 
-@rates_bp.route("/properties", methods=["GET"])
+@rates_bp.route("/properties", methods=["GET"], strict_slashes=False)
 @auth_required
 def get_rates_properties():
     """
     Return the authenticated resident's properties with enriched 'rates' details.
+    Uses request.current_identity set by @auth_required.
     """
-    resident = _current_resident()
-    if not resident:
+    # Only 401 if truly unauthenticated
+    try:
+        user_id = int(getattr(request, "current_identity", None))
+    except (TypeError, ValueError):
         return jsonify({"error": "Unauthorized"}), 401
 
+    # Eager-load council relationship to avoid N+1 queries
     props = (
-        Property.query.filter_by(resident_id=resident.id)
+        Property.query.filter_by(resident_id=user_id)
+        .options(joinedload(Property.council_obj))
         .order_by(Property.id.asc())
         .all()
     )
+
+    # Always 200; if no properties, return an empty list
     return jsonify({"properties": [_serialize_property(p) for p in props]}), 200
