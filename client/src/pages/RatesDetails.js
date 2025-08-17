@@ -21,7 +21,7 @@ const EXCLUDE_KEYS = new Set([
   'created_at','updated_at','submitted_at','rates'
 ]);
 
-function MiniMap({ item, councilLogo }) {
+function MiniMap({ item }) {
   const ref = useRef(null);
   const mapRef = useRef(null);
 
@@ -71,14 +71,7 @@ function MiniMap({ item, councilLogo }) {
     setTimeout(() => map.invalidateSize(), 0);
   }, [item]);
 
-  return (
-    <div className="map-stack">
-      <div className="mini-map-container" ref={ref} />
-      {councilLogo && (
-        <img src={councilLogo} alt="Council logo" className="council-logo-under-map" />
-      )}
-    </div>
-  );
+  return <div className="mini-map-container" ref={ref} />;
 }
 
 function RatesBlocks({ rates }) {
@@ -88,7 +81,7 @@ function RatesBlocks({ rates }) {
     balance, next_due_date, instalment_schedule = [],
     dd_active, ebill_active,
     valuation_history = [], recent_invoices = [],
-    waste_entitlements, overlays = [], last_bill, // charges are in rate_charges table shown via backend if you add it later
+    waste_entitlements, overlays = [], last_bill,
   } = rates;
 
   return (
@@ -210,10 +203,21 @@ function PropertyItem({ item }) {
   return (
     <li className="property-item-card">
       <div className="property-item-inner">
-        {/* LEFT: text */}
+        {/* LEFT: logo + text */}
         <div className="property-details-content">
+          {/* Rectangular, larger logo on the left */}
+          {item.council_logo_url && (
+            <div className="council-header">
+              <img
+                src={item.council_logo_url}
+                alt={`${item.council_name || 'Council'} logo`}
+                className="council-logo-rect"
+              />
+              {item.council_name && <div className="council-name">{item.council_name}</div>}
+            </div>
+          )}
+
           <div className="property-title">{item.address || '—'}</div>
-          {item.council_name && <div className="property-info muted">Council: {item.council_name}</div>}
 
           {/* curated */}
           {item.property_type && <div className="property-info"><span className="label">Type</span><span>{titleCase(item.property_type)}</span></div>}
@@ -231,8 +235,10 @@ function PropertyItem({ item }) {
           <RatesBlocks rates={item.rates} />
         </div>
 
-        {/* RIGHT: map + council logo (under map) */}
-        <MiniMap item={item} councilLogo={item.council_logo_url} />
+        {/* RIGHT: map */}
+        <div className="property-map-wrap">
+          <MiniMap item={item} />
+        </div>
       </div>
     </li>
   );
