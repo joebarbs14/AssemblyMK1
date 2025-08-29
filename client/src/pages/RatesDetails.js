@@ -2,7 +2,115 @@
 import React, { useEffect, useRef } from 'react';
 import L from 'leaflet';
 
-// Leaflet icon fix
+// ---- one-time CSS injection (so this file is truly drop-in) ----
+const __RATES_STYLES_ID__ = 'rates-details-autostyle';
+const injectStyles = () => {
+  if (document.getElementById(__RATES_STYLES_ID__)) return;
+  const css = `
+  .rates-details-content { width: 100%; }
+  .property-list-details ul { list-style: none; padding: 0; margin: 0; }
+  .property-item-card { margin: 16px 0; }
+  .property-item-inner {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 16px;
+    align-items: start;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 16px;
+    background: #fff;
+  }
+
+  /* council header row */
+  .council-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 40px;
+    margin-bottom: 6px;
+  }
+  /* Rectangular, responsive, never huge */
+  .council-logo-rect {
+    height: clamp(28px, 3.5vw, 48px);
+    width: auto;
+    max-width: clamp(80px, 12vw, 180px);
+    object-fit: contain;
+    border-radius: 6px;
+    display: block;
+  }
+  .council-name {
+    font-weight: 600;
+    line-height: 1.2;
+    font-size: clamp(12px, 1.2vw, 14px);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .property-title {
+    font-weight: 700;
+    margin: 4px 0 8px 0;
+    font-size: clamp(14px, 1.6vw, 18px);
+  }
+  .property-info { display: grid; grid-template-columns: 120px 1fr; column-gap: 10px; margin: 3px 0; }
+  .property-info .label { color: #6b7280; }
+  .muted { color: #6b7280; }
+
+  /* Right column map keeps proportions */
+  .property-map-wrap .mini-map-container {
+    height: clamp(110px, 14vw, 160px);
+    width: clamp(160px, 22vw, 260px);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  /* Rates subcards */
+  .rates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+    margin-top: 12px;
+  }
+  .rates-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 10px 12px;
+    background: #fafafa;
+  }
+  .section-title { font-weight: 700; margin-bottom: 8px; }
+  .subhead { margin-top: 10px; font-weight: 600; }
+  .kv { display: grid; grid-template-columns: 1fr auto; margin: 4px 0; }
+  .chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .chip {
+    border: 1px solid #e5e7eb; border-radius: 999px; padding: 2px 10px; font-size: 12px;
+    background: #fff;
+  }
+  .chip.ok { border-color: #16a34a; background: #ecfdf5; }
+  .chip.badge { background: #eef2ff; border-color: #c7d2fe; }
+  .simple-list { margin: 0; padding-left: 16px; }
+
+  /* Mini map container base */
+  .mini-map-container { width: 100%; height: 150px; }
+
+  /* Responsive: stack on small screens */
+  @media (max-width: 720px) {
+    .property-item-inner {
+      grid-template-columns: 1fr;
+    }
+    .property-map-wrap .mini-map-container {
+      width: 100%;
+      height: 180px;
+    }
+    .property-info { grid-template-columns: 100px 1fr; }
+  }
+  `;
+  const style = document.createElement('style');
+  style.id = __RATES_STYLES_ID__;
+  style.textContent = css;
+  document.head.appendChild(style);
+};
+
+// ---- Leaflet icon fix ----
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
@@ -112,7 +220,7 @@ function RatesBlocks({ rates }) {
           <ul className="simple-list">
             {instalment_schedule.map((it) => (
               <li key={`${it.seq}-${it.due_date}`}>
-                <strong>#{it.seq}</strong> &middot; {new Date(it.due_date).toLocaleDateString()} &middot; {money(it.amount)}
+                <strong>#{it.seq}</strong> · {new Date(it.due_date).toLocaleDateString()} · {money(it.amount)}
               </li>
             ))}
           </ul>
@@ -142,7 +250,7 @@ function RatesBlocks({ rates }) {
           <ul className="simple-list">
             {recent_invoices.map((b) => (
               <li key={b.id}>
-                {new Date(b.period_end || b.period_start).toLocaleDateString()} &middot; {money(b.amount)} &middot; {titleCase(b.status || '')}
+                {new Date(b.period_end || b.period_start).toLocaleDateString()} · {money(b.amount)} · {titleCase(b.status || '')}
               </li>
             ))}
           </ul>
@@ -160,7 +268,7 @@ function RatesBlocks({ rates }) {
               .sort((a,b)=> (a.year||0)-(b.year||0))
               .map((v) => (
                 <li key={v.year}>
-                  <strong>{v.year}</strong> &middot; CV {money(v.capital_value)} &middot; LV {money(v.land_value)} {v.percent_change!=null && <em>({v.percent_change}%)</em>}
+                  <strong>{v.year}</strong> · CV {money(v.capital_value)} · LV {money(v.land_value)} {v.percent_change!=null && <em>({v.percent_change}%)</em>}
                 </li>
               ))}
           </ul>
@@ -205,13 +313,15 @@ function PropertyItem({ item }) {
       <div className="property-item-inner">
         {/* LEFT: logo + text */}
         <div className="property-details-content">
-          {/* Rectangular, larger logo on the left */}
+          {/* Rectangular, auto-scaled logo on the left */}
           {item.council_logo_url && (
             <div className="council-header">
               <img
                 src={item.council_logo_url}
                 alt={`${item.council_name || 'Council'} logo`}
                 className="council-logo-rect"
+                loading="lazy"
+                onError={(e) => { e.currentTarget.style.display = 'none'; }}
               />
               {item.council_name && <div className="council-name">{item.council_name}</div>}
             </div>
@@ -245,7 +355,11 @@ function PropertyItem({ item }) {
 }
 
 export default function RatesDetails({ properties }) {
-  useEffect(() => { console.log('RatesDetails received properties:', properties); }, [properties]);
+  useEffect(() => {
+    injectStyles();
+    console.log('RatesDetails received properties:', properties);
+  }, [properties]);
+
   if (!properties || properties.length === 0) return <p>No properties found for this user.</p>;
 
   return (
