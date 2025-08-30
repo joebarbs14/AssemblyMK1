@@ -2,115 +2,180 @@
 import React, { useEffect, useRef } from 'react';
 import L from 'leaflet';
 
-// ---- one-time CSS injection (so this file is truly drop-in) ----
-const __RATES_STYLES_ID__ = 'rates-details-autostyle';
-const injectStyles = () => {
-  if (document.getElementById(__RATES_STYLES_ID__)) return;
+/* =========================
+   Inline style injection
+   ========================= */
+const STYLE_ID = 'rates-details-modern';
+function injectStyles() {
+  if (document.getElementById(STYLE_ID)) return;
   const css = `
-  .rates-details-content { width: 100%; }
-  .property-list-details ul { list-style: none; padding: 0; margin: 0; }
-  .property-item-card { margin: 16px 0; }
-  .property-item-inner {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 16px;
-    align-items: start;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    padding: 16px;
-    background: #fff;
+  :root {
+    --card-bg: #ffffff;
+    --soft: #f5f7fb;
+    --line: #e8ecf3;
+    --ink: #0f172a;
+    --muted: #6b7280;
+    --accent: #2563eb;
+    --ok: #16a34a;
+    --radius: 14px;
+    --shadow: 0 6px 18px rgba(2, 6, 23, 0.06);
   }
 
-  /* council header row */
-  .council-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    min-height: 40px;
-    margin-bottom: 6px;
+  .rates-details-content { width: 100%; }
+  .property-list-details ul { list-style: none; padding: 0; margin: 0; }
+  .property-item-card { margin: 18px 0; }
+
+  /* Card shell */
+  .property-item-inner {
+    display: grid;
+    grid-template-columns: 1.2fr 0.9fr;      /* left text / right map */
+    gap: 20px;
+    align-items: start;
+    background: var(--card-bg);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 18px;
   }
-  /* Rectangular, responsive, never huge */
+
+  /* Header: logo, council, address */
+  .prop-header {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    column-gap: 12px;
+    row-gap: 4px;
+    margin-bottom: 10px;
+  }
+
   .council-logo-rect {
-    height: clamp(28px, 3.5vw, 48px);
+    height: clamp(28px, 3.2vw, 46px);
     width: auto;
     max-width: clamp(80px, 12vw, 180px);
     object-fit: contain;
     border-radius: 6px;
     display: block;
   }
+
   .council-name {
     font-weight: 600;
-    line-height: 1.2;
-    font-size: clamp(12px, 1.2vw, 14px);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    color: var(--muted);
+    font-size: 13px;
   }
 
   .property-title {
-    font-weight: 700;
-    margin: 4px 0 8px 0;
-    font-size: clamp(14px, 1.6vw, 18px);
+    grid-column: 1 / -1;
+    font-weight: 800;
+    letter-spacing: 0.2px;
+    color: var(--ink);
+    font-size: clamp(16px, 1.7vw, 20px);
+    margin-top: 2px;
   }
-  .property-info { display: grid; grid-template-columns: 120px 1fr; column-gap: 10px; margin: 3px 0; }
-  .property-info .label { color: #6b7280; }
-  .muted { color: #6b7280; }
 
-  /* Right column map keeps proportions */
-  .property-map-wrap .mini-map-container {
-    height: clamp(110px, 14vw, 160px);
-    width: clamp(160px, 22vw, 260px);
-    border-radius: 8px;
+  /* Quick facts pills */
+  .quick-facts {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    margin: 6px 0 2px 0;
+  }
+  .pill {
+    background: var(--soft);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 12px;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+
+  /* Two-column info (Type, Zone, Land…) */
+  .info-grid {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    column-gap: 12px;
+    row-gap: 4px;
+    margin: 6px 0 10px 0;
+  }
+  .info-k { color: var(--muted); }
+  .info-v { color: var(--ink); }
+
+  .divider {
+    height: 1px;
+    background: var(--line);
+    margin: 10px 0 14px 0;
+    border-radius: 1px;
+  }
+
+  /* Right column map */
+  .property-map-wrap {
+    display: flex;
+    justify-content: flex-start;
+  }
+  .mini-map-container {
+    height: clamp(140px, 16vw, 180px);
+    width: clamp(220px, 26vw, 320px);
+    border-radius: 10px;
     overflow: hidden;
+    border: 1px solid var(--line);
   }
 
-  /* Rates subcards */
+  /* Rates blocks – compact cards */
   .rates-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 12px;
-    margin-top: 12px;
   }
   .rates-card {
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
-    padding: 10px 12px;
-    background: #fafafa;
-  }
-  .section-title { font-weight: 700; margin-bottom: 8px; }
-  .subhead { margin-top: 10px; font-weight: 600; }
-  .kv { display: grid; grid-template-columns: 1fr auto; margin: 4px 0; }
-  .chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
-  .chip {
-    border: 1px solid #e5e7eb; border-radius: 999px; padding: 2px 10px; font-size: 12px;
     background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px;
   }
-  .chip.ok { border-color: #16a34a; background: #ecfdf5; }
-  .chip.badge { background: #eef2ff; border-color: #c7d2fe; }
+  .rates-card .title {
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+  .kv { display: grid; grid-template-columns: 1fr auto; gap: 8px; margin: 4px 0; }
+  .kv .k { color: var(--muted); }
+  .kv .v { color: var(--ink); }
+
+  .chip-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+  .chip {
+    border: 1px solid var(--line);
+    background: var(--soft);
+    border-radius: 999px;
+    padding: 2px 10px;
+    font-size: 12px;
+  }
+  .chip.ok {
+    border-color: #bff0c9;
+    background: #f0fdf4;
+    color: #166534;
+  }
+  .chip.badge {
+    background: #eef2ff;
+    border-color: #c7d2fe;
+  }
+
   .simple-list { margin: 0; padding-left: 16px; }
+  .muted { color: var(--muted); }
 
-  /* Mini map container base */
-  .mini-map-container { width: 100%; height: 150px; }
-
-  /* Responsive: stack on small screens */
-  @media (max-width: 720px) {
-    .property-item-inner {
-      grid-template-columns: 1fr;
-    }
-    .property-map-wrap .mini-map-container {
-      width: 100%;
-      height: 180px;
-    }
-    .property-info { grid-template-columns: 100px 1fr; }
+  /* Mobile stack */
+  @media (max-width: 860px) {
+    .property-item-inner { grid-template-columns: 1fr; }
+    .property-map-wrap { order: 2; }
+    .mini-map-container { width: 100%; height: 220px; }
   }
   `;
-  const style = document.createElement('style');
-  style.id = __RATES_STYLES_ID__;
-  style.textContent = css;
-  document.head.appendChild(style);
-};
+  const el = document.createElement('style');
+  el.id = STYLE_ID;
+  el.textContent = css;
+  document.head.appendChild(el);
+}
 
-// ---- Leaflet icon fix ----
+/* =========================
+   Leaflet marker assets
+   ========================= */
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
@@ -118,17 +183,23 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
 });
 
-// helpers
-const money = (v) => (v == null ? '—' : `$${Number(v).toLocaleString(undefined, { minimumFractionDigits: 2 })}`);
-const titleCase = (s) => String(s).replace(/[_-]+/g, ' ').replace(/\b\w/g, (m) => m.toUpperCase());
+/* =========================
+   Helpers
+   ========================= */
+const money = (v) =>
+  v == null ? '—' : `$${Number(v).toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+const titleCase = (s) =>
+  String(s).replace(/[_-]+/g, ' ').replace(/\b\w/g, (m) => m.toUpperCase());
 
-// keys to hide in generic renderer
 const EXCLUDE_KEYS = new Set([
   'id','address','council_name','council_logo_url','gps_coordinates','shape_file_data',
   'property_type','land_size_sqm','property_value','land_value','zone',
   'created_at','updated_at','submitted_at','rates'
 ]);
 
+/* =========================
+   Mini Map
+   ========================= */
 function MiniMap({ item }) {
   const ref = useRef(null);
   const mapRef = useRef(null);
@@ -138,18 +209,29 @@ function MiniMap({ item }) {
 
     if (!mapRef.current) {
       mapRef.current = L.map(ref.current, {
-        zoomControl: false, attributionControl: false, scrollWheelZoom: false,
-        doubleClickZoom: false, dragging: false, touchZoom: false, boxZoom: false, keyboard: false, tap: false,
+        zoomControl: false,
+        attributionControl: false,
+        scrollWheelZoom: false,
+        doubleClickZoom: false,
+        dragging: false,
+        touchZoom: false,
+        boxZoom: false,
+        keyboard: false,
+        tap: false,
       });
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '' }).addTo(mapRef.current);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '' })
+        .addTo(mapRef.current);
     }
 
     const map = mapRef.current;
-    const dynamic = [];
+
+    // clear dynamic layers
+    const toRemove = [];
     map.eachLayer((layer) => {
-      if (layer instanceof L.Marker || layer instanceof L.Polygon || layer instanceof L.Polyline || layer instanceof L.GeoJSON) dynamic.push(layer);
+      if (layer instanceof L.Marker || layer instanceof L.Polygon || layer instanceof L.Polyline || layer instanceof L.GeoJSON)
+        toRemove.push(layer);
     });
-    dynamic.forEach((l) => map.removeLayer(l));
+    toRemove.forEach((l) => map.removeLayer(l));
 
     const bounds = [];
     const hasGps = item?.gps_coordinates?.lat != null && item?.gps_coordinates?.lon != null;
@@ -162,10 +244,16 @@ function MiniMap({ item }) {
 
     if (item?.shape_file_data) {
       try {
-        const data = typeof item.shape_file_data === 'string' ? JSON.parse(item.shape_file_data) : item.shape_file_data;
-        const gj = L.geoJSON(data, { style: { color: '#3b82f6', weight: 2, opacity: 0.75, fillOpacity: 0.15, fillColor: '#3b82f6' } }).addTo(map);
+        const data = typeof item.shape_file_data === 'string'
+          ? JSON.parse(item.shape_file_data)
+          : item.shape_file_data;
+        const gj = L.geoJSON(data, {
+          style: { color: '#3b82f6', weight: 2, opacity: 0.75, fillOpacity: 0.15, fillColor: '#3b82f6' }
+        }).addTo(map);
         if (gj.getBounds) bounds.push(gj.getBounds());
-      } catch (e) { console.error('Bad shape_file_data', e); }
+      } catch (e) {
+        console.error('Bad shape_file_data', e);
+      }
     }
 
     if (bounds.length) {
@@ -182,6 +270,9 @@ function MiniMap({ item }) {
   return <div className="mini-map-container" ref={ref} />;
 }
 
+/* =========================
+   Rates Blocks (compact)
+   ========================= */
 function RatesBlocks({ rates }) {
   if (!rates) return null;
 
@@ -196,7 +287,7 @@ function RatesBlocks({ rates }) {
     <div className="rates-grid">
       {/* Summary */}
       <div className="rates-card">
-        <div className="section-title">Account Summary</div>
+        <div className="title">Account Summary</div>
         <div className="kv">
           <span className="k">Current Balance</span>
           <span className="v">{money(balance)}</span>
@@ -213,7 +304,7 @@ function RatesBlocks({ rates }) {
 
       {/* Instalments */}
       <div className="rates-card">
-        <div className="section-title">Instalments</div>
+        <div className="title">Instalments</div>
         {instalment_schedule.length === 0 ? (
           <div className="muted">No instalments.</div>
         ) : (
@@ -229,12 +320,14 @@ function RatesBlocks({ rates }) {
 
       {/* Last bill + history */}
       <div className="rates-card">
-        <div className="section-title">Last Bill</div>
+        <div className="title">Last Bill</div>
         {last_bill ? (
           <>
             <div className="kv"><span className="k">Period</span>
               <span className="v">
-                {last_bill.period_start ? new Date(last_bill.period_start).toLocaleDateString() : '—'} – {last_bill.period_end ? new Date(last_bill.period_end).toLocaleDateString() : '—'}
+                {last_bill.period_start ? new Date(last_bill.period_start).toLocaleDateString() : '—'}
+                {' – '}
+                {last_bill.period_end ? new Date(last_bill.period_end).toLocaleDateString() : '—'}
               </span>
             </div>
             <div className="kv"><span className="k">Amount</span><span className="v">{money(last_bill.amount)}</span></div>
@@ -243,7 +336,7 @@ function RatesBlocks({ rates }) {
           </>
         ) : <div className="muted">No bill yet.</div>}
 
-        <div className="subhead">Recent Bills</div>
+        <div className="title" style={{marginTop: 10}}>Recent Bills</div>
         {recent_invoices.length === 0 ? (
           <div className="muted">No history.</div>
         ) : (
@@ -259,7 +352,7 @@ function RatesBlocks({ rates }) {
 
       {/* Valuations */}
       <div className="rates-card">
-        <div className="section-title">Valuation History</div>
+        <div className="title">Valuation History</div>
         {valuation_history.length === 0 ? (
           <div className="muted">No valuations.</div>
         ) : (
@@ -277,7 +370,7 @@ function RatesBlocks({ rates }) {
 
       {/* Waste & overlays */}
       <div className="rates-card">
-        <div className="section-title">Waste & Overlays</div>
+        <div className="title">Waste & Overlays</div>
         {waste_entitlements ? (
           <>
             <div className="kv"><span className="k">Bin Size</span><span className="v">{waste_entitlements.bin_size_l ? `${waste_entitlements.bin_size_l}L` : '—'}</span></div>
@@ -290,8 +383,7 @@ function RatesBlocks({ rates }) {
 
         {Array.isArray(overlays) && overlays.length > 0 && (
           <>
-            <div className="subhead">Overlays</div>
-            <div className="chip-row">
+            <div className="chip-row" style={{marginTop: 8}}>
               {overlays.map((o, i) => (
                 <span className="chip badge" key={`${o}-${i}`}>{titleCase(o)}</span>
               ))}
@@ -303,19 +395,20 @@ function RatesBlocks({ rates }) {
   );
 }
 
+/* =========================
+   Property Item
+   ========================= */
 function PropertyItem({ item }) {
-  // extra scalar fields beyond curated set
-  const extraEntries = Object.entries(item)
+  const extras = Object.entries(item)
     .filter(([k, v]) => !EXCLUDE_KEYS.has(k) && v != null && typeof v !== 'object');
 
   return (
     <li className="property-item-card">
       <div className="property-item-inner">
-        {/* LEFT: logo + text */}
-        <div className="property-details-content">
-          {/* Rectangular, auto-scaled logo on the left */}
-          {item.council_logo_url && (
-            <div className="council-header">
+        {/* LEFT */}
+        <div>
+          <div className="prop-header">
+            {item.council_logo_url && (
               <img
                 src={item.council_logo_url}
                 alt={`${item.council_name || 'Council'} logo`}
@@ -323,29 +416,39 @@ function PropertyItem({ item }) {
                 loading="lazy"
                 onError={(e) => { e.currentTarget.style.display = 'none'; }}
               />
-              {item.council_name && <div className="council-name">{item.council_name}</div>}
+            )}
+            <div className="council-name">{item.council_name || ''}</div>
+            <div className="property-title">{item.address || '—'}</div>
+          </div>
+
+          {/* quick facts */}
+          <div className="quick-facts">
+            {item.property_type && <span className="pill">{titleCase(item.property_type)}</span>}
+            {item.zone && <span className="pill">Zone {item.zone}</span>}
+            {item.land_size_sqm != null && <span className="pill">{item.land_size_sqm} m²</span>}
+            {item.land_value != null && <span className="pill">LV {money(item.land_value)}</span>}
+            {item.property_value != null && <span className="pill">PV {money(item.property_value)}</span>}
+          </div>
+
+          <div className="divider"></div>
+
+          {/* optional extra scalars (kept light) */}
+          {extras.length > 0 && (
+            <div className="info-grid" style={{marginBottom: 12}}>
+              {extras.map(([k, v]) => (
+                <React.Fragment key={k}>
+                  <div className="info-k">{titleCase(k)}</div>
+                  <div className="info-v">{String(v)}</div>
+                </React.Fragment>
+              ))}
             </div>
           )}
-
-          <div className="property-title">{item.address || '—'}</div>
-
-          {/* curated */}
-          {item.property_type && <div className="property-info"><span className="label">Type</span><span>{titleCase(item.property_type)}</span></div>}
-          {item.zone && <div className="property-info"><span className="label">Zone</span><span>{item.zone}</span></div>}
-          {item.land_size_sqm != null && <div className="property-info"><span className="label">Land Size</span><span>{item.land_size_sqm} m²</span></div>}
-          {item.land_value != null && <div className="property-info"><span className="label">Land Value</span><span>{money(item.land_value)}</span></div>}
-          {item.property_value != null && <div className="property-info"><span className="label">Property Value</span><span>{money(item.property_value)}</span></div>}
-
-          {/* any other scalars */}
-          {extraEntries.map(([k, v]) => (
-            <div className="property-info" key={k}><span className="label">{titleCase(k)}</span><span>{String(v)}</span></div>
-          ))}
 
           {/* rates sections */}
           <RatesBlocks rates={item.rates} />
         </div>
 
-        {/* RIGHT: map */}
+        {/* RIGHT */}
         <div className="property-map-wrap">
           <MiniMap item={item} />
         </div>
@@ -354,12 +457,11 @@ function PropertyItem({ item }) {
   );
 }
 
+/* =========================
+   Root
+   ========================= */
 export default function RatesDetails({ properties }) {
-  useEffect(() => {
-    injectStyles();
-    console.log('RatesDetails received properties:', properties);
-  }, [properties]);
-
+  useEffect(() => { injectStyles(); }, []);
   if (!properties || properties.length === 0) return <p>No properties found for this user.</p>;
 
   return (
