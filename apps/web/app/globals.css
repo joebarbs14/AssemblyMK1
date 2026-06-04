@@ -1,0 +1,104 @@
+/* Design tokens — see DESIGN.md */
+:root {
+  /* Colour (light) */
+  --surface: #ffffff;
+  --surface-muted: #f6f7f9;
+  --border: #e4e7ec;
+  --text-primary: #0b1220;
+  --text-secondary: #475467;
+  --brand: #0b3d2e;
+  --brand-fg: #ffffff;
+  --success: #067647;
+  --warning: #b54708;
+  --danger: #b42318;
+  --info: #175cd3;
+
+  /* Radius */
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 14px;
+  --r-xl: 20px;
+  --r-full: 999px;
+
+  /* Spacing scale (rem) — base 0.25 */
+  --s-1: 0.25rem;
+  --s-2: 0.5rem;
+  --s-3: 0.75rem;
+  --s-4: 1rem;
+  --s-5: 1.25rem;
+  --s-6: 1.5rem;
+  --s-8: 2rem;
+  --s-10: 3rem;
+  --s-12: 4rem;
+
+  /* Elevation */
+  --e1: 0 1px 2px rgba(16, 24, 40, 0.06);
+  --e2: 0 8px 24px rgba(16, 24, 40, 0.12);
+
+  /* Motion */
+  --d-micro: 120ms;
+  --d-std: 200ms;
+  --d-large: 320ms;
+  --ease-in: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-out: cubic-bezier(0.4, 0, 0.6, 1);
+
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --surface: #0f1419;
+    --surface-muted: #0a0d11;
+    --border: #1f2a37;
+    --text-primary: #f2f4f7;
+    --text-secondary: #98a2b3;
+    --brand: #2db380;
+    --brand-fg: #051912;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--surface-muted);
+  color: var(--text-primary);
+  font-family: var(--font-inter), -apple-system, system-ui, "Segoe UI", Roboto, sans-serif;
+  font-feature-settings: "cv11", "ss01", "ss03";
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+a {
+  color: var(--brand);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* Tabular figures for money/dates */
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
