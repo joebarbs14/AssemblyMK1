@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { Button } from "@/components/ui/Button";
@@ -34,6 +35,21 @@ export default async function AccountPage() {
       <h1 style={{ fontSize: "1.75rem", margin: "0.25rem 0 1.5rem", fontWeight: 600 }}>
         Hi {me.name ?? me.email}
       </h1>
+
+      <Card style={{ marginBottom: "1rem" }}>
+        <h2 style={{ marginTop: 0, fontSize: "1.125rem" }}>Reports</h2>
+        <p style={{ color: "var(--text-secondary)", margin: "0 0 1rem" }}>
+          Tell council about issues in your area, and follow them to resolution.
+        </p>
+        <div style={{ display: "flex", gap: "0.5rem" }}>
+          <Link href="/reports/new">
+            <Button>Report an issue</Button>
+          </Link>
+          <Link href="/reports">
+            <Button variant="secondary">My reports</Button>
+          </Link>
+        </div>
+      </Card>
 
       <Card>
         <h2 style={{ marginTop: 0, fontSize: "1.125rem" }}>Account</h2>

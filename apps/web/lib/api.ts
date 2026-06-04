@@ -51,3 +51,72 @@ export interface TokenOut {
   token_type: string;
   expires_in: number;
 }
+
+// --- Reports ---
+
+export interface Category {
+  id: number;
+  key: string;
+  label: string;
+  icon: string | null;
+  sla_hours: number;
+  requires_photo: boolean;
+}
+
+export type ReportStatus =
+  | "new"
+  | "triaging"
+  | "assigned"
+  | "in_progress"
+  | "awaiting_resident"
+  | "resolved"
+  | "closed"
+  | "duplicate"
+  | "rejected";
+
+export interface ReportListItem {
+  id: number;
+  title: string;
+  status: ReportStatus;
+  priority: string;
+  category_id: number;
+  category_label: string;
+  created_at: string;
+  sla_due_at: string | null;
+  assignee_name: string | null;
+}
+
+export interface ReportEvent {
+  id: number;
+  kind: string;
+  actor_user_id: number | null;
+  actor_name: string | null;
+  body: string | null;
+  internal: boolean;
+  metadata: Record<string, unknown> | null;
+  created_at: string;
+}
+
+export interface ReportDetail {
+  id: number;
+  title: string;
+  description: string;
+  status: ReportStatus;
+  priority: string;
+  category_id: number;
+  category_label: string;
+  reporter_user_id: number;
+  reporter_name: string | null;
+  assignee_user_id: number | null;
+  assignee_name: string | null;
+  team_id: number | null;
+  team_name: string | null;
+  lat: number | null;
+  lng: number | null;
+  address_text: string | null;
+  created_at: string;
+  sla_due_at: string | null;
+  resolved_at: string | null;
+  attachments: { id: number; kind: string; r2_key: string; mime: string | null; created_at: string }[];
+  custom_fields: Record<string, unknown> | null;
+}
