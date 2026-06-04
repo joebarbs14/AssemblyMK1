@@ -1,0 +1,11 @@
+{
+  "name": "Assembly",
+  "short_name": "Assembly",
+  "description": "Connecting residents and council staff.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0b3d2e",
+  "orientation": "portrait",
+  "icons": []
+}
