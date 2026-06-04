@@ -2,6 +2,7 @@
 
 > Status: **APPROVED v1**. All 10 open questions resolved (see section J). Awaiting go-ahead to start M1.
 > Branch: `claude/confident-dijkstra-RMBH2`.
+> Design direction: see [`DESIGN.md`](./DESIGN.md) — clean & airy + gov.au-trustworthy.
 
 ---
 
