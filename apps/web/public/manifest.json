@@ -3,9 +3,14 @@
   "short_name": "Assembly",
   "description": "Connecting residents and council staff.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#0b3d2e",
   "orientation": "portrait",
-  "icons": []
+  "categories": ["government", "productivity"],
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
 }

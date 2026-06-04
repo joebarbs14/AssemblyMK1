@@ -7,9 +7,14 @@ import { StatusBadge } from "@/components/ui/StatusBadge";
 import { api, type ReportListItem } from "@/lib/api";
 import { readSessionToken } from "@/lib/session";
 
-export default async function ReportsListPage() {
+export default async function ReportsListPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ queued?: string }>;
+}) {
   const token = await readSessionToken();
   if (!token) redirect("/login");
+  const sp = await searchParams;
 
   let reports: ReportListItem[] = [];
   try {
@@ -26,6 +31,23 @@ export default async function ReportsListPage() {
           <Button size="sm">+ New report</Button>
         </Link>
       </header>
+
+      {sp.queued && (
+        <div
+          role="status"
+          style={{
+            background: "#fff8e6",
+            border: "1px solid #f3d28a",
+            color: "#7a4b08",
+            padding: "0.75rem 1rem",
+            borderRadius: "var(--r-md)",
+            marginBottom: "1rem",
+            fontSize: "0.875rem",
+          }}
+        >
+          You're offline — your report is queued and will send as soon as you're back online.
+        </div>
+      )}
 
       {reports.length === 0 ? (
         <Card>

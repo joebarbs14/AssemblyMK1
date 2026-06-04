@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { API_BASE, DEFAULT_COUNCIL_SLUG } from "@/lib/env";
+import { enqueueReportDraft } from "@/lib/offline";
 import type { Category, ReportDetail } from "@/lib/api";
 
 type Step = "category" | "details" | "photo" | "location";
@@ -98,6 +99,15 @@ export function NewReportForm({ categories, token }: { categories: Category[]; t
     if (!categoryId) return;
     setPending(true);
     setError(null);
+    const body = {
+      category_id: categoryId,
+      title,
+      description,
+      lat,
+      lng,
+      address_text: address || null,
+      attachment_keys: photos.map((p) => p.key),
+    };
     try {
       const res = await fetch(`${API_BASE}/api/reports`, {
         method: "POST",
@@ -106,15 +116,7 @@ export function NewReportForm({ categories, token }: { categories: Category[]; t
           Authorization: `Bearer ${token}`,
           "X-Council-Slug": DEFAULT_COUNCIL_SLUG,
         },
-        body: JSON.stringify({
-          category_id: categoryId,
-          title,
-          description,
-          lat,
-          lng,
-          address_text: address || null,
-          attachment_keys: photos.map((p) => p.key),
-        }),
+        body: JSON.stringify(body),
       });
       if (!res.ok) {
         const data = (await res.json().catch(() => ({}))) as { detail?: string };
@@ -123,6 +125,16 @@ export function NewReportForm({ categories, token }: { categories: Category[]; t
       const out = (await res.json()) as ReportDetail;
       router.push(`/reports/${out.id}`);
     } catch (err) {
+      // Network failure (offline) — queue for background sync.
+      if (typeof navigator !== "undefined" && !navigator.onLine) {
+        try {
+          await enqueueReportDraft(body);
+          router.push("/reports?queued=1");
+          return;
+        } catch {
+          // fall through to error display
+        }
+      }
       setError(err instanceof Error ? err.message : "Couldn't submit");
     } finally {
       setPending(false);
