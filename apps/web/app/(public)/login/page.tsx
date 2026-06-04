@@ -35,7 +35,8 @@ export default function LoginPage() {
           const data = await res.json().catch(() => ({}));
           throw new Error(data?.detail ?? "Sign in failed");
         }
-        router.push("/account");
+        router.push("/");
+        router.refresh();
       } else {
         const apiBase = process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:8000";
         const res = await fetch(`${apiBase}/api/auth/magic-link`, {
@@ -47,9 +48,11 @@ export default function LoginPage() {
           body: JSON.stringify({ email }),
         });
         if (!res.ok && res.status !== 202) {
-          throw new Error("Couldn't send the link. Try again.");
+          throw new Error("We couldn't send a link right now. Please try again.");
         }
-        setInfo("If that email is registered, we've sent a sign-in link. Check your inbox.");
+        setInfo(
+          `If ${email} is registered, we've sent a sign-in link. Check your inbox — it expires in 15 minutes.`,
+        );
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
@@ -60,45 +63,58 @@ export default function LoginPage() {
 
   return (
     <Card>
-      <h2 style={{ marginTop: 0, marginBottom: "0.25rem", fontSize: "1.25rem" }}>Sign in</h2>
+      <h2 style={{ marginTop: 0, marginBottom: "0.25rem", fontSize: "1.25rem", fontWeight: 600 }}>
+        Sign in
+      </h2>
       <p style={{ marginTop: 0, marginBottom: "1.25rem", color: "var(--text-secondary)" }}>
-        Welcome back.
+        Use the email registered with your council.
       </p>
 
       <div
         role="tablist"
         aria-label="Sign-in method"
         style={{
-          display: "inline-flex",
+          display: "flex",
           background: "var(--surface-muted)",
           borderRadius: "var(--r-full)",
           padding: 4,
           gap: 4,
-          marginBottom: "1rem",
+          marginBottom: "1.25rem",
         }}
       >
-        {(["magic", "password"] as const).map((m) => (
+        {(
+          [
+            { id: "magic", label: "Email link" },
+            { id: "password", label: "Password" },
+          ] as const
+        ).map((m) => (
           <button
-            key={m}
+            key={m.id}
             role="tab"
-            aria-selected={mode === m}
+            aria-selected={mode === m.id}
             type="button"
-            onClick={() => setMode(m)}
+            onClick={() => {
+              setMode(m.id);
+              setError(null);
+              setInfo(null);
+            }}
             style={{
-              minHeight: 32,
+              flex: 1,
+              minHeight: 36,
               padding: "0.25rem 0.875rem",
               fontSize: "0.875rem",
               fontWeight: 500,
               border: "none",
               borderRadius: "var(--r-full)",
-              background: mode === m ? "var(--surface)" : "transparent",
-              color: "var(--text-primary)",
-              boxShadow: mode === m ? "var(--e1)" : "none",
+              background: mode === m.id ? "var(--surface)" : "transparent",
+              color: mode === m.id ? "var(--text-primary)" : "var(--text-secondary)",
+              boxShadow: mode === m.id ? "var(--e1)" : "none",
               cursor: "pointer",
               fontFamily: "inherit",
+              transition: "background var(--d-std) var(--ease-in)",
             }}
           >
-            {m === "magic" ? "Email link" : "Password"}
+            {m.label}
           </button>
         ))}
       </div>
@@ -108,9 +124,12 @@ export default function LoginPage() {
           label="Email"
           type="email"
           autoComplete="email"
+          inputMode="email"
           required
+          placeholder="you@example.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          hint={mode === "magic" ? "We'll send a one-time sign-in link." : undefined}
         />
         {mode === "password" && (
           <Input
@@ -122,22 +141,127 @@ export default function LoginPage() {
             onChange={(e) => setPassword(e.target.value)}
           />
         )}
-        <Button type="submit" disabled={pending} fullWidth>
-          {pending ? "Working…" : mode === "magic" ? "Send sign-in link" : "Sign in"}
+        <Button type="submit" disabled={pending} fullWidth size="lg">
+          {pending
+            ? "Working…"
+            : mode === "magic"
+              ? "Send sign-in link"
+              : "Sign in"}
         </Button>
         {error && (
-          <p role="alert" style={{ margin: 0, color: "var(--danger)", fontSize: "0.875rem" }}>
+          <p
+            role="alert"
+            style={{
+              margin: 0,
+              padding: "0.625rem 0.75rem",
+              background: "#fef3f2",
+              border: "1px solid #fecdca",
+              borderRadius: "var(--r-md)",
+              color: "var(--danger)",
+              fontSize: "0.875rem",
+            }}
+          >
             {error}
           </p>
         )}
         {info && (
-          <p style={{ margin: 0, color: "var(--text-secondary)", fontSize: "0.875rem" }}>{info}</p>
+          <p
+            role="status"
+            style={{
+              margin: 0,
+              padding: "0.625rem 0.75rem",
+              background: "#ecfdf3",
+              border: "1px solid #abefc6",
+              borderRadius: "var(--r-md)",
+              color: "#067647",
+              fontSize: "0.875rem",
+            }}
+          >
+            {info}
+          </p>
         )}
       </form>
 
-      <p style={{ marginTop: "1.25rem", marginBottom: 0, fontSize: "0.875rem" }}>
+      <div
+        style={{
+          margin: "1.5rem 0 0.75rem",
+          display: "flex",
+          alignItems: "center",
+          gap: "0.75rem",
+          color: "var(--text-secondary)",
+          fontSize: "0.75rem",
+        }}
+      >
+        <span style={{ flex: 1, height: 1, background: "var(--border)" }} aria-hidden="true" />
+        <span>Council staff</span>
+        <span style={{ flex: 1, height: 1, background: "var(--border)" }} aria-hidden="true" />
+      </div>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+        <button
+          type="button"
+          disabled
+          aria-disabled="true"
+          title="Microsoft Entra SSO arrives in M2.x"
+          style={ssoButton}
+        >
+          <span aria-hidden="true" style={{ ...ssoMark, background: "#f25022" }} />
+          Continue with Microsoft
+          <span style={ssoBadge}>Soon</span>
+        </button>
+        <button
+          type="button"
+          disabled
+          aria-disabled="true"
+          title="Google Workspace SSO arrives in M2.x"
+          style={ssoButton}
+        >
+          <span aria-hidden="true" style={{ ...ssoMark, background: "#ea4335" }} />
+          Continue with Google
+          <span style={ssoBadge}>Soon</span>
+        </button>
+      </div>
+
+      <p style={{ marginTop: "1.25rem", marginBottom: 0, fontSize: "0.875rem", textAlign: "center" }}>
         New here? <a href="/signup">Create an account</a>
       </p>
     </Card>
   );
 }
+
+const ssoButton: React.CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 10,
+  width: "100%",
+  minHeight: 44,
+  padding: "0.5rem 0.875rem",
+  background: "var(--surface)",
+  border: "1px solid var(--border)",
+  borderRadius: "var(--r-md)",
+  color: "var(--text-primary)",
+  fontSize: "0.9375rem",
+  fontWeight: 500,
+  cursor: "not-allowed",
+  opacity: 0.7,
+  fontFamily: "inherit",
+};
+
+const ssoMark: React.CSSProperties = {
+  display: "inline-block",
+  width: 16,
+  height: 16,
+  borderRadius: 3,
+};
+
+const ssoBadge: React.CSSProperties = {
+  marginLeft: "auto",
+  fontSize: "0.625rem",
+  fontWeight: 600,
+  letterSpacing: "0.04em",
+  textTransform: "uppercase",
+  color: "var(--text-secondary)",
+  background: "var(--surface-muted)",
+  padding: "2px 6px",
+  borderRadius: "var(--r-full)",
+};

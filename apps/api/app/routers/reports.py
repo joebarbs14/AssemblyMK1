@@ -1,7 +1,13 @@
 """Resident-facing report endpoints. All scoped to user.council_id + reporter_user_id == user.id."""
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, status
+import asyncio
+import json
+from collections.abc import AsyncGenerator
+
+from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi.responses import StreamingResponse
+from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from app.core.db import get_db
@@ -24,9 +30,95 @@ from app.schemas.report import (
     ReportListItem,
     ResidentEventIn,
 )
+from app.services import events_pubsub, r2
 from app.services.reports import append_event, create_report, list_resident_reports
 
 router = APIRouter(prefix="/reports", tags=["reports"])
+
+
+# --- Attachment presign + attach ---
+
+
+class PresignIn(BaseModel):
+    mime: str = Field(min_length=3, max_length=120)
+
+
+class PresignOut(BaseModel):
+    key: str
+    url: str
+    method: str
+    headers_json: str
+
+
+@router.post("/attachments/presign", response_model=PresignOut)
+def presign_upload(
+    body: PresignIn,
+    user: User = Depends(get_current_user),
+) -> PresignOut:
+    if not body.mime.startswith(("image/", "video/", "application/pdf")):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Unsupported file type")
+    key = r2.make_object_key(council_id=user.council_id, user_id=user.id, kind="photo", mime=body.mime)
+    presigned = r2.presign_put(key=key, mime=body.mime)
+    return PresignOut(key=key, **presigned)
+
+
+class AttachToReportIn(BaseModel):
+    r2_key: str = Field(min_length=4, max_length=500)
+    mime: str | None = Field(default=None, max_length=120)
+    in_response_to_event_id: int | None = None
+
+
+@router.post("/{report_id}/attachments", response_model=AttachmentOut, status_code=status.HTTP_201_CREATED)
+def attach_to_existing_report(
+    report_id: int,
+    body: AttachToReportIn,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> AttachmentOut:
+    rep = _get_owned_report(db, user=user, report_id=report_id)
+
+    # If responding to a file_request, verify it belongs to this report.
+    if body.in_response_to_event_id is not None:
+        ev = db.get(ReportEvent, body.in_response_to_event_id)
+        if ev is None or ev.report_id != rep.id or ev.kind != "file_request":
+            raise HTTPException(status_code=400, detail="Invalid file_request reference")
+
+    att = ReportAttachment(
+        report_id=rep.id,
+        kind="photo",
+        r2_key=body.r2_key,
+        mime=body.mime,
+        uploaded_by_user_id=user.id,
+        in_response_to_event_id=body.in_response_to_event_id,
+    )
+    db.add(att)
+    db.flush()
+    # Emit attachment_added event so the timeline updates.
+    append_event(
+        db,
+        report=rep,
+        actor=user,
+        kind=ReportEventKind.attachment_added,
+        body=None,
+        internal=False,
+        metadata={"attachment_id": att.id, "r2_key": att.r2_key},
+        commit=False,
+    )
+    # If this fulfilled a file_request, flip status back to in_progress.
+    if body.in_response_to_event_id and rep.status == "awaiting_resident":
+        prev = rep.status
+        rep.status = "in_progress"
+        append_event(
+            db,
+            report=rep,
+            actor=None,
+            kind=ReportEventKind.status_change,
+            metadata={"from": prev, "to": "in_progress", "auto": True},
+            commit=False,
+        )
+    db.commit()
+    db.refresh(att)
+    return AttachmentOut(id=att.id, kind=att.kind, r2_key=att.r2_key, mime=att.mime, created_at=att.created_at)
 
 
 def _require_resident(user: User) -> None:
@@ -155,6 +247,41 @@ def post_event(
         db, report=rep, actor=user, kind=ReportEventKind.message, body=body.body, internal=False
     )
     return _serialize_event(event, user)
+
+
+@router.get("/{report_id}/events/stream")
+async def stream_events(
+    report_id: int,
+    request: Request,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> StreamingResponse:
+    """SSE stream of new events for this report. Resident view — filters internal events."""
+    rep = _get_owned_report(db, user=user, report_id=report_id)
+    q = events_pubsub.subscribe(rep.id)
+
+    async def gen() -> AsyncGenerator[bytes, None]:
+        try:
+            yield b": connected\n\n"
+            while True:
+                if await request.is_disconnected():
+                    return
+                try:
+                    raw = await asyncio.wait_for(q.get(), timeout=20.0)
+                except TimeoutError:
+                    yield b": keepalive\n\n"
+                    continue
+                payload = json.loads(raw)
+                if payload.get("internal"):
+                    continue  # never leak to resident
+                yield f"id: {payload['id']}\nevent: report.event\ndata: {raw}\n\n".encode()
+        finally:
+            events_pubsub.unsubscribe(rep.id, q)
+
+    return StreamingResponse(gen(), media_type="text/event-stream", headers={
+        "Cache-Control": "no-cache, no-transform",
+        "X-Accel-Buffering": "no",
+    })
 
 
 # --- helpers ---

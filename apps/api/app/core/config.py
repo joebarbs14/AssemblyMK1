@@ -26,5 +26,12 @@ class Settings(BaseSettings):
     resend_sender_domain: str | None = None
     email_from: str = "Assembly <noreply@assembly.local>"
 
+    # Cloudflare R2 (S3-compatible)
+    r2_account_id: str | None = None
+    r2_access_key: str | None = None
+    r2_secret_key: str | None = None
+    r2_bucket_media: str = "assembly-media-dev"
+    r2_public_base: str | None = None  # https://media.assembly.app — for signed GETs
+
 
 settings = Settings()

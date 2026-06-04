@@ -97,6 +97,114 @@ export interface ReportEvent {
   created_at: string;
 }
 
+export interface QueueSummary {
+  total_open: number;
+  by_status: Record<string, number>;
+  by_team: Record<string, number>;
+  sla_breached: number;
+  sla_at_risk: number;
+  mine: number;
+}
+
+// --- Rates ---
+
+export interface AccountSummary {
+  id: number;
+  account_number: string;
+  balance_cents: number;
+  next_due_date: string | null;
+  ebilling_enabled: boolean;
+}
+
+export interface PropertyListItem {
+  id: number;
+  address: string;
+  suburb: string | null;
+  postcode: string | null;
+  property_type: string;
+  account: AccountSummary | null;
+  overdue: boolean;
+}
+
+export interface Valuation {
+  year: number;
+  land_value_cents: number;
+  capital_value_cents: number;
+}
+
+export interface RateChargeRow {
+  period_start: string;
+  period_end: string;
+  category: string;
+  amount_cents: number;
+  note: string | null;
+}
+
+export interface ConcessionRow {
+  type: string;
+  status: string;
+  annual_value_cents: number | null;
+  link_apply: string | null;
+}
+
+export interface OverlayRow {
+  kind: string;
+  source: string | null;
+  note: string | null;
+}
+
+export interface WasteEntitlementRow {
+  bin_size_l: number | null;
+  extra_bins: number;
+  collection_day: string | null;
+  notes: string | null;
+}
+
+export interface BillingSettingRow {
+  direct_debit_active: boolean;
+  ebill_active: boolean;
+  update_payment_link: string | null;
+}
+
+export interface PropertyDetail {
+  id: number;
+  address: string;
+  suburb: string | null;
+  postcode: string | null;
+  property_type: string;
+  lat: number | null;
+  lng: number | null;
+  zone: string | null;
+  land_size_sqm: number | null;
+  account: AccountSummary | null;
+  valuations: Valuation[];
+  rate_charges: RateChargeRow[];
+  concessions: ConcessionRow[];
+  overlays: OverlayRow[];
+  waste_entitlement: WasteEntitlementRow | null;
+  billing_setting: BillingSettingRow | null;
+  council_contact: { council_name: string | null; logo_url: string | null };
+}
+
+export interface InvoiceOut {
+  id: number;
+  invoice_number: string;
+  issue_date: string;
+  due_date: string;
+  amount_cents: number;
+  status: string;
+  pdf_url: string | null;
+  line_items: { label: string; amount_cents: number }[] | null;
+}
+
+export interface BpayOut {
+  biller_code: string;
+  crn: string;
+  deep_link: string;
+}
+
+// --- Reports detail (existing) ---
+
 export interface ReportDetail {
   id: number;
   title: string;

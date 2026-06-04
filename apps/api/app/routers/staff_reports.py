@@ -1,9 +1,13 @@
 """Staff/admin report endpoints — council-wide visibility, triage actions."""
 from __future__ import annotations
 
+import asyncio
+import json
+from collections.abc import AsyncGenerator
 from datetime import UTC, datetime
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 
 from app.core.db import get_db
@@ -26,6 +30,7 @@ from app.schemas.report import (
     ReportPatchIn,
     StaffEventIn,
 )
+from app.services import events_pubsub
 from app.services.reports import append_event, list_staff_reports, queue_summary
 
 router = APIRouter(prefix="/staff/reports", tags=["staff-reports"])
@@ -102,6 +107,39 @@ def get_one(
 ) -> ReportDetail:
     rep = _get_council_report(db, user=user, report_id=report_id)
     return _serialize_detail(db, rep)
+
+
+@router.get("/{report_id}/events/stream")
+async def stream_events_staff(
+    report_id: int,
+    request: Request,
+    user: User = Depends(_require_staff),
+    db: Session = Depends(get_db),
+) -> StreamingResponse:
+    """SSE stream for staff — includes internal events."""
+    rep = _get_council_report(db, user=user, report_id=report_id)
+    q = events_pubsub.subscribe(rep.id)
+
+    async def gen() -> AsyncGenerator[bytes, None]:
+        try:
+            yield b": connected\n\n"
+            while True:
+                if await request.is_disconnected():
+                    return
+                try:
+                    raw = await asyncio.wait_for(q.get(), timeout=20.0)
+                except TimeoutError:
+                    yield b": keepalive\n\n"
+                    continue
+                payload = json.loads(raw)
+                yield f"id: {payload['id']}\nevent: report.event\ndata: {raw}\n\n".encode()
+        finally:
+            events_pubsub.unsubscribe(rep.id, q)
+
+    return StreamingResponse(gen(), media_type="text/event-stream", headers={
+        "Cache-Control": "no-cache, no-transform",
+        "X-Accel-Buffering": "no",
+    })
 
 
 @router.get("/{report_id}/events", response_model=list[EventOut])
