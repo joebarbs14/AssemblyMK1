@@ -51,6 +51,16 @@ export default async function AccountPage() {
         </div>
       </Card>
 
+      <Card style={{ marginBottom: "1rem" }}>
+        <h2 style={{ marginTop: 0, fontSize: "1.125rem" }}>Rates &amp; properties</h2>
+        <p style={{ color: "var(--text-secondary)", margin: "0 0 1rem" }}>
+          View your rates balance, invoice history, valuations, and BPAY details.
+        </p>
+        <Link href="/rates">
+          <Button>Open rates</Button>
+        </Link>
+      </Card>
+
       <Card>
         <h2 style={{ marginTop: 0, fontSize: "1.125rem" }}>Account</h2>
         <dl style={{ margin: 0, display: "grid", gridTemplateColumns: "max-content 1fr", gap: "0.5rem 1rem" }}>

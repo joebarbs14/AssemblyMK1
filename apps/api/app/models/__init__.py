@@ -1,5 +1,20 @@
 from app.models.auth_token import MagicLinkUse
 from app.models.council import Council, Ward
+from app.models.rates import (
+    BillingSetting,
+    BpayCrn,
+    Concession,
+    InvoiceStatus,
+    Property,
+    PropertyOverlay,
+    PropertyOwnership,
+    PropertyType,
+    RateCharge,
+    RatesAccount,
+    RatesInvoice,
+    Valuation,
+    WasteEntitlement,
+)
 from app.models.report import (
     Report,
     ReportAttachment,
@@ -14,8 +29,19 @@ from app.models.team import StaffTeam, StaffTeamMember
 from app.models.user import SsoIdentity, TenantSsoConfig, User, UserRole, UserStatus
 
 __all__ = [
+    "BillingSetting",
+    "BpayCrn",
+    "Concession",
     "Council",
+    "InvoiceStatus",
     "MagicLinkUse",
+    "Property",
+    "PropertyOverlay",
+    "PropertyOwnership",
+    "PropertyType",
+    "RateCharge",
+    "RatesAccount",
+    "RatesInvoice",
     "Report",
     "ReportAttachment",
     "ReportCategory",
@@ -31,5 +57,7 @@ __all__ = [
     "User",
     "UserRole",
     "UserStatus",
+    "Valuation",
     "Ward",
+    "WasteEntitlement",
 ]
