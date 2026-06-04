@@ -15,11 +15,13 @@ export default function SignupPage() {
   const [pending, setPending] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
+  const tooShort = password.length > 0 && password.length < 12;
+
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     if (password.length < 12) {
-      setError("Use at least 12 characters.");
+      setError("Please use at least 12 characters.");
       return;
     }
     setPending(true);
@@ -33,7 +35,8 @@ export default function SignupPage() {
         const data = await res.json().catch(() => ({}));
         throw new Error(data?.detail ?? "Sign-up failed");
       }
-      router.push("/account");
+      router.push("/");
+      router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
@@ -43,9 +46,12 @@ export default function SignupPage() {
 
   return (
     <Card>
-      <h2 style={{ marginTop: 0, marginBottom: "0.25rem", fontSize: "1.25rem" }}>Create your account</h2>
+      <h2 style={{ marginTop: 0, marginBottom: "0.25rem", fontSize: "1.25rem", fontWeight: 600 }}>
+        Create your account
+      </h2>
       <p style={{ marginTop: 0, marginBottom: "1.25rem", color: "var(--text-secondary)" }}>
-        Use your council email if you have one. Takes 30 seconds.
+        Takes about 30 seconds. Your council uses this to send you updates on
+        anything you report.
       </p>
 
       <form onSubmit={onSubmit} style={{ display: "flex", flexDirection: "column", gap: "0.875rem" }}>
@@ -53,6 +59,7 @@ export default function SignupPage() {
           label="Full name"
           autoComplete="name"
           required
+          placeholder="Alex Smith"
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
@@ -60,7 +67,9 @@ export default function SignupPage() {
           label="Email"
           type="email"
           autoComplete="email"
+          inputMode="email"
           required
+          placeholder="you@example.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
@@ -70,21 +79,37 @@ export default function SignupPage() {
           autoComplete="new-password"
           required
           minLength={12}
-          hint="At least 12 characters."
+          hint={tooShort ? undefined : "At least 12 characters."}
+          errorText={tooShort ? `${12 - password.length} more characters needed.` : undefined}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <Button type="submit" disabled={pending} fullWidth>
+        <Button type="submit" disabled={pending} fullWidth size="lg">
           {pending ? "Creating…" : "Create account"}
         </Button>
         {error && (
-          <p role="alert" style={{ margin: 0, color: "var(--danger)", fontSize: "0.875rem" }}>
+          <p
+            role="alert"
+            style={{
+              margin: 0,
+              padding: "0.625rem 0.75rem",
+              background: "#fef3f2",
+              border: "1px solid #fecdca",
+              borderRadius: "var(--r-md)",
+              color: "var(--danger)",
+              fontSize: "0.875rem",
+            }}
+          >
             {error}
           </p>
         )}
+        <p style={{ margin: 0, fontSize: "0.75rem", color: "var(--text-secondary)" }}>
+          By creating an account, you agree to our terms and acknowledge the
+          Privacy Policy. We never share your data outside your council.
+        </p>
       </form>
 
-      <p style={{ marginTop: "1.25rem", marginBottom: 0, fontSize: "0.875rem" }}>
+      <p style={{ marginTop: "1.25rem", marginBottom: 0, fontSize: "0.875rem", textAlign: "center" }}>
         Already have an account? <a href="/login">Sign in</a>
       </p>
     </Card>
