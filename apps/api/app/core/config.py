@@ -34,6 +34,12 @@ class Settings(BaseSettings):
     r2_bucket_media: str = "assembly-media-dev"
     r2_public_base: str | None = None  # https://media.assembly.app — for signed GETs
 
+    # PayPal
+    paypal_env: str = "sandbox"  # sandbox|live
+    paypal_client_id: str | None = None
+    paypal_client_secret: str | None = None
+    paypal_webhook_id: str | None = None
+
     @field_validator("database_url", mode="before")
     @classmethod
     def _normalize_db_url(cls, v: object) -> object:

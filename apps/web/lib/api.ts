@@ -210,6 +210,26 @@ export interface BpayOut {
   deep_link: string;
 }
 
+export interface PaypalOrder {
+  order_id: string;
+  approve_url: string;
+  mock: boolean;
+  invoice_id: number;
+  amount_cents: number;
+}
+
+export interface PaymentRecord {
+  id: number;
+  amount_cents: number;
+  currency: string;
+  provider: "paypal" | "bpay" | "manual";
+  status: "pending" | "succeeded" | "failed" | "refunded";
+  paid_at: string | null;
+  invoice_id: number | null;
+  crn: string | null;
+  created_at: string;
+}
+
 // --- Reports detail (existing) ---
 
 export interface ReportDetail {

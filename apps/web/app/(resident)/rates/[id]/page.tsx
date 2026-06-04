@@ -100,7 +100,7 @@ export default async function RatesDetailPage({
           </div>
           <div style={{ display: "flex", gap: 8, marginTop: "1rem" }}>
             <Link href={`/rates/${property.id}/pay`}>
-              <Button disabled>Pay with PayPal (M6)</Button>
+              <Button>Pay rates</Button>
             </Link>
             <Link href={`/rates/${property.id}/invoices`}>
               <Button variant="secondary">Invoices</Button>

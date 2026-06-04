@@ -1,5 +1,13 @@
 from app.models.auth_token import MagicLinkUse
 from app.models.council import Council, Ward
+from app.models.payment import (
+    Payment,
+    PaymentPlan,
+    PaymentProvider,
+    PaymentStatus,
+    PlanStatus,
+    WebhookEvent,
+)
 from app.models.rates import (
     BillingSetting,
     BpayCrn,
@@ -35,6 +43,11 @@ __all__ = [
     "Council",
     "InvoiceStatus",
     "MagicLinkUse",
+    "Payment",
+    "PaymentPlan",
+    "PaymentProvider",
+    "PaymentStatus",
+    "PlanStatus",
     "Property",
     "PropertyOverlay",
     "PropertyOwnership",
@@ -60,4 +73,5 @@ __all__ = [
     "Valuation",
     "Ward",
     "WasteEntitlement",
+    "WebhookEvent",
 ]
