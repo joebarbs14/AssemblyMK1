@@ -43,7 +43,14 @@ export interface Me {
   email: string;
   name: string | null;
   role: "resident" | "staff" | "admin";
-  council: { id: number; slug: string; name: string; brand_color: string };
+  council: {
+    id: number;
+    slug: string;
+    name: string;
+    brand_color: string;
+    logo_url: string | null;
+    shire_name: string | null;
+  };
 }
 
 export interface TokenOut {

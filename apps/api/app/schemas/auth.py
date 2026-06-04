@@ -33,6 +33,8 @@ class CouncilOut(BaseModel):
     slug: str
     name: str
     brand_color: str
+    logo_url: str | None = None
+    shire_name: str | None = None
 
 
 class MeOut(BaseModel):

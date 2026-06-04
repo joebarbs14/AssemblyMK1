@@ -156,7 +156,14 @@ def me(user: User = Depends(get_current_user), db: Session = Depends(get_db)) ->
         email=user.email,
         name=user.name,
         role=user.role,
-        council=CouncilOut(id=council.id, slug=council.slug, name=council.name, brand_color=council.brand_color),
+        council=CouncilOut(
+            id=council.id,
+            slug=council.slug,
+            name=council.name,
+            brand_color=council.brand_color,
+            logo_url=council.logo_url,
+            shire_name=council.shire_name,
+        ),
     )
 
 

@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { ServiceGrid } from "@/components/ServiceGrid";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { api, type Me, type PropertyListItem, type ReportListItem } from "@/lib/api";
 import { readSessionToken } from "@/lib/session";
@@ -24,7 +25,6 @@ export default async function Home() {
     redirect("/staff");
   }
 
-  // Fetch dashboard data in parallel; tolerate empty results.
   const [reports, properties] = await Promise.all([
     api<ReportListItem[]>("/api/reports", { token }).catch(() => [] as ReportListItem[]),
     api<PropertyListItem[]>("/api/rates/properties", { token }).catch(() => [] as PropertyListItem[]),
@@ -34,29 +34,18 @@ export default async function Home() {
     (r) => !["resolved", "closed", "duplicate", "rejected"].includes(r.status),
   );
   const recent = reports.slice(0, 3);
+  const totalBalance = properties.reduce(
+    (acc, p) => acc + (p.account?.balance_cents ?? 0),
+    0,
+  );
   const isEmpty = reports.length === 0 && properties.length === 0;
 
   return (
-    <main style={{ maxWidth: 760, margin: "0 auto", padding: "1.5rem 1.25rem 6rem" }}>
-      <header style={{ marginBottom: "1.5rem" }}>
-        <p
-          style={{
-            fontSize: "0.75rem",
-            letterSpacing: "0.06em",
-            textTransform: "uppercase",
-            color: "var(--text-secondary)",
-            margin: 0,
-          }}
-        >
-          {me.council.name}
-        </p>
-        <h1 style={{ fontSize: "1.75rem", margin: "0.25rem 0 0", fontWeight: 600 }}>
-          Hi {me.name ?? me.email}
-        </h1>
-      </header>
+    <main style={{ maxWidth: 760, margin: "0 auto", padding: "1rem 1.25rem 6rem" }}>
+      <CouncilHeader me={me} />
 
       {/* Primary CTA */}
-      <Card style={{ marginBottom: "1rem", background: "var(--brand)", color: "var(--brand-fg)", border: "none" }}>
+      <Card style={{ marginBottom: "1rem", background: me.council.brand_color, color: "#fff", border: "none" }}>
         <h2 style={{ margin: 0, fontSize: "1.125rem", fontWeight: 600 }}>
           See something that needs council attention?
         </h2>
@@ -72,10 +61,12 @@ export default async function Home() {
 
       {isEmpty && <TryDemoPanel />}
 
+      <ServiceGrid />
+
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
           gap: 12,
           marginBottom: "1rem",
         }}
@@ -85,8 +76,8 @@ export default async function Home() {
         <Stat
           label="Total balance"
           value={
-            properties.reduce((acc, p) => acc + (p.account?.balance_cents ?? 0), 0) > 0
-              ? `$${(properties.reduce((acc, p) => acc + (p.account?.balance_cents ?? 0), 0) / 100).toLocaleString("en-AU", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+            totalBalance > 0
+              ? `$${(totalBalance / 100).toLocaleString("en-AU", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
               : "$0.00"
           }
           href="/rates"
@@ -116,7 +107,14 @@ export default async function Home() {
               >
                 <Link
                   href={`/reports/${r.id}`}
-                  style={{ display: "flex", justifyContent: "space-between", alignItems: "center", textDecoration: "none", color: "inherit", gap: 8 }}
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    textDecoration: "none",
+                    color: "inherit",
+                    gap: 8,
+                  }}
                 >
                   <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                     {r.title}
@@ -130,7 +128,7 @@ export default async function Home() {
       )}
 
       <Card>
-        <h2 style={{ marginTop: 0, fontSize: "1rem", fontWeight: 600 }}>Council shortcuts</h2>
+        <h2 style={{ marginTop: 0, fontSize: "1rem", fontWeight: 600 }}>Shortcuts</h2>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: "0.5rem" }}>
           <Link href="/reports/new">
             <Button variant="secondary" size="sm">
@@ -150,6 +148,66 @@ export default async function Home() {
         </div>
       </Card>
     </main>
+  );
+}
+
+function CouncilHeader({ me }: { me: Me }) {
+  return (
+    <header
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 12,
+        padding: "0.75rem 0",
+        marginBottom: "1rem",
+        borderBottom: "1px solid var(--border)",
+      }}
+    >
+      {me.council.logo_url ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={me.council.logo_url}
+          alt={me.council.name}
+          style={{ height: 44, width: "auto", maxWidth: 260, display: "block" }}
+        />
+      ) : (
+        <div
+          style={{
+            width: 44,
+            height: 44,
+            borderRadius: "var(--r-md)",
+            background: me.council.brand_color,
+          }}
+          aria-hidden="true"
+        />
+      )}
+      <div style={{ minWidth: 0 }}>
+        <p
+          style={{
+            margin: 0,
+            fontSize: "0.6875rem",
+            letterSpacing: "0.06em",
+            textTransform: "uppercase",
+            color: "var(--text-secondary)",
+            fontWeight: 600,
+          }}
+        >
+          Welcome
+        </p>
+        <p
+          style={{
+            margin: 0,
+            fontSize: "1.125rem",
+            fontWeight: 600,
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {me.name ?? me.email}
+        </p>
+      </div>
+    </header>
   );
 }
 

@@ -7,6 +7,6 @@ export const API_BASE =
 export const DEFAULT_COUNCIL_SLUG =
   process.env.NEXT_PUBLIC_DEFAULT_COUNCIL_SLUG ??
   process.env.DEFAULT_COUNCIL_SLUG ??
-  "demo";
+  "leeton";
 
 export const SESSION_COOKIE = "assembly_session";
