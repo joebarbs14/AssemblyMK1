@@ -9,7 +9,13 @@ import { Input } from "@/components/ui/Input";
 import { API_BASE, DEFAULT_COUNCIL_SLUG } from "@/lib/env";
 import type { Category, ReportDetail } from "@/lib/api";
 
-type Step = "category" | "details" | "location";
+type Step = "category" | "details" | "photo" | "location";
+
+interface UploadedPhoto {
+  key: string;
+  previewUrl: string;
+  mime: string;
+}
 
 export function NewReportForm({ categories, token }: { categories: Category[]; token: string }) {
   const router = useRouter();
@@ -20,11 +26,50 @@ export function NewReportForm({ categories, token }: { categories: Category[]; t
   const [lat, setLat] = React.useState<number | null>(null);
   const [lng, setLng] = React.useState<number | null>(null);
   const [address, setAddress] = React.useState("");
+  const [photos, setPhotos] = React.useState<UploadedPhoto[]>([]);
+  const [uploading, setUploading] = React.useState(false);
   const [geoStatus, setGeoStatus] = React.useState<"idle" | "loading" | "ok" | "denied">("idle");
   const [pending, setPending] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
   const selected = categories.find((c) => c.id === categoryId) ?? null;
+
+  async function uploadFile(file: File) {
+    setUploading(true);
+    try {
+      const presignRes = await fetch(`${API_BASE}/api/reports/attachments/presign`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+          "X-Council-Slug": DEFAULT_COUNCIL_SLUG,
+        },
+        body: JSON.stringify({ mime: file.type || "image/jpeg" }),
+      });
+      if (!presignRes.ok) throw new Error("Couldn't prepare upload");
+      const { key, url, headers_json } = (await presignRes.json()) as {
+        key: string;
+        url: string;
+        headers_json: string;
+      };
+      const putUrl = url.startsWith("/") ? `${API_BASE}${url}` : url;
+      const putHeaders = JSON.parse(headers_json) as Record<string, string>;
+      const put = await fetch(putUrl, { method: "PUT", headers: putHeaders, body: file });
+      if (!put.ok) throw new Error(`Upload failed (${put.status})`);
+      setPhotos((p) => [
+        ...p,
+        { key, previewUrl: URL.createObjectURL(file), mime: file.type || "image/jpeg" },
+      ]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  function removePhoto(key: string) {
+    setPhotos((p) => p.filter((x) => x.key !== key));
+  }
 
   function pickCategory(c: Category) {
     setCategoryId(c.id);
@@ -68,6 +113,7 @@ export function NewReportForm({ categories, token }: { categories: Category[]; t
           lat,
           lng,
           address_text: address || null,
+          attachment_keys: photos.map((p) => p.key),
         }),
       });
       if (!res.ok) {
@@ -181,12 +227,119 @@ export function NewReportForm({ categories, token }: { categories: Category[]; t
             <Button
               type="button"
               disabled={title.trim().length < 3}
-              onClick={() => setStep("location")}
+              onClick={() => setStep("photo")}
               style={{ marginLeft: "auto" }}
             >
               Next
             </Button>
           </div>
+        </div>
+      </Card>
+    );
+  }
+
+  if (step === "photo") {
+    const required = !!selected?.requires_photo;
+    return (
+      <Card>
+        <p style={{ marginTop: 0, color: "var(--text-secondary)", fontSize: "0.8125rem" }}>
+          {selected?.label}
+        </p>
+        <h2 style={{ marginTop: 0, fontSize: "1.125rem" }}>
+          Add a photo {required ? "" : "(optional)"}
+        </h2>
+        <p style={{ marginTop: 0, color: "var(--text-secondary)" }}>
+          A clear photo helps council triage faster.
+        </p>
+
+        <input
+          type="file"
+          accept="image/*"
+          capture="environment"
+          onChange={async (e) => {
+            const f = e.target.files?.[0];
+            if (f) await uploadFile(f);
+            e.target.value = "";
+          }}
+          style={{ display: "block", margin: "0.5rem 0 1rem" }}
+        />
+
+        {photos.length > 0 && (
+          <ul
+            style={{
+              listStyle: "none",
+              padding: 0,
+              margin: "0 0 1rem",
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(96px, 1fr))",
+              gap: 8,
+            }}
+          >
+            {photos.map((p) => (
+              <li
+                key={p.key}
+                style={{
+                  position: "relative",
+                  aspectRatio: "1",
+                  borderRadius: "var(--r-md)",
+                  overflow: "hidden",
+                  border: "1px solid var(--border)",
+                }}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={p.previewUrl}
+                  alt="upload preview"
+                  style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                />
+                <button
+                  type="button"
+                  onClick={() => removePhoto(p.key)}
+                  aria-label="Remove photo"
+                  style={{
+                    position: "absolute",
+                    top: 4,
+                    right: 4,
+                    width: 28,
+                    height: 28,
+                    border: "none",
+                    borderRadius: "var(--r-full)",
+                    background: "rgba(0,0,0,0.6)",
+                    color: "#fff",
+                    cursor: "pointer",
+                    fontSize: "1rem",
+                  }}
+                >
+                  ×
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {uploading && (
+          <p style={{ fontSize: "0.8125rem", color: "var(--text-secondary)", margin: 0 }}>
+            Uploading…
+          </p>
+        )}
+        {error && (
+          <p role="alert" style={{ color: "var(--danger)", margin: 0, fontSize: "0.875rem" }}>
+            {error}
+          </p>
+        )}
+
+        <div style={{ display: "flex", gap: 8, marginTop: "1rem" }}>
+          <Button variant="ghost" type="button" onClick={() => setStep("details")}>
+            Back
+          </Button>
+          <Button
+            type="button"
+            disabled={uploading || (required && photos.length === 0)}
+            onClick={() => setStep("location")}
+            style={{ marginLeft: "auto" }}
+          >
+            Next
+          </Button>
         </div>
       </Card>
     );
@@ -234,7 +387,7 @@ export function NewReportForm({ categories, token }: { categories: Category[]; t
           </p>
         )}
         <div style={{ display: "flex", gap: 8 }}>
-          <Button variant="ghost" type="button" onClick={() => setStep("details")}>
+          <Button variant="ghost" type="button" onClick={() => setStep("photo")}>
             Back
           </Button>
           <Button

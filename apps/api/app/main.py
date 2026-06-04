@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
-from app.routers import auth, health, reports, staff_reports
+from app.routers import auth, dev_uploads, health, reports, staff_reports
 
 if settings.sentry_dsn:
     sentry_sdk.init(dsn=settings.sentry_dsn, environment=settings.env, traces_sample_rate=0.1)
@@ -22,6 +22,7 @@ app.include_router(health.router, prefix="/api")
 app.include_router(auth.router, prefix="/api")
 app.include_router(reports.router, prefix="/api")
 app.include_router(staff_reports.router, prefix="/api")
+app.include_router(dev_uploads.router, prefix="/api")
 
 
 @app.get("/")

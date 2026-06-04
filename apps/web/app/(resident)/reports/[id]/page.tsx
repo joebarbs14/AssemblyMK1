@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 
 import { Card } from "@/components/ui/Card";
 import { StatusBadge } from "@/components/ui/StatusBadge";
-import { Timeline } from "@/components/Timeline";
+import { LiveTimeline } from "@/components/LiveTimeline";
 import { api, type Me, type ReportDetail, type ReportEvent } from "@/lib/api";
 import { readSessionToken } from "@/lib/session";
 
@@ -63,7 +63,12 @@ export default async function ReportDetailPage({
       </header>
 
       <Card style={{ padding: "1.25rem" }}>
-        <Timeline events={events} mineUserId={me.id} />
+        <LiveTimeline
+          reportId={report.id}
+          initialEvents={events}
+          mineUserId={me.id}
+          side="resident"
+        />
       </Card>
 
       <MessageComposer reportId={report.id} token={token} />

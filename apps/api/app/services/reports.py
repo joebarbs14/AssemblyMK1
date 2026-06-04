@@ -17,6 +17,7 @@ from app.models import (
     StaffTeam,
     User,
 )
+from app.services import events_pubsub
 
 
 def append_event(
@@ -42,6 +43,19 @@ def append_event(
     if commit:
         db.commit()
         db.refresh(event)
+        events_pubsub.publish(
+            report.id,
+            {
+                "id": event.id,
+                "kind": event.kind,
+                "actor_user_id": event.actor_user_id,
+                "actor_name": actor.name if actor else None,
+                "body": event.body,
+                "internal": event.internal,
+                "metadata": event.event_metadata,
+                "created_at": event.created_at.isoformat() if event.created_at else None,
+            },
+        )
     return event
 
 

@@ -97,6 +97,15 @@ export interface ReportEvent {
   created_at: string;
 }
 
+export interface QueueSummary {
+  total_open: number;
+  by_status: Record<string, number>;
+  by_team: Record<string, number>;
+  sla_breached: number;
+  sla_at_risk: number;
+  mine: number;
+}
+
 export interface ReportDetail {
   id: number;
   title: string;
