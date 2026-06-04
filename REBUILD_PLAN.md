@@ -121,11 +121,20 @@ Supporting:
 
 **Reports**
 - `report_category` (id, council_id, key, label, icon, sla_hours, default_team_id, requires_photo, custom_fields_schema JSONB)
-- `report` (id, council_id, ward_id, category_id, reporter_user_id, title, description, location_point geography(POINT,4326), address_text, status: new|triaging|assigned|in_progress|resolved|closed|duplicate|rejected, priority, assignee_user_id, team_id, sla_due_at, created_at, resolved_at, custom_fields JSONB, public)
-- `report_attachment` (id, report_id, kind: photo|video|doc, r2_key, mime, width, height, exif JSONB, uploaded_by_user_id)
-- `report_status_event` (id, report_id, actor_user_id, from_status, to_status, note, internal, created_at)
-- `report_comment` (id, report_id, author_user_id, body, internal, created_at)
-- `report_subscription` (report_id, user_id)
+- `report` (id, council_id, ward_id, category_id, reporter_user_id, title, description, location_point geography(POINT,4326), address_text, status: new|triaging|assigned|in_progress|awaiting_resident|resolved|closed|duplicate|rejected, priority, assignee_user_id, team_id, sla_due_at, created_at, resolved_at, custom_fields JSONB, public)
+- `report_attachment` (id, report_id, kind: photo|video|doc|signature, r2_key, mime, width, height, exif JSONB, uploaded_by_user_id, in_response_to_event_id nullable)
+- `report_event` — **unified timeline** powering the shared workspace. One row per thing that happened. Columns: id, report_id, actor_user_id (nullable for system events), kind, body (nullable text), internal (bool — staff-only when true), metadata JSONB, created_at. `kind` enum:
+  - `message` — chat-style message (resident or staff)
+  - `status_change` — status transition; metadata = `{from, to}`
+  - `assignment` — assignee/team change; metadata = `{from_user, to_user, from_team, to_team}`
+  - `priority_change` — metadata = `{from, to}`
+  - `attachment_added` — metadata = `{attachment_id}`
+  - `file_request` — staff asks resident for a photo/doc; metadata = `{requested_kinds, due_at, fulfilled_by_attachment_id}`
+  - `appointment_proposed|confirmed|cancelled|completed` — metadata = `{appointment_id}`
+  - `signature_requested|provided` — metadata = `{signature_id}`
+- `report_appointment` (id, report_id, proposed_by_user_id, slot_start, slot_end, location_text, address_point geography nullable, status: proposed|confirmed|cancelled|completed, confirmed_at, completed_at, notes)
+- `report_signature` (id, report_id, signer_user_id, kind: resident_acknowledge|staff_completion, signed_at, attachment_id FK→report_attachment, ip_address, user_agent)
+- `report_subscription` (report_id, user_id) — who gets push/email on new events.
 
 **Rates / payments** (port-forward existing)
 - `property` (id, council_id, owner_user_id, address, gps_point geography, lga_zone, land_size_sqm, parcel_geojson, property_type)
@@ -157,12 +166,22 @@ Supporting:
 **Reports — resident** (`/api/reports`)
 - `GET /categories`
 - `POST /`, `GET /`, `GET /:id`
-- `POST /:id/comments`, `POST /:id/subscribe`, `DELETE /:id/subscribe`
+- `GET /:id/events` — paginated history
+- `GET /:id/events/stream` — **SSE live updates** (new events as they arrive)
+- `POST /:id/events` — post a chat `message` (body) or attach files (`attachment_added` follows the presign+PUT flow)
+- `POST /:id/appointments/:appt/confirm` / `POST /:id/appointments/:appt/cancel`
+- `POST /:id/signatures` — provide a requested signature (canvas → PNG → R2)
+- `POST /:id/subscribe`, `DELETE /:id/subscribe`
 - `POST /attachments/presign`
 
 **Reports — staff** (`/api/staff/reports`)
 - `GET /` (filters), `GET /map`, `GET /:id`
-- `PATCH /:id`, `POST /:id/comments`, `POST /:id/merge`
+- `GET /:id/events`, `GET /:id/events/stream` (SSE, includes internal events)
+- `POST /:id/events` — `message` (with `internal` flag), `file_request`, `status_change`, `assignment`, `priority_change`
+- `POST /:id/appointments` — propose a slot
+- `POST /:id/signature-requests` — request resident sign off
+- `PATCH /:id` (shortcut for status/assignee/priority — emits the matching events)
+- `POST /:id/merge` — mark as duplicate of another report
 - `GET /queues/summary`
 
 **Rates / payments** (`/api/rates`)
@@ -202,7 +221,8 @@ Supporting:
   - **PayPal Smart Checkout (AUD)** — server-side order create + capture, idempotent webhook, signature-verified. Covers cards (Visa/MC/Amex) and PayPal wallet.
   - **BPAY deep-link** — per-account CRN generated, displayed with biller code; resident pays via their bank; reconciled via nightly bank statement import (M6 stub, finalised when first council onboards a real bank feed).
   - **Payment plans** — modelled in DB; instalments billed via PayPal subscriptions where the resident opts in, otherwise via scheduled reminders + manual pay.
-- **Offline queue**: Dexie stores pending reports + blobs. Service worker `sync` flushes when online (re-presign, upload to R2, post report). "Queued" badge in UI.
+- **Real-time (shared workspace)**: **Server-Sent Events** over FastAPI for `/reports/:id/events/stream` and `/staff/reports/:id/events/stream`. Redis pub/sub channel per report (`report:{id}:events`) fans out across workers. Reconnect with `Last-Event-ID`; falls back to 10s poll if `EventSource` unavailable. Websockets reserved for a later "staff team chat" feature if needed.
+- **Offline queue**: Dexie stores pending reports, chat messages, and attachment blobs. Service worker `sync` flushes when online (re-presign, upload to R2, post event). "Queued" badge in UI; messages show a clock icon until acknowledged by the server.
 - **Geo**: PostGIS for spatial queries (reports near me, in ward). GiST index on `report.location_point`.
 - **Rate limiting**: Render-level + FastAPI slowapi on auth and report-create.
 - **Privacy / AU compliance (v1)**:
@@ -276,7 +296,9 @@ The modelling work in current `models.py` is used as a **reference** for shaping
 
 **M2 — Auth, multi-tenancy, SSO (M/L)** — `council`, `ward`, `user`, `sso_identity`, `tenant_sso_config` tables; subdomain-based tenant resolution; resident magic-link + password; **staff/admin OIDC SSO via Microsoft Entra ID + Google Workspace**; TOTP MFA fallback; Auth.js wiring; session cookies; `/auth/me`; role guards; staff invite flow; per-tenant SSO config admin screen. **Deliverable**: residents sign up + log in; staff log in via Microsoft/Google; tenant isolation enforced.
 
-**M3 — Reports core (resident submit + staff inbox + teams) (L)** — `report*` tables, `staff_team`, `staff_team_member`, PostGIS, R2 presigned uploads, resident submit flow (multi-step PWA with camera + geo), resident list/detail, staff inbox + triage, **team-based routing** (auto-route by category → default team), assignment, status events timeline, internal vs public comments, email notifications. **Deliverable**: end-to-end report flow with photo + geo; staff triage and team queues; resident sees status changes.
+**M3 — Reports core + shared workspace (resident + staff coordinated) (XL)** — `report*` tables including the unified `report_event` timeline, `staff_team`, `staff_team_member`, PostGIS, R2 presigned uploads, resident submit flow (multi-step PWA with camera + geo), resident list/detail with **live event timeline (SSE)**, **chat messages** (resident ↔ assigned staff), **file requests** (staff asks resident for more photos, resident attaches), staff inbox + triage, **team-based routing** (auto-route by category → default team), assignment, internal vs public events, email + push notifications on each new event. **Deliverable**: a report is a shared workspace — resident files it; staff triage, message, ask for files, change status; resident sees everything live; both sides get pinged on every update.
+
+**M3.5 — Appointments + completion signatures (M)** — `report_appointment` + `report_signature` tables, staff "propose a visit" UX with slot picker, resident confirm/decline + add to calendar (.ics), staff "request resident sign-off" on completion with on-device signature pad → PNG → R2, resident e-sign acknowledgement on closure, full appointment + signature events surfaced in the timeline. **Deliverable**: in-app scheduling and proof-of-completion built into the report workspace.
 
 **M4 — PWA, offline queue, web push (M)** — Serwist service worker, install prompt, manifest, Dexie offline queue + background sync, Web Push VAPID + device registration + fan-out worker, notification prefs UI. **Deliverable**: installable app, offline drafts, push status updates.
 

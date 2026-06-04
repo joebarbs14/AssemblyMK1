@@ -143,8 +143,157 @@ component has visible focus, keyboard support, and an ARIA story.
 - Form errors are announced via `aria-live=polite` and tied to inputs
   with `aria-describedby`.
 
+## Staff Console
+
+The staff console shares **tokens, fonts, and components** with the
+resident app but inverts the priorities: information density, keyboard
+flow, and SLA awareness over hand-holding. It's desktop-first; tablets
+get a split layout; phone gets a single-pane sheet (staff occasionally
+triage from a phone, especially field crews).
+
+### Layout (desktop ≥1280px)
+
+Three columns:
+
+1. **Side rail** (220px) — saved channels:
+   - My queue (assigned to me)
+   - My team's queue
+   - All open (council-wide)
+   - SLA at risk (&lt; 25% time left)
+   - Awaiting resident
+   - By category (collapsible)
+   - Drafts + scheduled (announcements)
+2. **List pane** (380–520px, resizable) — virtualised table; row =
+   priority chip + title + category + ward + age + SLA badge + assignee
+   avatar. Row height 40px default; toolbar toggle to 32px compact (up
+   to 200 rows on a 14" screen).
+3. **Detail pane** (fills the rest) — the report **workspace** (next section).
+
+Tablet (768–1280): list + detail, side rail collapses to icons.
+Phone (&lt;768): single pane, list ↔ detail navigation via push transitions.
+
+### Density &amp; tokens
+
+- Base type drops one step: body `0.875rem`, captions `0.6875rem`.
+- Spacing scale skips `1.25` — use `1` or `1.5`. Tables use `0.5` row
+  padding in compact mode.
+- Card radius drops to `md` (10px); table rows are `sm` (6px) on hover.
+- Brand accent used **only** for primary buttons, the active row, focus
+  rings, and SLA-green badges. Everything else is neutral.
+
+### Keyboard (gov-grade speed)
+
+| Key | Action |
+| --- | --- |
+| `j` / `k` | Move list selection down / up |
+| `o` / `Enter` | Open selected report in detail pane |
+| `a` | Assign… (focus user picker) |
+| `t` | Change team |
+| `s` | Change status |
+| `p` | Change priority |
+| `i` | Toggle internal-only on the composer |
+| `e` | Expand detail to full width |
+| `⌘/Ctrl + Enter` | Send the composer |
+| `[` / `]` | Previous / next report in list |
+| `?` | Shortcut help sheet |
+
+Visible focus rings always — keyboard users are first-class staff.
+
+### SLA visualisation
+
+- Each row carries an SLA badge: time remaining or overdue duration,
+  paired with a colour (green &gt;25%, amber 5–25%, red &lt;5% or breached)
+  AND an icon (clock / clock-3 / alert).
+- Detail header shows a thin progress bar across the SLA window. Once
+  breached, the bar goes solid red and a "Breached" pill appears next
+  to the title.
+- Never colour-only — always icon + text + colour together.
+
+### Bulk actions
+
+- Checkbox column on the list; row select with `x`.
+- Toolbar appears above the list when ≥1 selected: Assign, Change
+  status, Add tag, Merge as duplicates, Send templated message, Export
+  CSV.
+- Confirm sheet before any action affecting ≥10 reports.
+
+## Shared workspace (the report detail pane)
+
+A single screen that both residents and staff see — same data,
+different chrome. This is where coordination happens.
+
+### Common layout
+
+- **Header**: report title, category icon, status pill, priority,
+  SLA chip (staff only), location chip (opens map), assignee avatar.
+- **Timeline** (centre): unified `report_event` stream, newest at
+  bottom, auto-scrolls on new events via SSE. Each event is rendered
+  by its `kind`:
+  - `message` — chat bubble; left-aligned for the other side,
+    right-aligned for you; staff messages show team + role under the
+    name.
+  - `status_change`, `assignment`, `priority_change` — neutral
+    centred "system" rows with an icon.
+  - `attachment_added` — inline thumbnail or doc card.
+  - `file_request` — yellow-tinted card with "Upload now" button on
+    the resident side; staff side shows "Awaiting resident" with a
+    timer.
+  - `appointment_proposed/confirmed/cancelled/completed` — calendar
+    card with date/time, location, Add to calendar button (.ics).
+  - `signature_requested/provided` — signature card; resident side
+    shows the pad inline, staff side shows the captured signature.
+- **Composer** (sticky bottom):
+  - Resident: message input + attach button. One Send action.
+  - Staff: tabbed composer — Message / Request file / Change status /
+    Propose appointment / Request signature. Each tab is a quick
+    form; submitting emits the matching event. An `internal` toggle
+    sits in the corner — internal events never appear on the
+    resident side.
+- **Right column** (staff desktop only): assignment + team picker,
+  category, priority, SLA, tags, original photos grid, location map,
+  resident profile card with link to their property/account.
+
+### Empty / waiting states
+
+- New report (no events yet): timeline shows the original submission
+  card with photos and a "Waiting for council to respond" hint for
+  the resident; staff side shows "Unassigned" with a one-click
+  "Assign to me + acknowledge" button.
+- `awaiting_resident` status: resident side surfaces the open
+  request as a banner at the top of the timeline ("Council is
+  waiting on you — see request below"); staff side shows last-pinged
+  time and a "Nudge resident" button (sends a follow-up push).
+
+### Notifications mapping
+
+| Event kind | Resident push | Resident email | Staff push (assignee) | Staff push (team) |
+| --- | --- | --- | --- | --- |
+| Resident creates report | — | "Got it, report #ABC received" | — | "New report in your team" |
+| Staff message (non-internal) | ✓ | digested if &gt;3/day | — | — |
+| Resident message | — | — | ✓ | — |
+| Status change | ✓ | ✓ | — | — |
+| Assignment to me | — | — | ✓ | — |
+| File request | ✓ | ✓ | — | — |
+| File provided | — | — | ✓ | — |
+| Appointment proposed | ✓ | ✓ + .ics | — | — |
+| Appointment confirmed | ✓ | ✓ + .ics | ✓ | — |
+| Signature requested | ✓ | ✓ | — | — |
+| Signature provided | — | — | ✓ | — |
+
+User preferences override these in `/account/notifications`.
+
+### Mobile staff (field crews)
+
+- Same timeline + composer; tabbed composer collapses to a "Reply"
+  bottom sheet with options.
+- Big "I'm here" geo-stamp button: posts an `appointment_completed`
+  event with current location and a timestamp.
+- Camera-first attach for proof-of-completion.
+
 ## Out of scope (for now)
 
 - Glassmorphism / heavy gradients / neon.
 - Animated mascots, illustrations beyond simple iconography.
 - Per-user theming. Per-tenant only.
+- Staff-to-staff team chat outside a report (deferred until a real
+  ask appears).
