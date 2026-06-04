@@ -1,3 +1,4 @@
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -32,6 +33,20 @@ class Settings(BaseSettings):
     r2_secret_key: str | None = None
     r2_bucket_media: str = "assembly-media-dev"
     r2_public_base: str | None = None  # https://media.assembly.app — for signed GETs
+
+    @field_validator("database_url", mode="before")
+    @classmethod
+    def _normalize_db_url(cls, v: object) -> object:
+        """Render hands us postgresql://...; SQLAlchemy defaults to psycopg2
+        for that scheme. We ship psycopg v3 only, so force the +psycopg
+        dialect. Also handle the legacy postgres:// alias."""
+        if not isinstance(v, str):
+            return v
+        if v.startswith("postgres://"):
+            return "postgresql+psycopg://" + v[len("postgres://") :]
+        if v.startswith("postgresql://"):
+            return "postgresql+psycopg://" + v[len("postgresql://") :]
+        return v
 
 
 settings = Settings()
