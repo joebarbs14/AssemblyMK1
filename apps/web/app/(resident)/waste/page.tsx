@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { api, type WasteRow } from "@/lib/api";
 import { readSessionToken } from "@/lib/session";
@@ -26,9 +27,32 @@ export default async function WastePage() {
       <h1 style={{ fontSize: "1.5rem", fontWeight: 600, margin: "0.75rem 0 0.25rem" }}>
         Waste & bins
       </h1>
-      <p style={{ color: "var(--text-secondary)", margin: "0 0 1.25rem" }}>
+      <p style={{ color: "var(--text-secondary)", margin: "0 0 1rem" }}>
         Council collection schedule. Address-matched routes ship in M12.x.
       </p>
+      <Card
+        style={{
+          marginBottom: "1rem",
+          background: "var(--gold-soft)",
+          border: "1px solid var(--gold)",
+        }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+          <div>
+            <p style={{ margin: 0, fontWeight: 600, color: "var(--gold-deep)" }}>
+              Bin not emptied?
+            </p>
+            <p style={{ margin: "0.125rem 0 0", fontSize: "0.8125rem", color: "var(--text-secondary)" }}>
+              Tell council and we'll get a crew out.
+            </p>
+          </div>
+          <Link href="/reports/new">
+            <Button variant="secondary" size="sm">
+              Report it
+            </Button>
+          </Link>
+        </div>
+      </Card>
 
       {routes.length === 0 ? (
         <Card>

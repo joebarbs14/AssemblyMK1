@@ -6,17 +6,20 @@ become live without ballooning scope.
 """
 from __future__ import annotations
 
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from app.core.db import get_db
 from app.core.deps import get_current_user
 from app.models import (
+    AdoptionApplication,
+    AdoptionStatus,
     Animal,
+    DAStatus,
     DevelopmentApplication,
     Property,
     PropertyOwnership,
@@ -90,6 +93,107 @@ def get_animal(
     )
 
 
+# --- M9.x: Apply to adopt ---
+
+
+class AdoptionApplicationIn(BaseModel):
+    phone: str | None = None
+    has_other_pets: bool = False
+    home_type: str | None = None
+    why_this_animal: str = Field(min_length=10, max_length=2000)
+
+
+class AdoptionApplicationOut(BaseModel):
+    id: int
+    animal_id: int
+    animal_name: str
+    status: str
+    why_this_animal: str
+    has_other_pets: bool
+    home_type: str | None
+    created_at: datetime
+
+
+@router.post(
+    "/animals/{animal_id}/apply",
+    response_model=AdoptionApplicationOut,
+    status_code=201,
+)
+def apply_to_adopt(
+    animal_id: int,
+    body: AdoptionApplicationIn,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> AdoptionApplicationOut:
+    a = db.get(Animal, animal_id)
+    if a is None or a.council_id != user.council_id:
+        raise HTTPException(status_code=404, detail="Animal not found")
+    if a.status != "available":
+        raise HTTPException(
+            status_code=400,
+            detail=f"This animal is no longer available ({a.status})",
+        )
+    # Prevent duplicate pending applications for the same animal.
+    existing = (
+        db.query(AdoptionApplication)
+        .filter(
+            AdoptionApplication.animal_id == a.id,
+            AdoptionApplication.applicant_user_id == user.id,
+            AdoptionApplication.status == AdoptionStatus.pending.value,
+        )
+        .first()
+    )
+    if existing is not None:
+        return AdoptionApplicationOut(
+            id=existing.id, animal_id=a.id, animal_name=a.name,
+            status=existing.status, why_this_animal=existing.why_this_animal,
+            has_other_pets=existing.has_other_pets, home_type=existing.home_type,
+            created_at=existing.created_at,
+        )
+
+    app_row = AdoptionApplication(
+        council_id=user.council_id,
+        animal_id=a.id,
+        applicant_user_id=user.id,
+        phone=body.phone,
+        has_other_pets=body.has_other_pets,
+        home_type=body.home_type,
+        why_this_animal=body.why_this_animal,
+    )
+    db.add(app_row)
+    db.commit()
+    db.refresh(app_row)
+    return AdoptionApplicationOut(
+        id=app_row.id, animal_id=a.id, animal_name=a.name,
+        status=app_row.status, why_this_animal=app_row.why_this_animal,
+        has_other_pets=app_row.has_other_pets, home_type=app_row.home_type,
+        created_at=app_row.created_at,
+    )
+
+
+@router.get("/account/adoption-applications", response_model=list[AdoptionApplicationOut])
+def list_my_applications(
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> list[AdoptionApplicationOut]:
+    rows = (
+        db.query(AdoptionApplication, Animal)
+        .join(Animal, Animal.id == AdoptionApplication.animal_id)
+        .filter(AdoptionApplication.applicant_user_id == user.id)
+        .order_by(AdoptionApplication.created_at.desc())
+        .all()
+    )
+    return [
+        AdoptionApplicationOut(
+            id=app_row.id, animal_id=animal.id, animal_name=animal.name,
+            status=app_row.status, why_this_animal=app_row.why_this_animal,
+            has_other_pets=app_row.has_other_pets, home_type=app_row.home_type,
+            created_at=app_row.created_at,
+        )
+        for (app_row, animal) in rows
+    ]
+
+
 # --- M10 Development applications ---
 
 
@@ -132,6 +236,69 @@ def list_das(
         )
         for d in rows
     ]
+
+
+class DACreateIn(BaseModel):
+    application_type: str = Field(min_length=2, max_length=64)
+    description: str = Field(min_length=10, max_length=4000)
+    estimated_cost_cents: int | None = Field(default=None, ge=0)
+    property_id: int | None = None
+
+
+@router.post("/development", response_model=DAOut, status_code=201)
+def submit_da(
+    body: DACreateIn,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> DAOut:
+    if body.property_id is not None:
+        prop = db.get(Property, body.property_id)
+        if prop is None or prop.council_id != user.council_id:
+            raise HTTPException(status_code=400, detail="Unknown property")
+        own = (
+            db.query(PropertyOwnership)
+            .filter(
+                PropertyOwnership.property_id == prop.id,
+                PropertyOwnership.user_id == user.id,
+            )
+            .first()
+        )
+        if own is None:
+            raise HTTPException(status_code=403, detail="You don't own that property")
+
+    today = date.today()
+    # Generate a DA number: DA-YYYY-XXXX (counted within the council/year).
+    year_count = (
+        db.query(DevelopmentApplication)
+        .filter(
+            DevelopmentApplication.council_id == user.council_id,
+            DevelopmentApplication.submission_date >= date(today.year, 1, 1),
+        )
+        .count()
+    )
+    da_number = f"DA-{today.year}-{(year_count + 1):04d}"
+
+    da = DevelopmentApplication(
+        council_id=user.council_id,
+        applicant_user_id=user.id,
+        property_id=body.property_id,
+        da_number=da_number,
+        application_type=body.application_type,
+        description=body.description,
+        estimated_cost_cents=body.estimated_cost_cents,
+        status=DAStatus.submitted.value,
+        submission_date=today,
+        public=True,
+    )
+    db.add(da)
+    db.commit()
+    db.refresh(da)
+    return DAOut(
+        id=da.id, da_number=da.da_number, application_type=da.application_type,
+        description=da.description, estimated_cost_cents=da.estimated_cost_cents,
+        status=da.status, submission_date=da.submission_date,
+        decision_date=da.decision_date, exhibition_ends_at=da.exhibition_ends_at,
+    )
 
 
 # --- M11 Water consumption ---
