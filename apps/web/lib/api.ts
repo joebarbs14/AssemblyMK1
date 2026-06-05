@@ -218,6 +218,53 @@ export interface PaypalOrder {
   amount_cents: number;
 }
 
+// --- Announcements ---
+
+export interface Announcement {
+  id: number;
+  title: string;
+  body_markdown: string;
+  audience: string;
+  ward_id: number | null;
+  category_id: number | null;
+  status: "draft" | "scheduled" | "published" | "archived";
+  publish_at: string | null;
+  expires_at: string | null;
+  author_name: string | null;
+  created_at: string;
+}
+
+// --- Admin ---
+
+export interface AdminUser {
+  id: number;
+  email: string;
+  name: string | null;
+  role: "resident" | "staff" | "admin";
+  status: "invited" | "active" | "disabled";
+}
+
+export interface AdminCategory {
+  id: number;
+  key: string;
+  label: string;
+  icon: string | null;
+  sla_hours: number;
+  requires_photo: boolean;
+  is_active: boolean;
+}
+
+export interface AuditEntry {
+  id: number;
+  actor_user_id: number | null;
+  actor_name: string | null;
+  action: string;
+  target_type: string | null;
+  target_id: string | null;
+  ip_address: string | null;
+  created_at: string;
+}
+
 export interface PaymentRecord {
   id: number;
   amount_cents: number;

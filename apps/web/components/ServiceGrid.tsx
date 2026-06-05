@@ -62,8 +62,8 @@ const SERVICES: Service[] = [
   {
     key: "community",
     label: "Community",
-    href: "/coming-soon?module=community",
-    available: false,
+    href: "/announcements",
+    available: true,
     description: "News & announcements",
     icon: <IconMegaphone />,
   },

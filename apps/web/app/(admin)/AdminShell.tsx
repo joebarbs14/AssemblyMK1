@@ -3,9 +3,9 @@ import * as React from "react";
 
 import type { Me } from "@/lib/api";
 
-type Tab = "dashboard" | "inbox";
+type Tab = "users" | "categories" | "audit";
 
-export function StaffShell({
+export function AdminShell({
   me,
   active,
   children,
@@ -39,28 +39,17 @@ export function StaffShell({
             fontSize: "0.75rem",
             textTransform: "uppercase",
             letterSpacing: "0.06em",
-            color: "var(--text-secondary)",
+            color: "var(--gold-deep)",
+            fontWeight: 700,
           }}
         >
-          {me.council.name}
+          {me.council.name} · Admin
         </p>
-        <NavItem href="/staff" label="Triage" active={active === "dashboard"} />
-        <NavItem href="/staff/inbox" label="Inbox" active={active === "inbox"} />
-        <NavItem href="/staff/announcements" label="Announcements" active={false} />
-        {(me.role === "admin") && (
-          <NavItem href="/admin/users" label="Admin" active={false} />
-        )}
+        <Item href="/admin/users" label="Users" active={active === "users"} />
+        <Item href="/admin/categories" label="Report categories" active={active === "categories"} />
+        <Item href="/admin/audit" label="Audit log" active={active === "audit"} />
         <div style={{ flex: 1 }} />
-        <p
-          style={{
-            margin: "0 0.5rem",
-            fontSize: "0.8125rem",
-            color: "var(--text-secondary)",
-          }}
-        >
-          {me.name ?? me.email}
-        </p>
-        <NavItem href="/account" label="My account" active={false} />
+        <Item href="/staff" label="← Back to staff" active={false} />
       </aside>
 
       <main style={{ padding: "1.25rem 1.5rem 4rem", maxWidth: 1100, width: "100%" }}>
@@ -70,7 +59,7 @@ export function StaffShell({
   );
 }
 
-function NavItem({ href, label, active }: { href: string; label: string; active: boolean }) {
+function Item({ href, label, active }: { href: string; label: string; active: boolean }) {
   return (
     <Link
       href={href}

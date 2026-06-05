@@ -1,4 +1,10 @@
 from app.models.auth_token import MagicLinkUse
+from app.models.comms import (
+    Announcement,
+    AnnouncementAudience,
+    AnnouncementStatus,
+    AuditEvent,
+)
 from app.models.council import Council, Ward
 from app.models.payment import (
     Payment,
@@ -37,6 +43,10 @@ from app.models.team import StaffTeam, StaffTeamMember
 from app.models.user import SsoIdentity, TenantSsoConfig, User, UserRole, UserStatus
 
 __all__ = [
+    "Announcement",
+    "AnnouncementAudience",
+    "AnnouncementStatus",
+    "AuditEvent",
     "BillingSetting",
     "BpayCrn",
     "Concession",
