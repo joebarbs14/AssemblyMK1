@@ -12,6 +12,7 @@ from app.routers import (
     announcements,
     appointments,
     auth,
+    council_ops,
     dev_uploads,
     devices,
     health,
@@ -54,6 +55,8 @@ app.include_router(devices.router, prefix="/api")
 app.include_router(v1x.router, prefix="/api")
 app.include_router(v2_features.router, prefix="/api")
 app.include_router(v2_features.public_router, prefix="/api")
+app.include_router(council_ops.router, prefix="/api")
+app.include_router(council_ops.public_router, prefix="/api")
 app.include_router(dev_uploads.router, prefix="/api")
 
 

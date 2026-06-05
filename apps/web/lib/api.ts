@@ -386,6 +386,102 @@ export interface ClimateMetricRow {
   period_end: string;
 }
 
+export interface BinLookupResult {
+  matched_address: string | null;
+  route_name: string | null;
+  collection_day: string | null;
+  frequency: string | null;
+  next_collection: string | null;
+  bin_colours_tomorrow: string[];
+}
+
+export interface PetRegistrationRow {
+  id: number;
+  species: string;
+  name: string;
+  breed: string | null;
+  registration_number: string;
+  valid_until: string;
+  annual_fee_cents: number;
+  status: string;
+}
+
+export interface PermitRow {
+  id: number;
+  kind: string;
+  permit_number: string;
+  plate: string | null;
+  holder_name: string;
+  valid_from: string;
+  valid_until: string;
+  qr_payload: string;
+  status: string;
+}
+
+export interface BudgetSliceRow {
+  category: string;
+  label: string;
+  expense_cents: number;
+  prior_year_expense_cents: number | null;
+}
+
+export interface BudgetData {
+  fiscal_year: number;
+  total_expense_cents: number;
+  total_revenue_cents: number;
+  by_category: BudgetSliceRow[];
+}
+
+export interface CapitalProjectRow {
+  id: number;
+  title: string;
+  category: string | null;
+  budget_cents: number;
+  spent_cents: number;
+  status: string;
+  progress_pct: number;
+  expected_completion: string | null;
+}
+
+export interface BusinessRow {
+  id: number;
+  name: string;
+  category: string;
+  description: string | null;
+  phone: string | null;
+  website: string | null;
+  address: string | null;
+  verified: boolean;
+}
+
+export interface CampaignRow {
+  id: number;
+  title: string;
+  blurb: string;
+  target_cents: number;
+  raised_cents: number;
+  progress_pct: number;
+  status: string;
+  closes_at: string | null;
+}
+
+export interface GrantDraftRow {
+  id: number;
+  title: string;
+  grant_name: string | null;
+  draft_markdown: string;
+  provider: string;
+  updated_at: string;
+}
+
+export interface ConcessionRow {
+  id: number;
+  kind: string;
+  status: string;
+  requested_relief: string | null;
+  created_at: string;
+}
+
 export interface ProgramRow {
   id: number;
   title: string;

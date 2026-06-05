@@ -6,6 +6,21 @@ from app.models.comms import (
     AuditEvent,
 )
 from app.models.council import Council, Ward
+from app.models.council_ops import (
+    BudgetCategory,
+    BudgetLine,
+    Business,
+    CapitalProject,
+    CemeteryRecord,
+    ConcessionApplication,
+    ConcessionApplicationStatus,
+    Donation,
+    DonationCampaign,
+    GrantDraft,
+    Permit,
+    PetRegistration,
+    PetSpecies,
+)
 from app.models.device import Device
 from app.models.legacy_modules import (
     AdoptionApplication,
@@ -91,6 +106,19 @@ __all__ = [
     "AppointmentStatus",
     "AuditEvent",
     "BillingSetting",
+    "BudgetCategory",
+    "BudgetLine",
+    "Business",
+    "CapitalProject",
+    "CemeteryRecord",
+    "ConcessionApplication",
+    "ConcessionApplicationStatus",
+    "Donation",
+    "DonationCampaign",
+    "GrantDraft",
+    "Permit",
+    "PetRegistration",
+    "PetSpecies",
     "DAStatus",
     "DevelopmentApplication",
     "ReportAppointment",

@@ -115,6 +115,86 @@ const SERVICES: Service[] = [
     description: "Volunteer & bookings",
     icon: <IconCalendar />,
   },
+  {
+    key: "bin_lookup",
+    label: "Bin lookup",
+    href: "/bin-lookup",
+    available: true,
+    description: "What bin tomorrow?",
+    icon: <IconTrash />,
+  },
+  {
+    key: "pets",
+    label: "Pets",
+    href: "/pets",
+    available: true,
+    description: "Register & renew",
+    icon: <IconPaw />,
+  },
+  {
+    key: "permits",
+    label: "Permits",
+    href: "/permits",
+    available: true,
+    description: "Parking & visitor",
+    icon: <IconBuilding />,
+  },
+  {
+    key: "hardship",
+    label: "Hardship",
+    href: "/hardship",
+    available: true,
+    description: "Pensioner & relief",
+    icon: <IconHeart />,
+  },
+  {
+    key: "budget",
+    label: "Budget",
+    href: "/budget",
+    available: true,
+    description: "Where your rates go",
+    icon: <IconChart />,
+  },
+  {
+    key: "businesses",
+    label: "Businesses",
+    href: "/businesses",
+    available: true,
+    description: "Local trades & shops",
+    icon: <IconShop />,
+  },
+  {
+    key: "donations",
+    label: "Community fund",
+    href: "/donations",
+    available: true,
+    description: "Back local projects",
+    icon: <IconHeart />,
+  },
+  {
+    key: "cemetery",
+    label: "Cemetery",
+    href: "/cemetery",
+    available: true,
+    description: "Plot search",
+    icon: <IconDocument />,
+  },
+  {
+    key: "grants",
+    label: "Grant writer",
+    href: "/grants",
+    available: true,
+    description: "Draft a grant",
+    icon: <IconDocument />,
+  },
+  {
+    key: "calendar",
+    label: "Calendar",
+    href: "/calendar",
+    available: true,
+    description: "Export to iCal",
+    icon: <IconCalendar />,
+  },
 ];
 
 export function ServiceGrid() {
@@ -327,6 +407,32 @@ function IconCalendar() {
       <line x1="3" y1="10" x2="21" y2="10" />
       <line x1="8" y1="3" x2="8" y2="7" />
       <line x1="16" y1="3" x2="16" y2="7" />
+    </IconBase>
+  );
+}
+function IconHeart() {
+  return (
+    <IconBase>
+      <path d="M20.84 4.6a5.5 5.5 0 0 0-7.78 0L12 5.66 10.94 4.6a5.5 5.5 0 0 0-7.78 7.78L12 21l8.84-8.62a5.5 5.5 0 0 0 0-7.78z" />
+    </IconBase>
+  );
+}
+function IconChart() {
+  return (
+    <IconBase>
+      <line x1="4" y1="20" x2="4" y2="10" />
+      <line x1="10" y1="20" x2="10" y2="4" />
+      <line x1="16" y1="20" x2="16" y2="14" />
+      <line x1="22" y1="20" x2="22" y2="8" />
+    </IconBase>
+  );
+}
+function IconShop() {
+  return (
+    <IconBase>
+      <path d="M3 9l1-5h16l1 5" />
+      <path d="M5 9v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9" />
+      <path d="M9 21v-6h6v6" />
     </IconBase>
   );
 }
