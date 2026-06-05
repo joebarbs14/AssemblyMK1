@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { api, type WasteRow } from "@/lib/api";
+import { api, type MyWasteRow, type WasteRow } from "@/lib/api";
 import { readSessionToken } from "@/lib/session";
 
 const TYPE_TONE: Record<string, { bg: string; fg: string }> = {
@@ -16,7 +17,11 @@ export default async function WastePage() {
   const token = await readSessionToken();
   if (!token) redirect("/login");
 
-  const routes = await api<WasteRow[]>("/api/waste", { token });
+  const [routes, mine] = await Promise.all([
+    api<WasteRow[]>("/api/waste", { token }),
+    api<MyWasteRow[]>("/api/waste/mine", { token }).catch(() => [] as MyWasteRow[]),
+  ]);
+  const myRoutes = mine.filter((m) => m.route !== null);
 
   return (
     <main style={{ maxWidth: 760, margin: "0 auto", padding: "1.5rem 1.25rem 6rem" }}>
@@ -26,9 +31,73 @@ export default async function WastePage() {
       <h1 style={{ fontSize: "1.5rem", fontWeight: 600, margin: "0.75rem 0 0.25rem" }}>
         Waste & bins
       </h1>
-      <p style={{ color: "var(--text-secondary)", margin: "0 0 1.25rem" }}>
+      <p style={{ color: "var(--text-secondary)", margin: "0 0 1rem" }}>
         Council collection schedule. Address-matched routes ship in M12.x.
       </p>
+      {myRoutes.length > 0 && (
+        <Card
+          style={{
+            marginBottom: "1rem",
+            background: "var(--brand)",
+            color: "var(--brand-fg)",
+            border: "none",
+            padding: "1.25rem 1.5rem",
+          }}
+        >
+          <p
+            style={{
+              margin: 0,
+              fontSize: "0.6875rem",
+              letterSpacing: "0.06em",
+              textTransform: "uppercase",
+              opacity: 0.8,
+              fontWeight: 600,
+            }}
+          >
+            Your bin nights
+          </p>
+          {myRoutes.map((m) => (
+            <div key={m.property_id} style={{ marginTop: "0.5rem" }}>
+              <p style={{ margin: 0, fontSize: "1.375rem", fontWeight: 700 }}>
+                {m.route?.collection_day} —{" "}
+                {m.route?.next_collection
+                  ? new Date(m.route.next_collection).toLocaleDateString("en-AU", {
+                      day: "numeric",
+                      month: "short",
+                    })
+                  : ""}
+              </p>
+              <p style={{ margin: "2px 0 0", fontSize: "0.875rem", opacity: 0.85 }}>
+                {m.property_address} · {m.route?.collection_type} · {m.route?.frequency}
+              </p>
+            </div>
+          ))}
+        </Card>
+      )}
+
+      <Card
+        style={{
+          marginBottom: "1rem",
+          background: "var(--gold-soft)",
+          border: "1px solid var(--gold)",
+        }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+          <div>
+            <p style={{ margin: 0, fontWeight: 600, color: "var(--gold-deep)" }}>
+              Bin not emptied?
+            </p>
+            <p style={{ margin: "0.125rem 0 0", fontSize: "0.8125rem", color: "var(--text-secondary)" }}>
+              Tell council and we'll get a crew out.
+            </p>
+          </div>
+          <Link href="/reports/new">
+            <Button variant="secondary" size="sm">
+              Report it
+            </Button>
+          </Link>
+        </div>
+      </Card>
 
       {routes.length === 0 ? (
         <Card>

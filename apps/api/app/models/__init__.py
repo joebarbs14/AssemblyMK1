@@ -6,7 +6,10 @@ from app.models.comms import (
     AuditEvent,
 )
 from app.models.council import Council, Ward
+from app.models.device import Device
 from app.models.legacy_modules import (
+    AdoptionApplication,
+    AdoptionStatus,
     Animal,
     AppointmentStatus,
     DAStatus,
@@ -53,6 +56,8 @@ from app.models.team import StaffTeam, StaffTeamMember
 from app.models.user import SsoIdentity, TenantSsoConfig, User, UserRole, UserStatus
 
 __all__ = [
+    "AdoptionApplication",
+    "AdoptionStatus",
     "Animal",
     "Announcement",
     "AnnouncementAudience",
@@ -69,6 +74,7 @@ __all__ = [
     "BpayCrn",
     "Concession",
     "Council",
+    "Device",
     "InvoiceStatus",
     "MagicLinkUse",
     "Payment",

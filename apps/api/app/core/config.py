@@ -40,6 +40,11 @@ class Settings(BaseSettings):
     paypal_client_secret: str | None = None
     paypal_webhook_id: str | None = None
 
+    # Web Push (VAPID)
+    vapid_public_key: str | None = None
+    vapid_private_key: str | None = None
+    vapid_subject: str = "mailto:dev@assembly.local"
+
     @field_validator("database_url", mode="before")
     @classmethod
     def _normalize_db_url(cls, v: object) -> object:

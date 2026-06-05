@@ -13,6 +13,7 @@ from app.routers import (
     appointments,
     auth,
     dev_uploads,
+    devices,
     health,
     payments,
     rates,
@@ -48,6 +49,7 @@ app.include_router(payments.router, prefix="/api")
 app.include_router(payments.webhook_router, prefix="/api")
 app.include_router(admin.router, prefix="/api")
 app.include_router(appointments.router, prefix="/api")
+app.include_router(devices.router, prefix="/api")
 app.include_router(v1x.router, prefix="/api")
 app.include_router(dev_uploads.router, prefix="/api")
 

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Money } from "@/components/ui/Money";
 import { api, type DARow } from "@/lib/api";
@@ -26,9 +27,14 @@ export default async function DevelopmentPage() {
       <Link href="/" style={{ fontSize: "0.875rem", color: "var(--text-secondary)" }}>
         ← Home
       </Link>
-      <h1 style={{ fontSize: "1.5rem", fontWeight: 600, margin: "0.75rem 0 0.25rem" }}>
-        Development applications
-      </h1>
+      <header style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", margin: "0.75rem 0 0.25rem" }}>
+        <h1 style={{ fontSize: "1.5rem", fontWeight: 600, margin: 0 }}>
+          Development applications
+        </h1>
+        <Link href="/development/new">
+          <Button size="sm">+ Submit DA</Button>
+        </Link>
+      </header>
       <p style={{ color: "var(--text-secondary)", margin: "0 0 1.25rem" }}>
         Public register of current and recent applications in your shire.
       </p>

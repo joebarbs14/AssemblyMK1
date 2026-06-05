@@ -1,38 +1,38 @@
-/* Design tokens — Leeton blue, white surfaces, gold accents, black highlights. */
+/* Design tokens — modern navy / off-white / gold. */
 :root {
   /* Surfaces */
-  --surface: #ffffff;
-  --surface-muted: #f4f7fb;
-  --surface-soft: #eaf0fa;
-  --border: #dbe3ee;
-  --border-strong: #b9c5d8;
+  --surface: #fbfbf9;        /* warm off-white */
+  --surface-muted: #f4f4f0;  /* page background */
+  --surface-soft: #ece8da;
+  --border: #e3e0d4;
+  --border-strong: #c8c4b5;
 
   /* Text */
-  --text-primary: #0b1a2b;
-  --text-secondary: #4a5b70;
-  --text-tertiary: #8092a8;
+  --text-primary: #22303c;   /* navy */
+  --text-secondary: #5a6975;
+  --text-tertiary: #8a96a1;
 
-  /* Brand — deep council blue */
-  --brand: #0f3b7a;
-  --brand-deep: #0a2856;
-  --brand-soft: #e8eef9;
-  --brand-fg: #ffffff;
+  /* Brand — slate navy */
+  --brand: #22303c;
+  --brand-deep: #1a242e;
+  --brand-soft: #e7ebef;
+  --brand-fg: #fbfbf9;
 
-  /* Accents */
-  --gold: #c7a55d;
-  --gold-deep: #9b7d3e;
+  /* Accents — warm gold */
+  --gold: #c9a24b;
+  --gold-deep: #9e7e32;
   --gold-soft: #faf3df;
   --black: #0b1220;
 
-  /* Semantic */
+  /* Semantic (kept conventional) */
   --success: #067647;
   --success-soft: #ecfdf3;
   --warning: #b45309;
   --warning-soft: #fff8e6;
   --danger: #b91c1c;
   --danger-soft: #fef2f2;
-  --info: #1e5bba;
-  --info-soft: #eaf2ff;
+  --info: #2c6da8;
+  --info-soft: #e8f0f7;
 
   /* Radius */
   --r-sm: 6px;
@@ -41,7 +41,7 @@
   --r-xl: 20px;
   --r-full: 999px;
 
-  /* Spacing scale (rem) — base 0.25 */
+  /* Spacing scale (rem) */
   --s-1: 0.25rem;
   --s-2: 0.5rem;
   --s-3: 0.75rem;
@@ -53,9 +53,10 @@
   --s-12: 4rem;
 
   /* Elevation */
-  --e1: 0 1px 2px rgba(11, 26, 43, 0.06);
-  --e2: 0 8px 24px rgba(11, 26, 43, 0.12);
-  --e-brand: 0 6px 16px rgba(15, 59, 122, 0.18);
+  --e1: 0 1px 2px rgba(34, 48, 60, 0.06);
+  --e2: 0 8px 24px rgba(34, 48, 60, 0.12);
+  --e-brand: 0 6px 16px rgba(34, 48, 60, 0.18);
+  --e-gold: 0 4px 14px rgba(201, 162, 75, 0.22);
 
   /* Motion */
   --d-micro: 120ms;
@@ -69,18 +70,18 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --surface: #0b1730;
-    --surface-muted: #060f22;
-    --surface-soft: #1c2e52;
-    --border: #1c2e52;
-    --border-strong: #2c4374;
-    --text-primary: #e7eef9;
-    --text-secondary: #93a4be;
+    --surface: #1a242e;
+    --surface-muted: #141c24;
+    --surface-soft: #2d3a47;
+    --border: #2d3a47;
+    --border-strong: #44525f;
+    --text-primary: #fbfbf9;
+    --text-secondary: #98a2b3;
     --text-tertiary: #6c7e98;
-    --brand: #4d7fd9;
-    --brand-deep: #2f5fb1;
-    --brand-soft: #142447;
-    --brand-fg: #051b35;
+    --brand: #d1d8df;        /* off-white as accent in dark mode */
+    --brand-deep: #98a2b3;
+    --brand-soft: #2d3a47;
+    --brand-fg: #1a242e;
     --gold: #d4b66b;
     --gold-deep: #b89849;
     --gold-soft: #2a2415;
@@ -90,8 +91,8 @@
     --warning-soft: #2a2010;
     --danger: #ef4444;
     --danger-soft: #2a1313;
-    --info: #5b8df0;
-    --info-soft: #14233f;
+    --info: #6ba0d6;
+    --info-soft: #1a2a3d;
   }
 }
 

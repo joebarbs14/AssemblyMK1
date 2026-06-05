@@ -6,6 +6,8 @@ import { Card } from "@/components/ui/Card";
 import { api, type AnimalListItem } from "@/lib/api";
 import { readSessionToken } from "@/lib/session";
 
+import { AdoptionForm } from "./AdoptionForm";
+
 export default async function AnimalDetail({
   params,
 }: {
@@ -69,11 +71,8 @@ export default async function AnimalDetail({
             </p>
           )}
 
-          <div style={{ marginTop: "1.5rem", display: "flex", gap: 8 }}>
-            <Button disabled>Apply to adopt (M9.x)</Button>
-            <Link href="/animals">
-              <Button variant="secondary">Back</Button>
-            </Link>
+          <div style={{ marginTop: "1.5rem" }}>
+            <AdoptionForm animalId={a.id} animalName={a.name} token={token} />
           </div>
         </div>
       </Card>

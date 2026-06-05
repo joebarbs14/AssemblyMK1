@@ -180,3 +180,38 @@ class ReportSignature(Base):
     )
     ip_address: Mapped[str | None] = mapped_column(String(64))
     user_agent: Mapped[str | None] = mapped_column(String(255))
+
+
+# --- M9.x: Adoption applications ---
+
+
+class AdoptionStatus(enum.StrEnum):
+    pending = "pending"
+    approved = "approved"
+    rejected = "rejected"
+    withdrawn = "withdrawn"
+
+
+class AdoptionApplication(Base):
+    __tablename__ = "adoption_application"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    council_id: Mapped[int] = mapped_column(
+        ForeignKey("council.id", ondelete="CASCADE"), index=True, nullable=False
+    )
+    animal_id: Mapped[int] = mapped_column(
+        ForeignKey("animal.id", ondelete="CASCADE"), index=True, nullable=False
+    )
+    applicant_user_id: Mapped[int] = mapped_column(
+        ForeignKey("user_account.id", ondelete="CASCADE"), index=True, nullable=False
+    )
+    phone: Mapped[str | None] = mapped_column(String(32))
+    has_other_pets: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    home_type: Mapped[str | None] = mapped_column(String(32))  # house|apartment|other
+    why_this_animal: Mapped[str] = mapped_column(Text, nullable=False)
+    status: Mapped[str] = mapped_column(
+        String(16), default=AdoptionStatus.pending.value, nullable=False, index=True
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False
+    )

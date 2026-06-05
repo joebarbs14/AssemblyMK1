@@ -6,17 +6,20 @@ become live without ballooning scope.
 """
 from __future__ import annotations
 
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from app.core.db import get_db
 from app.core.deps import get_current_user
 from app.models import (
+    AdoptionApplication,
+    AdoptionStatus,
     Animal,
+    DAStatus,
     DevelopmentApplication,
     Property,
     PropertyOwnership,
@@ -24,6 +27,7 @@ from app.models import (
     WasteCollection,
     WaterConsumption,
 )
+from app.services import r2
 
 router = APIRouter(tags=["v1x"])
 
@@ -67,7 +71,7 @@ def list_animals(
             age_years=a.age_years,
             temperament=a.temperament,
             status=a.status,
-            photo_url=None,  # R2 presign in M9.x once real photos exist
+            photo_url=r2.presign_get(a.main_photo_r2_key) if a.main_photo_r2_key else None,
             description=a.description,
         )
         for a in rows
@@ -86,8 +90,110 @@ def get_animal(
     return AnimalOut(
         id=a.id, name=a.name, species=a.species, breed=a.breed, sex=a.sex,
         age_years=a.age_years, temperament=a.temperament, status=a.status,
-        photo_url=None, description=a.description,
+        photo_url=r2.presign_get(a.main_photo_r2_key) if a.main_photo_r2_key else None,
+        description=a.description,
     )
+
+
+# --- M9.x: Apply to adopt ---
+
+
+class AdoptionApplicationIn(BaseModel):
+    phone: str | None = None
+    has_other_pets: bool = False
+    home_type: str | None = None
+    why_this_animal: str = Field(min_length=10, max_length=2000)
+
+
+class AdoptionApplicationOut(BaseModel):
+    id: int
+    animal_id: int
+    animal_name: str
+    status: str
+    why_this_animal: str
+    has_other_pets: bool
+    home_type: str | None
+    created_at: datetime
+
+
+@router.post(
+    "/animals/{animal_id}/apply",
+    response_model=AdoptionApplicationOut,
+    status_code=201,
+)
+def apply_to_adopt(
+    animal_id: int,
+    body: AdoptionApplicationIn,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> AdoptionApplicationOut:
+    a = db.get(Animal, animal_id)
+    if a is None or a.council_id != user.council_id:
+        raise HTTPException(status_code=404, detail="Animal not found")
+    if a.status != "available":
+        raise HTTPException(
+            status_code=400,
+            detail=f"This animal is no longer available ({a.status})",
+        )
+    # Prevent duplicate pending applications for the same animal.
+    existing = (
+        db.query(AdoptionApplication)
+        .filter(
+            AdoptionApplication.animal_id == a.id,
+            AdoptionApplication.applicant_user_id == user.id,
+            AdoptionApplication.status == AdoptionStatus.pending.value,
+        )
+        .first()
+    )
+    if existing is not None:
+        return AdoptionApplicationOut(
+            id=existing.id, animal_id=a.id, animal_name=a.name,
+            status=existing.status, why_this_animal=existing.why_this_animal,
+            has_other_pets=existing.has_other_pets, home_type=existing.home_type,
+            created_at=existing.created_at,
+        )
+
+    app_row = AdoptionApplication(
+        council_id=user.council_id,
+        animal_id=a.id,
+        applicant_user_id=user.id,
+        phone=body.phone,
+        has_other_pets=body.has_other_pets,
+        home_type=body.home_type,
+        why_this_animal=body.why_this_animal,
+    )
+    db.add(app_row)
+    db.commit()
+    db.refresh(app_row)
+    return AdoptionApplicationOut(
+        id=app_row.id, animal_id=a.id, animal_name=a.name,
+        status=app_row.status, why_this_animal=app_row.why_this_animal,
+        has_other_pets=app_row.has_other_pets, home_type=app_row.home_type,
+        created_at=app_row.created_at,
+    )
+
+
+@router.get("/account/adoption-applications", response_model=list[AdoptionApplicationOut])
+def list_my_applications(
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> list[AdoptionApplicationOut]:
+    rows = (
+        db.query(AdoptionApplication, Animal)
+        .join(Animal, Animal.id == AdoptionApplication.animal_id)
+        .filter(AdoptionApplication.applicant_user_id == user.id)
+        .order_by(AdoptionApplication.created_at.desc())
+        .all()
+    )
+    return [
+        AdoptionApplicationOut(
+            id=app_row.id, animal_id=animal.id, animal_name=animal.name,
+            status=app_row.status, why_this_animal=app_row.why_this_animal,
+            has_other_pets=app_row.has_other_pets, home_type=app_row.home_type,
+            created_at=app_row.created_at,
+        )
+        for (app_row, animal) in rows
+    ]
 
 
 # --- M10 Development applications ---
@@ -132,6 +238,69 @@ def list_das(
         )
         for d in rows
     ]
+
+
+class DACreateIn(BaseModel):
+    application_type: str = Field(min_length=2, max_length=64)
+    description: str = Field(min_length=10, max_length=4000)
+    estimated_cost_cents: int | None = Field(default=None, ge=0)
+    property_id: int | None = None
+
+
+@router.post("/development", response_model=DAOut, status_code=201)
+def submit_da(
+    body: DACreateIn,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> DAOut:
+    if body.property_id is not None:
+        prop = db.get(Property, body.property_id)
+        if prop is None or prop.council_id != user.council_id:
+            raise HTTPException(status_code=400, detail="Unknown property")
+        own = (
+            db.query(PropertyOwnership)
+            .filter(
+                PropertyOwnership.property_id == prop.id,
+                PropertyOwnership.user_id == user.id,
+            )
+            .first()
+        )
+        if own is None:
+            raise HTTPException(status_code=403, detail="You don't own that property")
+
+    today = date.today()
+    # Generate a DA number: DA-YYYY-XXXX (counted within the council/year).
+    year_count = (
+        db.query(DevelopmentApplication)
+        .filter(
+            DevelopmentApplication.council_id == user.council_id,
+            DevelopmentApplication.submission_date >= date(today.year, 1, 1),
+        )
+        .count()
+    )
+    da_number = f"DA-{today.year}-{(year_count + 1):04d}"
+
+    da = DevelopmentApplication(
+        council_id=user.council_id,
+        applicant_user_id=user.id,
+        property_id=body.property_id,
+        da_number=da_number,
+        application_type=body.application_type,
+        description=body.description,
+        estimated_cost_cents=body.estimated_cost_cents,
+        status=DAStatus.submitted.value,
+        submission_date=today,
+        public=True,
+    )
+    db.add(da)
+    db.commit()
+    db.refresh(da)
+    return DAOut(
+        id=da.id, da_number=da.da_number, application_type=da.application_type,
+        description=da.description, estimated_cost_cents=da.estimated_cost_cents,
+        status=da.status, submission_date=da.submission_date,
+        decision_date=da.decision_date, exhibition_ends_at=da.exhibition_ends_at,
+    )
 
 
 # --- M11 Water consumption ---
@@ -219,6 +388,54 @@ def list_waste(
     ]
 
 
+class MyWasteRow(BaseModel):
+    property_id: int
+    property_address: str
+    route: WasteRow | None
+
+
+@router.get("/waste/mine", response_model=list[MyWasteRow])
+def my_waste(
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> list[MyWasteRow]:
+    """Per-property bin schedule for the resident's properties."""
+    props = (
+        db.query(Property)
+        .join(PropertyOwnership, PropertyOwnership.property_id == Property.id)
+        .filter(
+            PropertyOwnership.user_id == user.id,
+            Property.council_id == user.council_id,
+        )
+        .all()
+    )
+    out: list[MyWasteRow] = []
+    for p in props:
+        route_obj = (
+            db.get(WasteCollection, p.waste_route_id) if p.waste_route_id else None
+        )
+        out.append(
+            MyWasteRow(
+                property_id=p.id,
+                property_address=p.address,
+                route=(
+                    WasteRow(
+                        id=route_obj.id,
+                        name=route_obj.name,
+                        collection_type=route_obj.collection_type,
+                        collection_day=route_obj.collection_day,
+                        frequency=route_obj.frequency,
+                        next_collection=route_obj.next_collection,
+                        notes=route_obj.notes,
+                    )
+                    if route_obj
+                    else None
+                ),
+            )
+        )
+    return out
+
+
 # --- Seed extension for the demo property ---
 
 
@@ -248,17 +465,27 @@ def seed_demo_extras(db: Session, *, council_id: int, property_id: int) -> dict[
             ("Tuesday recycling", "recycling", "Tue", "fortnightly"),
             ("Friday green waste", "green", "Fri", "fortnightly"),
         ]
+        first_id: int | None = None
         for name, kind, day, freq in seeds:
-            next_col = today + timedelta(days=(1 - today.weekday()) % 7)  # next Tue-ish
-            db.add(WasteCollection(
+            next_col = today + timedelta(days=(1 - today.weekday()) % 7)
+            w = WasteCollection(
                 council_id=council_id,
                 name=name,
                 collection_type=kind,
                 collection_day=day,
                 frequency=freq,
                 next_collection=next_col,
-            ))
+            )
+            db.add(w)
+            db.flush()
+            first_id = first_id or w.id
             counts["waste"] += 1
+        # Link the demo property to the general route so the resident's
+        # /waste view shows 'Your bin night is Tuesday' instead of just a
+        # list of all routes.
+        prop = db.get(Property, property_id)
+        if prop is not None and first_id is not None and prop.waste_route_id is None:
+            prop.waste_route_id = first_id
 
     if not db.query(Animal).filter(Animal.council_id == council_id).first():
         animals_data = [

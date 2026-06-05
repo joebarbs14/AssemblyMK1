@@ -15,14 +15,14 @@ const STATUS_LABEL: Record<ReportStatus, string> = {
 };
 
 const STATUS_COLOURS: Record<ReportStatus, { bg: string; fg: string }> = {
-  new: { bg: "#eaf2ff", fg: "#1e5bba" },
-  triaging: { bg: "#eaf2ff", fg: "#1e5bba" },
-  assigned: { bg: "#e8eef9", fg: "#0f3b7a" },
-  in_progress: { bg: "#faf3df", fg: "#9b7d3e" },
-  awaiting_resident: { bg: "#faf3df", fg: "#9b7d3e" },
+  new: { bg: "#e8f0f7", fg: "#2c6da8" },
+  triaging: { bg: "#e8f0f7", fg: "#2c6da8" },
+  assigned: { bg: "#e7ebef", fg: "#22303c" },
+  in_progress: { bg: "#faf3df", fg: "#9e7e32" },
+  awaiting_resident: { bg: "#faf3df", fg: "#9e7e32" },
   resolved: { bg: "#ecfdf3", fg: "#067647" },
-  closed: { bg: "#f4f7fb", fg: "#4a5b70" },
-  duplicate: { bg: "#f4f7fb", fg: "#4a5b70" },
+  closed: { bg: "#f4f4f0", fg: "#5a6975" },
+  duplicate: { bg: "#f4f4f0", fg: "#5a6975" },
   rejected: { bg: "#fef2f2", fg: "#b91c1c" },
 };
 
