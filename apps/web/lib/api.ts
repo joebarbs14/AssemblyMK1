@@ -496,6 +496,110 @@ export interface ProgramRow {
   spots_remaining: number | null;
 }
 
+// --- v3 features ---
+
+export interface GrantOpportunityRow {
+  id: number;
+  source: string;
+  title: string;
+  description: string;
+  min_amount_cents: number | null;
+  max_amount_cents: number | null;
+  closes_at: string | null;
+  url: string | null;
+  eligibility: string | null;
+}
+
+export interface AssetRow {
+  id: number;
+  kind: string;
+  label: string;
+  qr_payload: string;
+  lat: number | null;
+  lng: number | null;
+  address_text: string | null;
+  status: string;
+  last_inspected_at: string | null;
+}
+
+export interface RoadClosureRow {
+  id: number;
+  title: string;
+  description: string | null;
+  lat_from: number;
+  lng_from: number;
+  lat_to: number | null;
+  lng_to: number | null;
+  starts_at: string;
+  ends_at: string;
+  severity: string;
+  detour: string | null;
+}
+
+export interface VerificationRow {
+  provider: string;
+  status: string;
+  verified_at: string;
+}
+
+export interface PreferencesRow {
+  language: string;
+  high_contrast: boolean;
+  dyslexia_font: boolean;
+  larger_text: boolean;
+  reduced_motion: boolean;
+}
+
+export interface LandHireRow {
+  id: number;
+  name: string;
+  kind: string;
+  description: string | null;
+  capacity: number | null;
+  fee_cents_per_unit: number;
+  fee_unit: string;
+  location: string | null;
+  available: boolean;
+}
+
+export interface SensorRow {
+  id: number;
+  kind: string;
+  source: string;
+  value: number;
+  unit: string;
+  lat: number;
+  lng: number;
+  taken_at: string;
+}
+
+export interface WebhookRow {
+  id: number;
+  url: string;
+  secret: string;
+  event_types: string[];
+  active: boolean;
+  last_status: number | null;
+}
+
+export interface SlaPredictionRow {
+  report_id: number;
+  title: string;
+  category: string;
+  status: string;
+  sla_due_at: string;
+  hours_left: number;
+  risk: string;
+  rationale: string;
+}
+
+export interface DumpingHotspotRow {
+  lat: number;
+  lng: number;
+  incidents: number;
+  prediction: string;
+}
+
 // --- Reports detail (existing) ---
 
 export interface ReportDetail {

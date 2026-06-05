@@ -3,7 +3,7 @@ import * as React from "react";
 
 import type { Me } from "@/lib/api";
 
-type Tab = "users" | "categories" | "audit";
+type Tab = "users" | "categories" | "audit" | "webhooks";
 
 export function AdminShell({
   me,
@@ -48,6 +48,7 @@ export function AdminShell({
         <Item href="/admin/users" label="Users" active={active === "users"} />
         <Item href="/admin/categories" label="Report categories" active={active === "categories"} />
         <Item href="/admin/audit" label="Audit log" active={active === "audit"} />
+        <Item href="/admin/webhooks" label="Webhooks" active={active === "webhooks"} />
         <div style={{ flex: 1 }} />
         <Item href="/staff" label="← Back to staff" active={false} />
       </aside>

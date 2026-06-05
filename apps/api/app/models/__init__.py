@@ -21,6 +21,19 @@ from app.models.council_ops import (
     PetRegistration,
     PetSpecies,
 )
+from app.models.council_v3 import (
+    Asset,
+    AssetKind,
+    GrantOpportunity,
+    IdentityVerification,
+    LandHireBooking,
+    LandHireResource,
+    RoadClosure,
+    SensorReading,
+    UserPreference,
+    WebhookDelivery,
+    WebhookSubscription,
+)
 from app.models.device import Device
 from app.models.legacy_modules import (
     AdoptionApplication,
@@ -104,6 +117,17 @@ __all__ = [
     "AnnouncementAudience",
     "AnnouncementStatus",
     "AppointmentStatus",
+    "Asset",
+    "AssetKind",
+    "GrantOpportunity",
+    "IdentityVerification",
+    "LandHireBooking",
+    "LandHireResource",
+    "RoadClosure",
+    "SensorReading",
+    "UserPreference",
+    "WebhookDelivery",
+    "WebhookSubscription",
     "AuditEvent",
     "BillingSetting",
     "BudgetCategory",

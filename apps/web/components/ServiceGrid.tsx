@@ -195,6 +195,30 @@ const SERVICES: Service[] = [
     description: "Export to iCal",
     icon: <IconCalendar />,
   },
+  {
+    key: "road_closures",
+    label: "Road closures",
+    href: "/road-closures",
+    available: true,
+    description: "Works & detours",
+    icon: <IconRoad />,
+  },
+  {
+    key: "land_hire",
+    label: "Land & venue hire",
+    href: "/land-hire",
+    available: true,
+    description: "Halls, ovals, BBQ",
+    icon: <IconBuilding />,
+  },
+  {
+    key: "sensors",
+    label: "Sensors",
+    href: "/sensors",
+    available: true,
+    description: "Air, noise, water",
+    icon: <IconLeaf />,
+  },
 ];
 
 export function ServiceGrid() {

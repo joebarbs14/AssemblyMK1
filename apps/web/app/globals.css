@@ -140,3 +140,40 @@ a:hover {
 .tnum {
   font-variant-numeric: tabular-nums;
 }
+
+/* --- Accessibility opt-ins (toggled via user preferences) --- */
+
+html.a11y-high-contrast {
+  --text-primary: #000;
+  --text-secondary: #1a1a1a;
+  --surface: #fff;
+  --surface-muted: #f0f0f0;
+  --border: #000;
+  --brand: #000080;
+  --brand-fg: #fff;
+}
+html.a11y-high-contrast a {
+  text-decoration: underline;
+}
+
+html.a11y-dyslexia,
+html.a11y-dyslexia body {
+  font-family: "OpenDyslexic", "Comic Sans MS", "Verdana", system-ui, sans-serif;
+  letter-spacing: 0.02em;
+  word-spacing: 0.08em;
+}
+
+html.a11y-larger-text {
+  font-size: 18px;
+}
+html.a11y-larger-text body {
+  line-height: 1.6;
+}
+
+html.a11y-reduced-motion *,
+html.a11y-reduced-motion *::before,
+html.a11y-reduced-motion *::after {
+  animation-duration: 0.001ms !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
