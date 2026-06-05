@@ -7,6 +7,7 @@ import { api, type Me } from "@/lib/api";
 import { readSessionToken } from "@/lib/session";
 
 import { LogoutButton } from "./LogoutButton";
+import { NotificationsToggle } from "./NotificationsToggle";
 
 export default async function AccountPage() {
   const token = await readSessionToken();
@@ -25,6 +26,14 @@ export default async function AccountPage() {
         ← Home
       </Link>
       <h1 style={{ fontSize: "1.5rem", fontWeight: 600, margin: "0.75rem 0 1.25rem" }}>My account</h1>
+
+      <Card style={{ marginBottom: "1rem" }}>
+        <h2 style={{ marginTop: 0, fontSize: "1rem", fontWeight: 600 }}>Notifications</h2>
+        <p style={{ color: "var(--text-secondary)", margin: "0 0 0.75rem", fontSize: "0.875rem" }}>
+          Get a push when council replies on your reports.
+        </p>
+        <NotificationsToggle token={token} />
+      </Card>
 
       <Card>
         <h2 style={{ marginTop: 0, fontSize: "1rem", fontWeight: 600 }}>Profile</h2>

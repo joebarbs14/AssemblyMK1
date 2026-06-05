@@ -27,6 +27,7 @@ from app.models import (
     WasteCollection,
     WaterConsumption,
 )
+from app.services import r2
 
 router = APIRouter(tags=["v1x"])
 
@@ -70,7 +71,7 @@ def list_animals(
             age_years=a.age_years,
             temperament=a.temperament,
             status=a.status,
-            photo_url=None,  # R2 presign in M9.x once real photos exist
+            photo_url=r2.presign_get(a.main_photo_r2_key) if a.main_photo_r2_key else None,
             description=a.description,
         )
         for a in rows
@@ -89,7 +90,8 @@ def get_animal(
     return AnimalOut(
         id=a.id, name=a.name, species=a.species, breed=a.breed, sex=a.sex,
         age_years=a.age_years, temperament=a.temperament, status=a.status,
-        photo_url=None, description=a.description,
+        photo_url=r2.presign_get(a.main_photo_r2_key) if a.main_photo_r2_key else None,
+        description=a.description,
     )
 
 
@@ -386,6 +388,54 @@ def list_waste(
     ]
 
 
+class MyWasteRow(BaseModel):
+    property_id: int
+    property_address: str
+    route: WasteRow | None
+
+
+@router.get("/waste/mine", response_model=list[MyWasteRow])
+def my_waste(
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> list[MyWasteRow]:
+    """Per-property bin schedule for the resident's properties."""
+    props = (
+        db.query(Property)
+        .join(PropertyOwnership, PropertyOwnership.property_id == Property.id)
+        .filter(
+            PropertyOwnership.user_id == user.id,
+            Property.council_id == user.council_id,
+        )
+        .all()
+    )
+    out: list[MyWasteRow] = []
+    for p in props:
+        route_obj = (
+            db.get(WasteCollection, p.waste_route_id) if p.waste_route_id else None
+        )
+        out.append(
+            MyWasteRow(
+                property_id=p.id,
+                property_address=p.address,
+                route=(
+                    WasteRow(
+                        id=route_obj.id,
+                        name=route_obj.name,
+                        collection_type=route_obj.collection_type,
+                        collection_day=route_obj.collection_day,
+                        frequency=route_obj.frequency,
+                        next_collection=route_obj.next_collection,
+                        notes=route_obj.notes,
+                    )
+                    if route_obj
+                    else None
+                ),
+            )
+        )
+    return out
+
+
 # --- Seed extension for the demo property ---
 
 
@@ -415,17 +465,27 @@ def seed_demo_extras(db: Session, *, council_id: int, property_id: int) -> dict[
             ("Tuesday recycling", "recycling", "Tue", "fortnightly"),
             ("Friday green waste", "green", "Fri", "fortnightly"),
         ]
+        first_id: int | None = None
         for name, kind, day, freq in seeds:
-            next_col = today + timedelta(days=(1 - today.weekday()) % 7)  # next Tue-ish
-            db.add(WasteCollection(
+            next_col = today + timedelta(days=(1 - today.weekday()) % 7)
+            w = WasteCollection(
                 council_id=council_id,
                 name=name,
                 collection_type=kind,
                 collection_day=day,
                 frequency=freq,
                 next_collection=next_col,
-            ))
+            )
+            db.add(w)
+            db.flush()
+            first_id = first_id or w.id
             counts["waste"] += 1
+        # Link the demo property to the general route so the resident's
+        # /waste view shows 'Your bin night is Tuesday' instead of just a
+        # list of all routes.
+        prop = db.get(Property, property_id)
+        if prop is not None and first_id is not None and prop.waste_route_id is None:
+            prop.waste_route_id = first_id
 
     if not db.query(Animal).filter(Animal.council_id == council_id).first():
         animals_data = [

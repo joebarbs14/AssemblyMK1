@@ -53,6 +53,9 @@ class Property(Base):
     parcel_geojson: Mapped[dict[str, Any] | None] = mapped_column(JSON)
     land_size_sqm: Mapped[int | None] = mapped_column(Integer)
     zone: Mapped[str | None] = mapped_column(String(32))
+    waste_route_id: Mapped[int | None] = mapped_column(
+        ForeignKey("waste_collection.id", ondelete="SET NULL")
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False
     )

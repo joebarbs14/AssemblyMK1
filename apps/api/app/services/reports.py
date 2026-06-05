@@ -17,7 +17,7 @@ from app.models import (
     StaffTeam,
     User,
 )
-from app.services import events_pubsub
+from app.services import events_pubsub, push
 
 
 def append_event(
@@ -56,7 +56,45 @@ def append_event(
                 "created_at": event.created_at.isoformat() if event.created_at else None,
             },
         )
+        _push_to_reporter_if_applicable(db, report=report, event=event)
     return event
+
+
+def _push_to_reporter_if_applicable(
+    db: Session, *, report: Report, event: ReportEvent
+) -> None:
+    """Best-effort web push to the report's reporter for public events
+    they care about. Silently no-ops if VAPID isn't configured or the
+    actor is the reporter (don't push to yourself)."""
+    if event.internal:
+        return
+    if event.actor_user_id == report.reporter_user_id:
+        return
+    if event.kind not in {
+        "message",
+        "status_change",
+        "file_request",
+        "appointment_proposed",
+        "appointment_completed",
+    }:
+        return
+    reporter = db.get(User, report.reporter_user_id)
+    if reporter is None:
+        return
+    titles = {
+        "message": f"New reply on #{report.id}",
+        "status_change": f"Status update on #{report.id}",
+        "file_request": f"Council needs something from you (#{report.id})",
+        "appointment_proposed": f"Council proposed a time (#{report.id})",
+        "appointment_completed": f"Visit complete (#{report.id})",
+    }
+    push.push_to_user(
+        db,
+        user=reporter,
+        title=titles.get(event.kind, "Update on your report"),
+        body=(event.body or report.title)[:140],
+        url=f"/reports/{report.id}",
+    )
 
 
 def create_report(

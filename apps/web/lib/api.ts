@@ -323,6 +323,12 @@ export interface WasteRow {
   notes: string | null;
 }
 
+export interface MyWasteRow {
+  property_id: number;
+  property_address: string;
+  route: WasteRow | null;
+}
+
 // --- Reports detail (existing) ---
 
 export interface ReportDetail {

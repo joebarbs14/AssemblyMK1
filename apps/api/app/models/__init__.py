@@ -6,6 +6,7 @@ from app.models.comms import (
     AuditEvent,
 )
 from app.models.council import Council, Ward
+from app.models.device import Device
 from app.models.legacy_modules import (
     AdoptionApplication,
     AdoptionStatus,
@@ -73,6 +74,7 @@ __all__ = [
     "BpayCrn",
     "Concession",
     "Council",
+    "Device",
     "InvoiceStatus",
     "MagicLinkUse",
     "Payment",
