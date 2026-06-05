@@ -10,6 +10,7 @@ from app.routers import (
     account,
     admin,
     announcements,
+    appointments,
     auth,
     dev_uploads,
     health,
@@ -17,6 +18,7 @@ from app.routers import (
     rates,
     reports,
     staff_reports,
+    v1x,
 )
 
 if settings.sentry_dsn:
@@ -45,6 +47,8 @@ app.include_router(rates.router, prefix="/api")
 app.include_router(payments.router, prefix="/api")
 app.include_router(payments.webhook_router, prefix="/api")
 app.include_router(admin.router, prefix="/api")
+app.include_router(appointments.router, prefix="/api")
+app.include_router(v1x.router, prefix="/api")
 app.include_router(dev_uploads.router, prefix="/api")
 
 

@@ -6,6 +6,16 @@ from app.models.comms import (
     AuditEvent,
 )
 from app.models.council import Council, Ward
+from app.models.legacy_modules import (
+    Animal,
+    AppointmentStatus,
+    DAStatus,
+    DevelopmentApplication,
+    ReportAppointment,
+    ReportSignature,
+    WasteCollection,
+    WaterConsumption,
+)
 from app.models.payment import (
     Payment,
     PaymentPlan,
@@ -43,11 +53,19 @@ from app.models.team import StaffTeam, StaffTeamMember
 from app.models.user import SsoIdentity, TenantSsoConfig, User, UserRole, UserStatus
 
 __all__ = [
+    "Animal",
     "Announcement",
     "AnnouncementAudience",
     "AnnouncementStatus",
+    "AppointmentStatus",
     "AuditEvent",
     "BillingSetting",
+    "DAStatus",
+    "DevelopmentApplication",
+    "ReportAppointment",
+    "ReportSignature",
+    "WasteCollection",
+    "WaterConsumption",
     "BpayCrn",
     "Concession",
     "Council",

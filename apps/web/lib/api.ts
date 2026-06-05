@@ -277,6 +277,52 @@ export interface PaymentRecord {
   created_at: string;
 }
 
+// --- v1.x modules ---
+
+export interface AnimalListItem {
+  id: number;
+  name: string;
+  species: string;
+  breed: string | null;
+  sex: string | null;
+  age_years: number | null;
+  temperament: string | null;
+  status: string;
+  photo_url: string | null;
+  description: string | null;
+}
+
+export interface DARow {
+  id: number;
+  da_number: string;
+  application_type: string;
+  description: string;
+  estimated_cost_cents: number | null;
+  status: string;
+  submission_date: string;
+  decision_date: string | null;
+  exhibition_ends_at: string | null;
+}
+
+export interface WaterRow {
+  quarter_start: string;
+  quarter_end: string;
+  consumed_litres: number;
+  allocated_litres: number | null;
+  amount_owing_cents: number;
+  bill_due_date: string | null;
+}
+
+export interface WasteRow {
+  id: number;
+  name: string;
+  collection_type: string;
+  collection_day: string;
+  frequency: string;
+  next_collection: string | null;
+  notes: string | null;
+}
+
 // --- Reports detail (existing) ---
 
 export interface ReportDetail {
