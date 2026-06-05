@@ -329,6 +329,77 @@ export interface MyWasteRow {
   route: WasteRow | null;
 }
 
+// --- v2 ideas ---
+
+export interface MapReportRow {
+  id: number;
+  title: string;
+  category_label: string;
+  status: string;
+  lat: number;
+  lng: number;
+}
+
+export interface MeetingAgendaItemRow {
+  id: number;
+  position: number;
+  title: string;
+  description: string | null;
+  outcome: string | null;
+  votes_for: number | null;
+  votes_against: number | null;
+  votes_abstain: number | null;
+}
+
+export interface MeetingRow {
+  id: number;
+  title: string;
+  starts_at: string;
+  duration_minutes: number;
+  location: string | null;
+  agenda_url: string | null;
+  minutes_url: string | null;
+  livestream_url: string | null;
+  status: string;
+  items: MeetingAgendaItemRow[];
+}
+
+export interface CommunityPostRow {
+  id: number;
+  kind: string;
+  title: string;
+  body_markdown: string;
+  event_at: string | null;
+  location_text: string | null;
+  author_name: string | null;
+  status: string;
+  created_at: string;
+}
+
+export interface ClimateMetricRow {
+  key: string;
+  label: string;
+  unit: string;
+  value: number;
+  target: number | null;
+  target_year: number | null;
+  period_end: string;
+}
+
+export interface ProgramRow {
+  id: number;
+  title: string;
+  description: string;
+  kind: string;
+  capacity: number | null;
+  starts_at: string | null;
+  ends_at: string | null;
+  location: string | null;
+  fee_cents: number;
+  bookings_open: boolean;
+  spots_remaining: number | null;
+}
+
 // --- Reports detail (existing) ---
 
 export interface ReportDetail {

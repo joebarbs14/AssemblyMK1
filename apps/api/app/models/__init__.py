@@ -54,12 +54,38 @@ from app.models.report import (
 )
 from app.models.team import StaffTeam, StaffTeamMember
 from app.models.user import SsoIdentity, TenantSsoConfig, User, UserRole, UserStatus
+from app.models.v2_features import (
+    AiTriageHint,
+    ClimateMetric,
+    CommunityPost,
+    CouncilMeeting,
+    DirectDebitAuth,
+    MeetingAgendaItem,
+    MeetingStatus,
+    PostStatus,
+    Program,
+    ProgramBooking,
+    ProgramKind,
+    SmsMessage,
+)
 
 __all__ = [
     "AdoptionApplication",
     "AdoptionStatus",
+    "AiTriageHint",
     "Animal",
     "Announcement",
+    "ClimateMetric",
+    "CommunityPost",
+    "CouncilMeeting",
+    "DirectDebitAuth",
+    "MeetingAgendaItem",
+    "MeetingStatus",
+    "PostStatus",
+    "Program",
+    "ProgramBooking",
+    "ProgramKind",
+    "SmsMessage",
     "AnnouncementAudience",
     "AnnouncementStatus",
     "AppointmentStatus",

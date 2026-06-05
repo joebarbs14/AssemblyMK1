@@ -20,6 +20,7 @@ from app.routers import (
     reports,
     staff_reports,
     v1x,
+    v2_features,
 )
 
 if settings.sentry_dsn:
@@ -51,6 +52,8 @@ app.include_router(admin.router, prefix="/api")
 app.include_router(appointments.router, prefix="/api")
 app.include_router(devices.router, prefix="/api")
 app.include_router(v1x.router, prefix="/api")
+app.include_router(v2_features.router, prefix="/api")
+app.include_router(v2_features.public_router, prefix="/api")
 app.include_router(dev_uploads.router, prefix="/api")
 
 

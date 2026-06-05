@@ -75,6 +75,46 @@ const SERVICES: Service[] = [
     description: "Adoptions & registration",
     icon: <IconPaw />,
   },
+  {
+    key: "map",
+    label: "Map",
+    href: "/map",
+    available: true,
+    description: "Reports near you",
+    icon: <IconMap />,
+  },
+  {
+    key: "noticeboard",
+    label: "Noticeboard",
+    href: "/noticeboard",
+    available: true,
+    description: "Local events & lost found",
+    icon: <IconUsers />,
+  },
+  {
+    key: "meetings",
+    label: "Meetings",
+    href: "/meetings",
+    available: true,
+    description: "Agendas & minutes",
+    icon: <IconGavel />,
+  },
+  {
+    key: "climate",
+    label: "Climate",
+    href: "/climate",
+    available: true,
+    description: "Sustainability targets",
+    icon: <IconLeaf />,
+  },
+  {
+    key: "programs",
+    label: "Programs",
+    href: "/programs",
+    available: true,
+    description: "Volunteer & bookings",
+    icon: <IconCalendar />,
+  },
 ];
 
 export function ServiceGrid() {
@@ -239,6 +279,54 @@ function IconPaw() {
       <circle cx="14" cy="5" r="2" />
       <circle cx="18" cy="9" r="2" />
       <path d="M12 11c-3 0-7 3-7 6a3 3 0 0 0 3 3c1 0 2-1 4-1s3 1 4 1a3 3 0 0 0 3-3c0-3-4-6-7-6z" />
+    </IconBase>
+  );
+}
+function IconMap() {
+  return (
+    <IconBase>
+      <polygon points="1 6 8 3 16 6 23 3 23 18 16 21 8 18 1 21" />
+      <line x1="8" y1="3" x2="8" y2="18" />
+      <line x1="16" y1="6" x2="16" y2="21" />
+    </IconBase>
+  );
+}
+function IconUsers() {
+  return (
+    <IconBase>
+      <circle cx="9" cy="8" r="3" />
+      <circle cx="17" cy="9" r="2" />
+      <path d="M3 21v-1a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v1" />
+      <path d="M16 21v-1a3 3 0 0 1 3-3h1a3 3 0 0 1 3 3v1" />
+    </IconBase>
+  );
+}
+function IconGavel() {
+  return (
+    <IconBase>
+      <path d="M14 4l6 6" />
+      <path d="M11 7l6 6" />
+      <path d="M5 13l6 6" />
+      <path d="M3 21h12" />
+      <line x1="13" y1="2" x2="22" y2="11" />
+    </IconBase>
+  );
+}
+function IconLeaf() {
+  return (
+    <IconBase>
+      <path d="M21 3v6a9 9 0 0 1-9 9H5" />
+      <path d="M5 18c0-5 3-9 8-10" />
+    </IconBase>
+  );
+}
+function IconCalendar() {
+  return (
+    <IconBase>
+      <rect x="3" y="5" width="18" height="16" rx="2" />
+      <line x1="3" y1="10" x2="21" y2="10" />
+      <line x1="8" y1="3" x2="8" y2="7" />
+      <line x1="16" y1="3" x2="16" y2="7" />
     </IconBase>
   );
 }

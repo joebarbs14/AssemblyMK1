@@ -184,6 +184,8 @@ def seed_demo_property_for_user(db: Session, *, council: Council, user: User) ->
 
     # v1.x extras — water quarters, waste routes, animals, DAs. Idempotent.
     from app.routers.v1x import seed_demo_extras  # noqa: PLC0415 (circular guard)
+    from app.routers.v2_features import seed_v2_demo  # noqa: PLC0415
 
     seed_demo_extras(db, council_id=council.id, property_id=prop.id)
+    seed_v2_demo(db, council_id=council.id)
     return prop
