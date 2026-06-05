@@ -1,5 +1,29 @@
 from app.models.auth_token import MagicLinkUse
+from app.models.comms import (
+    Announcement,
+    AnnouncementAudience,
+    AnnouncementStatus,
+    AuditEvent,
+)
 from app.models.council import Council, Ward
+from app.models.legacy_modules import (
+    Animal,
+    AppointmentStatus,
+    DAStatus,
+    DevelopmentApplication,
+    ReportAppointment,
+    ReportSignature,
+    WasteCollection,
+    WaterConsumption,
+)
+from app.models.payment import (
+    Payment,
+    PaymentPlan,
+    PaymentProvider,
+    PaymentStatus,
+    PlanStatus,
+    WebhookEvent,
+)
 from app.models.rates import (
     BillingSetting,
     BpayCrn,
@@ -29,12 +53,29 @@ from app.models.team import StaffTeam, StaffTeamMember
 from app.models.user import SsoIdentity, TenantSsoConfig, User, UserRole, UserStatus
 
 __all__ = [
+    "Animal",
+    "Announcement",
+    "AnnouncementAudience",
+    "AnnouncementStatus",
+    "AppointmentStatus",
+    "AuditEvent",
     "BillingSetting",
+    "DAStatus",
+    "DevelopmentApplication",
+    "ReportAppointment",
+    "ReportSignature",
+    "WasteCollection",
+    "WaterConsumption",
     "BpayCrn",
     "Concession",
     "Council",
     "InvoiceStatus",
     "MagicLinkUse",
+    "Payment",
+    "PaymentPlan",
+    "PaymentProvider",
+    "PaymentStatus",
+    "PlanStatus",
     "Property",
     "PropertyOverlay",
     "PropertyOwnership",
@@ -60,4 +101,5 @@ __all__ = [
     "Valuation",
     "Ward",
     "WasteEntitlement",
+    "WebhookEvent",
 ]

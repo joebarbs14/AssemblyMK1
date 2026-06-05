@@ -4,7 +4,7 @@ import logging
 import secrets
 from datetime import UTC, datetime
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
@@ -12,6 +12,7 @@ from app.core.config import settings
 from app.core.db import get_db
 from app.core.deps import get_current_council, get_current_user
 from app.core.email import send_magic_link
+from app.core.rate_limit import limiter
 from app.core.security import (
     consume_magic_link_token,
     hash_password,
@@ -52,7 +53,9 @@ def _find_user(db: Session, council_id: int, email: str) -> User | None:
 
 
 @router.post("/register", response_model=TokenOut, status_code=status.HTTP_201_CREATED)
+@limiter.limit("10/minute")
 def register(
+    request: Request,
     body: RegisterIn,
     council: Council = Depends(get_current_council),
     db: Session = Depends(get_db),
@@ -79,7 +82,9 @@ def register(
 
 
 @router.post("/password/login", response_model=TokenOut)
+@limiter.limit("5/minute")
 def password_login(
+    request: Request,
     body: PasswordLoginIn,
     council: Council = Depends(get_current_council),
     db: Session = Depends(get_db),
@@ -101,7 +106,9 @@ def password_login(
 
 
 @router.post("/magic-link", status_code=status.HTTP_202_ACCEPTED)
+@limiter.limit("5/minute")
 def request_magic_link(
+    request: Request,
     body: MagicLinkRequestIn,
     council: Council = Depends(get_current_council),
     db: Session = Depends(get_db),
@@ -156,7 +163,14 @@ def me(user: User = Depends(get_current_user), db: Session = Depends(get_db)) ->
         email=user.email,
         name=user.name,
         role=user.role,
-        council=CouncilOut(id=council.id, slug=council.slug, name=council.name, brand_color=council.brand_color),
+        council=CouncilOut(
+            id=council.id,
+            slug=council.slug,
+            name=council.name,
+            brand_color=council.brand_color,
+            logo_url=council.logo_url,
+            shire_name=council.shire_name,
+        ),
     )
 
 

@@ -1,17 +1,38 @@
-/* Design tokens — see DESIGN.md */
+/* Design tokens — Leeton blue, white surfaces, gold accents, black highlights. */
 :root {
-  /* Colour (light) */
+  /* Surfaces */
   --surface: #ffffff;
-  --surface-muted: #f6f7f9;
-  --border: #e4e7ec;
-  --text-primary: #0b1220;
-  --text-secondary: #475467;
-  --brand: #0b3d2e;
+  --surface-muted: #f4f7fb;
+  --surface-soft: #eaf0fa;
+  --border: #dbe3ee;
+  --border-strong: #b9c5d8;
+
+  /* Text */
+  --text-primary: #0b1a2b;
+  --text-secondary: #4a5b70;
+  --text-tertiary: #8092a8;
+
+  /* Brand — deep council blue */
+  --brand: #0f3b7a;
+  --brand-deep: #0a2856;
+  --brand-soft: #e8eef9;
   --brand-fg: #ffffff;
+
+  /* Accents */
+  --gold: #c7a55d;
+  --gold-deep: #9b7d3e;
+  --gold-soft: #faf3df;
+  --black: #0b1220;
+
+  /* Semantic */
   --success: #067647;
-  --warning: #b54708;
-  --danger: #b42318;
-  --info: #175cd3;
+  --success-soft: #ecfdf3;
+  --warning: #b45309;
+  --warning-soft: #fff8e6;
+  --danger: #b91c1c;
+  --danger-soft: #fef2f2;
+  --info: #1e5bba;
+  --info-soft: #eaf2ff;
 
   /* Radius */
   --r-sm: 6px;
@@ -32,8 +53,9 @@
   --s-12: 4rem;
 
   /* Elevation */
-  --e1: 0 1px 2px rgba(16, 24, 40, 0.06);
-  --e2: 0 8px 24px rgba(16, 24, 40, 0.12);
+  --e1: 0 1px 2px rgba(11, 26, 43, 0.06);
+  --e2: 0 8px 24px rgba(11, 26, 43, 0.12);
+  --e-brand: 0 6px 16px rgba(15, 59, 122, 0.18);
 
   /* Motion */
   --d-micro: 120ms;
@@ -47,13 +69,29 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --surface: #0f1419;
-    --surface-muted: #0a0d11;
-    --border: #1f2a37;
-    --text-primary: #f2f4f7;
-    --text-secondary: #98a2b3;
-    --brand: #2db380;
-    --brand-fg: #051912;
+    --surface: #0b1730;
+    --surface-muted: #060f22;
+    --surface-soft: #1c2e52;
+    --border: #1c2e52;
+    --border-strong: #2c4374;
+    --text-primary: #e7eef9;
+    --text-secondary: #93a4be;
+    --text-tertiary: #6c7e98;
+    --brand: #4d7fd9;
+    --brand-deep: #2f5fb1;
+    --brand-soft: #142447;
+    --brand-fg: #051b35;
+    --gold: #d4b66b;
+    --gold-deep: #b89849;
+    --gold-soft: #2a2415;
+    --success: #34c787;
+    --success-soft: #0f2a1e;
+    --warning: #f59e0b;
+    --warning-soft: #2a2010;
+    --danger: #ef4444;
+    --danger-soft: #2a1313;
+    --info: #5b8df0;
+    --info-soft: #14233f;
   }
 }
 
@@ -84,7 +122,7 @@ a:hover {
 }
 
 :focus-visible {
-  outline: 2px solid var(--brand);
+  outline: 2px solid var(--gold);
   outline-offset: 2px;
   border-radius: var(--r-sm);
 }
@@ -98,7 +136,6 @@ a:hover {
   }
 }
 
-/* Tabular figures for money/dates */
 .tnum {
   font-variant-numeric: tabular-nums;
 }

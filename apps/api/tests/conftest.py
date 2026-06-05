@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from app.core.db import Base, get_db
+from app.core.rate_limit import limiter
 from app.core.security import hash_password
 from app.main import app
 from app.models import (
@@ -19,6 +20,10 @@ from app.models import (
     UserRole,
     UserStatus,
 )
+
+# Rate limits would otherwise throttle the test fixture flow (same client IP
+# hits /register, /password/login, /reports in rapid succession).
+limiter.enabled = False
 
 
 @pytest.fixture

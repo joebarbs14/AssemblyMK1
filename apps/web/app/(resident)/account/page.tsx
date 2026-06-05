@@ -20,54 +20,21 @@ export default async function AccountPage() {
   }
 
   return (
-    <main style={{ maxWidth: 720, margin: "0 auto", padding: "2rem 1.5rem" }}>
-      <p
-        style={{
-          fontSize: "0.75rem",
-          letterSpacing: "0.06em",
-          textTransform: "uppercase",
-          color: "var(--text-secondary)",
-          margin: 0,
-        }}
-      >
-        {me.council.name}
-      </p>
-      <h1 style={{ fontSize: "1.75rem", margin: "0.25rem 0 1.5rem", fontWeight: 600 }}>
-        Hi {me.name ?? me.email}
-      </h1>
-
-      <Card style={{ marginBottom: "1rem" }}>
-        <h2 style={{ marginTop: 0, fontSize: "1.125rem" }}>Reports</h2>
-        <p style={{ color: "var(--text-secondary)", margin: "0 0 1rem" }}>
-          Tell council about issues in your area, and follow them to resolution.
-        </p>
-        <div style={{ display: "flex", gap: "0.5rem" }}>
-          <Link href="/reports/new">
-            <Button>Report an issue</Button>
-          </Link>
-          <Link href="/reports">
-            <Button variant="secondary">My reports</Button>
-          </Link>
-        </div>
-      </Card>
-
-      <Card style={{ marginBottom: "1rem" }}>
-        <h2 style={{ marginTop: 0, fontSize: "1.125rem" }}>Rates &amp; properties</h2>
-        <p style={{ color: "var(--text-secondary)", margin: "0 0 1rem" }}>
-          View your rates balance, invoice history, valuations, and BPAY details.
-        </p>
-        <Link href="/rates">
-          <Button>Open rates</Button>
-        </Link>
-      </Card>
+    <main style={{ maxWidth: 560, margin: "0 auto", padding: "1.5rem 1.25rem 6rem" }}>
+      <Link href="/" style={{ fontSize: "0.875rem", color: "var(--text-secondary)" }}>
+        ← Home
+      </Link>
+      <h1 style={{ fontSize: "1.5rem", fontWeight: 600, margin: "0.75rem 0 1.25rem" }}>My account</h1>
 
       <Card>
-        <h2 style={{ marginTop: 0, fontSize: "1.125rem" }}>Account</h2>
+        <h2 style={{ marginTop: 0, fontSize: "1rem", fontWeight: 600 }}>Profile</h2>
         <dl style={{ margin: 0, display: "grid", gridTemplateColumns: "max-content 1fr", gap: "0.5rem 1rem" }}>
+          <dt style={{ color: "var(--text-secondary)" }}>Name</dt>
+          <dd style={{ margin: 0 }}>{me.name ?? "—"}</dd>
           <dt style={{ color: "var(--text-secondary)" }}>Email</dt>
           <dd style={{ margin: 0 }}>{me.email}</dd>
           <dt style={{ color: "var(--text-secondary)" }}>Role</dt>
-          <dd style={{ margin: 0 }}>{me.role}</dd>
+          <dd style={{ margin: 0, textTransform: "capitalize" }}>{me.role}</dd>
           <dt style={{ color: "var(--text-secondary)" }}>Council</dt>
           <dd style={{ margin: 0 }}>{me.council.name}</dd>
         </dl>

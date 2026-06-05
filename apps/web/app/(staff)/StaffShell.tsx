@@ -46,6 +46,10 @@ export function StaffShell({
         </p>
         <NavItem href="/staff" label="Triage" active={active === "dashboard"} />
         <NavItem href="/staff/inbox" label="Inbox" active={active === "inbox"} />
+        <NavItem href="/staff/announcements" label="Announcements" active={false} />
+        {(me.role === "admin") && (
+          <NavItem href="/admin/users" label="Admin" active={false} />
+        )}
         <div style={{ flex: 1 }} />
         <p
           style={{

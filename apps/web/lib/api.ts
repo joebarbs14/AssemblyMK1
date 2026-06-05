@@ -43,7 +43,14 @@ export interface Me {
   email: string;
   name: string | null;
   role: "resident" | "staff" | "admin";
-  council: { id: number; slug: string; name: string; brand_color: string };
+  council: {
+    id: number;
+    slug: string;
+    name: string;
+    brand_color: string;
+    logo_url: string | null;
+    shire_name: string | null;
+  };
 }
 
 export interface TokenOut {
@@ -201,6 +208,119 @@ export interface BpayOut {
   biller_code: string;
   crn: string;
   deep_link: string;
+}
+
+export interface PaypalOrder {
+  order_id: string;
+  approve_url: string;
+  mock: boolean;
+  invoice_id: number;
+  amount_cents: number;
+}
+
+// --- Announcements ---
+
+export interface Announcement {
+  id: number;
+  title: string;
+  body_markdown: string;
+  audience: string;
+  ward_id: number | null;
+  category_id: number | null;
+  status: "draft" | "scheduled" | "published" | "archived";
+  publish_at: string | null;
+  expires_at: string | null;
+  author_name: string | null;
+  created_at: string;
+}
+
+// --- Admin ---
+
+export interface AdminUser {
+  id: number;
+  email: string;
+  name: string | null;
+  role: "resident" | "staff" | "admin";
+  status: "invited" | "active" | "disabled";
+}
+
+export interface AdminCategory {
+  id: number;
+  key: string;
+  label: string;
+  icon: string | null;
+  sla_hours: number;
+  requires_photo: boolean;
+  is_active: boolean;
+}
+
+export interface AuditEntry {
+  id: number;
+  actor_user_id: number | null;
+  actor_name: string | null;
+  action: string;
+  target_type: string | null;
+  target_id: string | null;
+  ip_address: string | null;
+  created_at: string;
+}
+
+export interface PaymentRecord {
+  id: number;
+  amount_cents: number;
+  currency: string;
+  provider: "paypal" | "bpay" | "manual";
+  status: "pending" | "succeeded" | "failed" | "refunded";
+  paid_at: string | null;
+  invoice_id: number | null;
+  crn: string | null;
+  created_at: string;
+}
+
+// --- v1.x modules ---
+
+export interface AnimalListItem {
+  id: number;
+  name: string;
+  species: string;
+  breed: string | null;
+  sex: string | null;
+  age_years: number | null;
+  temperament: string | null;
+  status: string;
+  photo_url: string | null;
+  description: string | null;
+}
+
+export interface DARow {
+  id: number;
+  da_number: string;
+  application_type: string;
+  description: string;
+  estimated_cost_cents: number | null;
+  status: string;
+  submission_date: string;
+  decision_date: string | null;
+  exhibition_ends_at: string | null;
+}
+
+export interface WaterRow {
+  quarter_start: string;
+  quarter_end: string;
+  consumed_litres: number;
+  allocated_litres: number | null;
+  amount_owing_cents: number;
+  bill_due_date: string | null;
+}
+
+export interface WasteRow {
+  id: number;
+  name: string;
+  collection_type: string;
+  collection_day: string;
+  frequency: string;
+  next_collection: string | null;
+  notes: string | null;
 }
 
 // --- Reports detail (existing) ---

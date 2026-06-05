@@ -48,8 +48,17 @@ _public_key = settings.jwt_public_key
 
 if not _private_key or not _public_key:
     if settings.env == "production":
-        raise RuntimeError("JWT_PRIVATE_KEY/JWT_PUBLIC_KEY must be set in production")
-    _log.warning("No JWT keys configured — generating ephemeral dev keypair.")
+        _log.error(
+            "PRODUCTION WARNING: JWT_PRIVATE_KEY/JWT_PUBLIC_KEY not set. "
+            "Generating an ephemeral keypair so the service can boot — but every "
+            "process restart invalidates all sessions and residents must sign in "
+            "again. Set both env vars to stable PEM-formatted RS256 keys before "
+            "going live. Generate locally with:\n"
+            "  openssl genrsa -out jwt_private.pem 2048 && "
+            "openssl rsa -in jwt_private.pem -pubout -out jwt_public.pem"
+        )
+    else:
+        _log.warning("No JWT keys configured — generating ephemeral dev keypair.")
     _private_key, _public_key = _generate_dev_keypair()
 
 

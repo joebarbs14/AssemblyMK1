@@ -15,15 +15,15 @@ const STATUS_LABEL: Record<ReportStatus, string> = {
 };
 
 const STATUS_COLOURS: Record<ReportStatus, { bg: string; fg: string }> = {
-  new: { bg: "#eef4ff", fg: "#175cd3" },
-  triaging: { bg: "#eef4ff", fg: "#175cd3" },
-  assigned: { bg: "#eef4ff", fg: "#175cd3" },
-  in_progress: { bg: "#fff8e6", fg: "#b54708" },
-  awaiting_resident: { bg: "#fff8e6", fg: "#b54708" },
+  new: { bg: "#eaf2ff", fg: "#1e5bba" },
+  triaging: { bg: "#eaf2ff", fg: "#1e5bba" },
+  assigned: { bg: "#e8eef9", fg: "#0f3b7a" },
+  in_progress: { bg: "#faf3df", fg: "#9b7d3e" },
+  awaiting_resident: { bg: "#faf3df", fg: "#9b7d3e" },
   resolved: { bg: "#ecfdf3", fg: "#067647" },
-  closed: { bg: "#f2f4f7", fg: "#475467" },
-  duplicate: { bg: "#f2f4f7", fg: "#475467" },
-  rejected: { bg: "#fee4e2", fg: "#b42318" },
+  closed: { bg: "#f4f7fb", fg: "#4a5b70" },
+  duplicate: { bg: "#f4f7fb", fg: "#4a5b70" },
+  rejected: { bg: "#fef2f2", fg: "#b91c1c" },
 };
 
 export function StatusBadge({ status }: { status: ReportStatus }) {
