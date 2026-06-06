@@ -130,6 +130,16 @@ from app.models.rates import (
     Valuation,
     WasteEntitlement,
 )
+from app.models.rates_ext import (
+    ConcessionClaim,
+    HardshipPlan,
+    InterestCharge,
+    PropertyRateAssignment,
+    RateInstalment,
+    RateLevy,
+    RatesCertificate,
+    ValuationObjection,
+)
 from app.models.report import (
     Report,
     ReportAttachment,
@@ -277,8 +287,16 @@ __all__ = [
     "PropertyOverlay",
     "PropertyOwnership",
     "PropertyType",
+    "ConcessionClaim",
+    "HardshipPlan",
+    "InterestCharge",
+    "PropertyRateAssignment",
     "RateCategory",
     "RateCharge",
+    "RateInstalment",
+    "RateLevy",
+    "RatesCertificate",
+    "ValuationObjection",
     "RatesAccount",
     "RatesInvoice",
     "Report",

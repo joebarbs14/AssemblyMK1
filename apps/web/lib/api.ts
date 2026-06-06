@@ -1076,6 +1076,85 @@ export interface RateKpis {
   current_fy: number;
 }
 
+export interface RateKpisExt {
+  active_levies: number;
+  pending_certificates: number;
+  open_objections: number;
+  active_plans: number;
+}
+
+export interface RateLevyRow {
+  id: number;
+  fiscal_year: number;
+  code: string;
+  label: string;
+  kind: string;
+  amount_cents: number;
+  applies_to_property_type: string | null;
+  notes: string | null;
+}
+
+export interface RateInstalmentRow {
+  id: number;
+  fiscal_year: number;
+  period_label: string;
+  due_date: string;
+  amount_cents: number;
+  paid_cents: number;
+  status: string;
+}
+
+export interface CertificateRow {
+  id: number;
+  reference: string;
+  property_id: number;
+  status: string;
+  fee_cents: number;
+  requester_name: string | null;
+  requester_email: string | null;
+  issued_at: string | null;
+  valid_until: string | null;
+  created_at: string;
+}
+
+export interface HardshipPlanRow {
+  id: number;
+  account_id: number;
+  term_months: number;
+  monthly_amount_cents: number;
+  starts_on: string;
+  ends_on: string;
+  status: string;
+  paid_count: number;
+  notes: string | null;
+}
+
+export interface ObjectionRow {
+  id: number;
+  property_id: number;
+  user_id: number;
+  year: number;
+  current_uv_cents: number;
+  proposed_uv_cents: number;
+  grounds: string;
+  status: string;
+  created_at: string;
+}
+
+export interface ConcessionClaimRow {
+  id: number;
+  period_year: number;
+  period_half: number;
+  pensioner_count: number;
+  total_concession_cents: number;
+  state_subsidy_pct: number;
+  state_subsidy_cents: number;
+  reference: string | null;
+  status: string;
+  submitted_at: string | null;
+  paid_at: string | null;
+}
+
 // --- v7 admin ---
 
 export interface SearchGroup {

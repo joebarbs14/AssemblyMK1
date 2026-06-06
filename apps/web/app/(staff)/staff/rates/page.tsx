@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { StaffShell } from "@/app/(staff)/StaffShell";
 import { Card } from "@/components/ui/Card";
 import { Money } from "@/components/ui/Money";
-import { api, type Me, type RateKpis, type RatePropertyRollRow } from "@/lib/api";
+import { api, type Me, type RateKpis, type RateKpisExt, type RatePropertyRollRow } from "@/lib/api";
 import { readSessionToken } from "@/lib/session";
 
 import { RollFilter } from "./RollFilter";
@@ -25,8 +25,11 @@ export default async function StaffRatesPage({ searchParams }: PageProps) {
   if (overdue === "true") params.set("overdue", "true");
   const qs = params.toString() ? `?${params.toString()}` : "";
 
-  const [kpis, roll] = await Promise.all([
+  const [kpis, kpisExt, roll] = await Promise.all([
     api<RateKpis>("/api/staff/rates/kpis", { token }),
+    api<RateKpisExt>("/api/staff/rates/kpis-ext", { token }).catch(() =>
+      ({ active_levies: 0, pending_certificates: 0, open_objections: 0, active_plans: 0 } as RateKpisExt),
+    ),
     api<RatePropertyRollRow[]>(`/api/staff/rates/properties${qs}`, { token }),
   ]);
 
@@ -34,9 +37,13 @@ export default async function StaffRatesPage({ searchParams }: PageProps) {
     <StaffShell me={me} active="rates">
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "0.75rem" }}>
         <h1 style={{ fontSize: "1.5rem", fontWeight: 600, margin: 0 }}>Rates</h1>
-        <div style={{ display: "flex", gap: "0.75rem", fontSize: "0.875rem" }}>
+        <div style={{ display: "flex", gap: "0.75rem", fontSize: "0.875rem", flexWrap: "wrap" }}>
           <Link href="/staff/rates/calculator">Calculator →</Link>
           <Link href="/staff/rates/categories">Categories →</Link>
+          <Link href="/staff/rates/levies">Levies →</Link>
+          <Link href="/staff/rates/certificates">Certificates →</Link>
+          <Link href="/staff/rates/plans">Plans →</Link>
+          <Link href="/staff/rates/objections">Objections →</Link>
         </div>
       </div>
 
@@ -50,6 +57,11 @@ export default async function StaffRatesPage({ searchParams }: PageProps) {
         <Stat label={`FY${kpis.current_fy} categories`}
           value={kpis.active_categories_current_fy.toLocaleString()}
           danger={kpis.active_categories_current_fy === 0} />
+        <Stat label="Active levies" value={kpisExt.active_levies.toLocaleString()} />
+        <Stat label="Cert queue" value={kpisExt.pending_certificates.toLocaleString()}
+          danger={kpisExt.pending_certificates > 5} />
+        <Stat label="Open objections" value={kpisExt.open_objections.toLocaleString()} />
+        <Stat label="Active plans" value={kpisExt.active_plans.toLocaleString()} />
       </div>
 
       <RollFilter defaultQ={q} defaultOverdue={overdue === "true"} />

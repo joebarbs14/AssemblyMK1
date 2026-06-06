@@ -38,6 +38,10 @@ class RateCategory(Base):
         ForeignKey("council.id", ondelete="CASCADE"), index=True, nullable=False
     )
     fiscal_year: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+    # Optional ward sub-categorisation (LGA Act sect.514A).
+    ward_id: Mapped[int | None] = mapped_column(
+        ForeignKey("ward.id", ondelete="SET NULL")
+    )
     code: Mapped[str] = mapped_column(String(32), nullable=False)
     # residential|business|farmland|mining|primary_production|sub_residential|sub_business
     label: Mapped[str] = mapped_column(String(120), nullable=False)
