@@ -600,6 +600,160 @@ export interface DumpingHotspotRow {
   prediction: string;
 }
 
+// --- v4 features ---
+
+export interface DisasterAlertRow {
+  id: number;
+  kind: string;
+  severity: string;
+  title: string;
+  body: string;
+  source: string;
+  starts_at: string;
+  ends_at: string | null;
+}
+
+export interface EvacCentreRow {
+  id: number;
+  name: string;
+  address: string;
+  lat: number;
+  lng: number;
+  capacity: number | null;
+  facilities: string[] | null;
+  status: string;
+}
+
+export interface SandbagDepotRow {
+  id: number;
+  name: string;
+  address: string;
+  lat: number;
+  lng: number;
+  bags_available: number;
+  self_serve: boolean;
+  hours: string | null;
+}
+
+export interface PbProjectRow {
+  id: number;
+  title: string;
+  description: string;
+  requested_cents: number;
+  image_url: string | null;
+  votes_tokens: number;
+}
+
+export interface PbRoundRow {
+  id: number;
+  title: string;
+  description: string;
+  pool_cents: number;
+  tokens_per_voter: number;
+  opens_at: string;
+  closes_at: string;
+  status: string;
+  projects: PbProjectRow[];
+  tokens_remaining: number;
+}
+
+export interface VolunteerOpportunityRow {
+  id: number;
+  title: string;
+  description: string;
+  skills_needed: string[];
+  location: string | null;
+  starts_at: string;
+  ends_at: string;
+  capacity: number | null;
+  status: string;
+  signed_up: boolean;
+  spots_remaining: number | null;
+}
+
+export interface TreeRow {
+  id: number;
+  species_common: string;
+  species_botanical: string | null;
+  qr_payload: string;
+  lat: number;
+  lng: number;
+  planted_on: string | null;
+  canopy_m: number | null;
+  height_m: number | null;
+  status: string;
+}
+
+export interface FoodPremisesRow {
+  id: number;
+  name: string;
+  kind: string;
+  address: string;
+  lat: number | null;
+  lng: number | null;
+  licence_no: string;
+  status: string;
+  latest_grade: string | null;
+  latest_score: number | null;
+  latest_inspection: string | null;
+}
+
+export interface InfringementRow {
+  id: number;
+  kind: string;
+  code: string;
+  description: string;
+  plate: string | null;
+  fee_cents: number;
+  issued_at: string;
+  status: string;
+  lat: number | null;
+  lng: number | null;
+}
+
+export interface FleetVehicleRow {
+  id: number;
+  rego: string;
+  make: string;
+  model: string;
+  kind: string;
+  fuel: string;
+  year: number | null;
+  odometer_km: number;
+  last_service_on: string | null;
+  next_service_due: string | null;
+  co2_kg_per_km: number;
+  status: string;
+  service_overdue: boolean;
+}
+
+export interface LibraryItemRow {
+  id: number;
+  title: string;
+  author: string | null;
+  isbn: string | null;
+  kind: string;
+  copies_total: number;
+  copies_available: number;
+  cover_url: string | null;
+  blurb: string | null;
+}
+
+export interface TourismRow {
+  id: number;
+  kind: string;
+  name: string;
+  blurb: string;
+  image_url: string | null;
+  lat: number | null;
+  lng: number | null;
+  address: string | null;
+  url: string | null;
+  starts_at: string | null;
+  ends_at: string | null;
+  tags: string[] | null;
+}
+
 // --- Reports detail (existing) ---
 
 export interface ReportDetail {

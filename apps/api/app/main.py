@@ -14,6 +14,7 @@ from app.routers import (
     auth,
     council_ops,
     council_v3,
+    council_v4,
     dev_uploads,
     devices,
     health,
@@ -60,6 +61,8 @@ app.include_router(council_ops.router, prefix="/api")
 app.include_router(council_ops.public_router, prefix="/api")
 app.include_router(council_v3.router, prefix="/api")
 app.include_router(council_v3.public_router, prefix="/api")
+app.include_router(council_v4.router, prefix="/api")
+app.include_router(council_v4.public_router, prefix="/api")
 app.include_router(dev_uploads.router, prefix="/api")
 
 
