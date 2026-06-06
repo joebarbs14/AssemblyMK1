@@ -1044,6 +1044,28 @@ export interface SurveyResults {
   tallies: Record<string, Record<string, number>>;
 }
 
+export interface AdminJobRow {
+  id: number;
+  title: string;
+  employer: string;
+  is_council: boolean;
+  kind: string;
+  status: string;
+  posted_at: string;
+  closes_at: string | null;
+}
+
+export interface AdminTenderRow {
+  id: number;
+  reference: string;
+  title: string;
+  category: string;
+  status: string;
+  estimated_value_cents: number | null;
+  opens_at: string;
+  closes_at: string;
+}
+
 // --- Reports detail (existing) ---
 
 export interface ReportDetail {

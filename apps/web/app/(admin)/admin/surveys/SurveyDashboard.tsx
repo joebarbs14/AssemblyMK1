@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { api, type SurveyResults, type SurveyRow } from "@/lib/api";
+import { API_BASE } from "@/lib/env";
 
 export function SurveyDashboard({ token, initial }: { token: string; initial: SurveyRow[] }) {
   const [rows, setRows] = useState(initial);
@@ -74,9 +75,15 @@ export function SurveyDashboard({ token, initial }: { token: string; initial: Su
 function ResultsView({ survey, results }: { survey: SurveyRow; results: SurveyResults }) {
   return (
     <div style={{ marginTop: "0.75rem", borderTop: "1px solid var(--border)", paddingTop: "0.75rem" }}>
-      <p style={{ margin: 0, fontSize: "0.8125rem", color: "var(--text-secondary)" }}>
-        <strong>{results.total_responses}</strong> total responses
-      </p>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <p style={{ margin: 0, fontSize: "0.8125rem", color: "var(--text-secondary)" }}>
+          <strong>{results.total_responses}</strong> total responses
+        </p>
+        <a href={`${API_BASE}/api/admin/surveys/${survey.id}/export.csv`}
+          style={{ fontSize: "0.8125rem", color: "var(--brand)", fontWeight: 600 }}>
+          Export CSV →
+        </a>
+      </div>
       {survey.questions.map((q) => {
         const tally = results.tallies[String(q.id)] ?? {};
         const total = Object.values(tally).reduce((n, v) => n + v, 0);

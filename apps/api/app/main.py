@@ -32,8 +32,21 @@ from app.routers import (
 if settings.sentry_dsn:
     sentry_sdk.init(dsn=settings.sentry_dsn, environment=settings.env, traces_sample_rate=0.1)
 
+from app.services import scheduler
+
 app = FastAPI(title="Assembly API", version="0.1.0")
 app.state.limiter = limiter
+
+
+@app.on_event("startup")
+def _startup_scheduler() -> None:
+    if settings.env != "test":
+        scheduler.start()
+
+
+@app.on_event("shutdown")
+def _shutdown_scheduler() -> None:
+    scheduler.shutdown()
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)  # type: ignore[arg-type]
 
 app.add_middleware(

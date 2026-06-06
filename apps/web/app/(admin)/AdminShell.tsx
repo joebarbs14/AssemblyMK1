@@ -4,7 +4,8 @@ import * as React from "react";
 import type { Me } from "@/lib/api";
 
 type Tab = "users" | "categories" | "audit" | "webhooks"
-  | "foi" | "surveys" | "petitions" | "disaster" | "kb";
+  | "foi" | "surveys" | "petitions" | "disaster" | "kb"
+  | "jobs" | "tenders";
 
 export function AdminShell({
   me,
@@ -59,6 +60,8 @@ export function AdminShell({
         <Item href="/admin/surveys" label="Surveys" active={active === "surveys"} />
         <Item href="/admin/disaster" label="Disaster" active={active === "disaster"} />
         <Item href="/admin/kb" label="FAQ articles" active={active === "kb"} />
+        <Item href="/admin/jobs" label="Jobs" active={active === "jobs"} />
+        <Item href="/admin/tenders" label="Tenders" active={active === "tenders"} />
         <div style={{ flex: 1 }} />
         <Item href="/staff" label="← Back to staff" active={false} />
       </aside>

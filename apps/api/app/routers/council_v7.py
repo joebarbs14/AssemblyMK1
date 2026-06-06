@@ -11,6 +11,7 @@ from datetime import UTC, date, datetime, timedelta
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel, Field
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
@@ -491,6 +492,130 @@ def admin_close_job(jid: int, user: User = Depends(get_current_user),
     j.status = "closed"
     db.commit()
     return {"ok": True}
+
+
+@router.get("/admin/jobs")
+def admin_list_jobs(user: User = Depends(get_current_user),
+                    db: Session = Depends(get_db)) -> list[dict[str, Any]]:
+    _staff(user)
+    rows = (
+        db.query(JobListing)
+        .filter(JobListing.council_id == user.council_id)
+        .order_by(JobListing.posted_at.desc())
+        .limit(200).all()
+    )
+    return [{"id": j.id, "title": j.title, "employer": j.employer,
+             "is_council": j.is_council, "kind": j.kind, "status": j.status,
+             "posted_at": j.posted_at.isoformat(),
+             "closes_at": j.closes_at.isoformat() if j.closes_at else None}
+            for j in rows]
+
+
+@router.get("/admin/tenders")
+def admin_list_tenders(user: User = Depends(get_current_user),
+                       db: Session = Depends(get_db)) -> list[dict[str, Any]]:
+    _staff(user)
+    rows = (
+        db.query(Tender)
+        .filter(Tender.council_id == user.council_id)
+        .order_by(Tender.closes_at.desc()).limit(200).all()
+    )
+    return [{"id": t.id, "reference": t.reference, "title": t.title,
+             "category": t.category, "status": t.status,
+             "estimated_value_cents": t.estimated_value_cents,
+             "opens_at": t.opens_at.isoformat(),
+             "closes_at": t.closes_at.isoformat()} for t in rows]
+
+
+@router.post("/admin/tenders/{tid}/close", status_code=200)
+def admin_close_tender(tid: int, user: User = Depends(get_current_user),
+                       db: Session = Depends(get_db)) -> dict[str, Any]:
+    _staff(user)
+    t = db.get(Tender, tid)
+    if t is None or t.council_id != user.council_id:
+        raise HTTPException(status_code=404, detail="Not found")
+    t.status = "closed"
+    db.commit()
+    return {"ok": True}
+
+
+class AwardIn(BaseModel):
+    title: str
+    supplier_name: str
+    supplier_abn: str | None = None
+    value_cents: int
+    starts_on: date
+    ends_on: date
+    local_supplier: bool = False
+    summary: str | None = None
+
+
+@router.post("/admin/tenders/{tid}/award", status_code=201)
+def admin_award_tender(tid: int, body: AwardIn,
+                       user: User = Depends(get_current_user),
+                       db: Session = Depends(get_db)) -> dict[str, Any]:
+    _staff(user)
+    t = db.get(Tender, tid)
+    if t is None or t.council_id != user.council_id:
+        raise HTTPException(status_code=404, detail="Not found")
+    from app.models import ContractAward  # noqa: PLC0415
+    now = datetime.now(UTC)
+    c = ContractAward(
+        council_id=user.council_id, tender_id=tid,
+        contract_no=f"C-{now.strftime('%Y%m')}-{secrets.token_hex(3).upper()}",
+        **body.model_dump(),
+    )
+    t.status = "awarded"
+    db.add(c)
+    db.commit()
+    db.refresh(c)
+    return {"id": c.id, "contract_no": c.contract_no}
+
+
+# ============ Survey CSV export ============
+
+
+@router.get("/admin/surveys/{sid}/export.csv")
+def export_survey_csv(sid: int,
+                      user: User = Depends(get_current_user),
+                      db: Session = Depends(get_db)) -> PlainTextResponse:
+    import csv  # noqa: PLC0415
+    import io  # noqa: PLC0415
+
+    from app.models import SurveyResponse  # noqa: PLC0415
+
+    _staff(user)
+    s = db.get(Survey, sid)
+    if s is None or s.council_id != user.council_id:
+        raise HTTPException(status_code=404, detail="Not found")
+    questions = (
+        db.query(SurveyQuestion)
+        .filter(SurveyQuestion.survey_id == sid)
+        .order_by(SurveyQuestion.position)
+        .all()
+    )
+    responses = (
+        db.query(SurveyResponse)
+        .filter(SurveyResponse.survey_id == sid)
+        .order_by(SurveyResponse.submitted_at)
+        .all()
+    )
+    buf = io.StringIO()
+    w = csv.writer(buf)
+    w.writerow(["response_id", "user_id", "submitted_at"] + [q.prompt for q in questions])
+    for r in responses:
+        row: list[Any] = [r.id, r.user_id, r.submitted_at.isoformat()]
+        for q in questions:
+            v = r.answers.get(str(q.id))
+            if isinstance(v, list):
+                row.append("; ".join(str(x) for x in v))
+            else:
+                row.append("" if v is None else str(v))
+        w.writerow(row)
+    return PlainTextResponse(
+        buf.getvalue(), media_type="text/csv",
+        headers={"Content-Disposition": f'attachment; filename="survey-{sid}.csv"'},
+    )
 
 
 # ============ Lifecycle batch ============
