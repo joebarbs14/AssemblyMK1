@@ -5,358 +5,150 @@ interface Service {
   key: string;
   label: string;
   href: string;
-  available: boolean;
   description: string;
   icon: React.ReactNode;
 }
 
-const SERVICES: Service[] = [
-  {
-    key: "rates",
-    label: "Rates",
-    href: "/rates",
-    available: true,
-    description: "Balance, invoices, BPAY",
-    icon: <IconDocument />,
-  },
+interface Group {
+  key: string;
+  label: string;
+  services: Service[];
+}
+
+const GROUPS: Group[] = [
   {
     key: "report",
-    label: "Report an issue",
-    href: "/reports/new",
-    available: true,
-    description: "Potholes, lights, dumping",
-    icon: <IconReport />,
+    label: "Report & track",
+    services: [
+      { key: "report", label: "Report an issue", href: "/reports/new", description: "Potholes, lights, dumping", icon: <IconReport /> },
+      { key: "my_reports", label: "My reports", href: "/reports", description: "Status & updates", icon: <IconDocument /> },
+      { key: "map", label: "Map", href: "/map", description: "Reports near you", icon: <IconMap /> },
+      { key: "road_closures", label: "Road closures", href: "/road-closures", description: "Works & detours", icon: <IconRoad /> },
+      { key: "disaster", label: "Disaster", href: "/disaster", description: "Alerts, evac, sandbags", icon: <IconHeart /> },
+      { key: "food_premises", label: "Food hygiene", href: "/food-premises", description: "Inspection grades", icon: <IconShop /> },
+      { key: "sensors", label: "Sensors", href: "/sensors", description: "Air, noise, water", icon: <IconLeaf /> },
+    ],
   },
   {
-    key: "water",
-    label: "Water",
-    href: "/water",
-    available: true,
-    description: "Consumption & bills",
-    icon: <IconDroplet />,
+    key: "pay",
+    label: "Pay & manage",
+    services: [
+      { key: "rates", label: "Rates", href: "/rates", description: "Balance, invoices, BPAY", icon: <IconDocument /> },
+      { key: "water", label: "Water", href: "/water", description: "Consumption & bills", icon: <IconDroplet /> },
+      { key: "waste", label: "Waste & bins", href: "/waste", description: "Collection days", icon: <IconTrash /> },
+      { key: "bin_lookup", label: "Bin lookup", href: "/bin-lookup", description: "What bin tomorrow?", icon: <IconTrash /> },
+      { key: "pets", label: "Pets", href: "/pets", description: "Register & renew", icon: <IconPaw /> },
+      { key: "permits", label: "Permits", href: "/permits", description: "Parking & visitor", icon: <IconBuilding /> },
+      { key: "hardship", label: "Hardship", href: "/hardship", description: "Pensioner & relief", icon: <IconHeart /> },
+    ],
   },
   {
-    key: "waste",
-    label: "Waste & bins",
-    href: "/waste",
-    available: true,
-    description: "Collection days",
-    icon: <IconTrash />,
+    key: "say",
+    label: "Have your say",
+    services: [
+      { key: "announcements", label: "Announcements", href: "/announcements", description: "Council news", icon: <IconMegaphone /> },
+      { key: "noticeboard", label: "Noticeboard", href: "/noticeboard", description: "Local events & lost found", icon: <IconUsers /> },
+      { key: "meetings", label: "Meetings", href: "/meetings", description: "Agendas & minutes", icon: <IconGavel /> },
+      { key: "pb", label: "Community budget", href: "/pb", description: "Vote on projects", icon: <IconChart /> },
+      { key: "grants", label: "Grants", href: "/grants", description: "Draft & opportunities", icon: <IconDocument /> },
+    ],
   },
   {
-    key: "roads",
-    label: "Roads",
-    href: "/reports/new",
-    available: true,
-    description: "Report a road issue",
-    icon: <IconRoad />,
+    key: "involve",
+    label: "Get involved",
+    services: [
+      { key: "volunteer", label: "Volunteer", href: "/volunteer", description: "Help out council", icon: <IconUsers /> },
+      { key: "programs", label: "Programs", href: "/programs", description: "Bookings", icon: <IconCalendar /> },
+      { key: "trees", label: "Tree register", href: "/trees", description: "Adopt-a-tree", icon: <IconLeaf /> },
+      { key: "donations", label: "Community fund", href: "/donations", description: "Back local projects", icon: <IconHeart /> },
+      { key: "library", label: "Library", href: "/library", description: "Search & hold", icon: <IconDocument /> },
+    ],
   },
   {
-    key: "development",
-    label: "Development",
-    href: "/development",
-    available: true,
-    description: "DAs & approvals",
-    icon: <IconBuilding />,
+    key: "discover",
+    label: "Discover",
+    services: [
+      { key: "businesses", label: "Businesses", href: "/businesses", description: "Local trades & shops", icon: <IconShop /> },
+      { key: "tourism", label: "What's on", href: "/tourism", description: "Events & places", icon: <IconMap /> },
+      { key: "calendar", label: "Calendar", href: "/calendar", description: "Export to iCal", icon: <IconCalendar /> },
+      { key: "climate", label: "Climate", href: "/climate", description: "Sustainability targets", icon: <IconLeaf /> },
+      { key: "budget", label: "Budget", href: "/budget", description: "Where your rates go", icon: <IconChart /> },
+      { key: "open_data", label: "Open data", href: "/open-data", description: "CSV downloads", icon: <IconDocument /> },
+    ],
   },
   {
-    key: "community",
-    label: "Community",
-    href: "/announcements",
-    available: true,
-    description: "News & announcements",
-    icon: <IconMegaphone />,
-  },
-  {
-    key: "animals",
-    label: "Animals",
-    href: "/animals",
-    available: true,
-    description: "Adoptions & registration",
-    icon: <IconPaw />,
-  },
-  {
-    key: "map",
-    label: "Map",
-    href: "/map",
-    available: true,
-    description: "Reports near you",
-    icon: <IconMap />,
-  },
-  {
-    key: "noticeboard",
-    label: "Noticeboard",
-    href: "/noticeboard",
-    available: true,
-    description: "Local events & lost found",
-    icon: <IconUsers />,
-  },
-  {
-    key: "meetings",
-    label: "Meetings",
-    href: "/meetings",
-    available: true,
-    description: "Agendas & minutes",
-    icon: <IconGavel />,
-  },
-  {
-    key: "climate",
-    label: "Climate",
-    href: "/climate",
-    available: true,
-    description: "Sustainability targets",
-    icon: <IconLeaf />,
-  },
-  {
-    key: "programs",
-    label: "Programs",
-    href: "/programs",
-    available: true,
-    description: "Volunteer & bookings",
-    icon: <IconCalendar />,
-  },
-  {
-    key: "bin_lookup",
-    label: "Bin lookup",
-    href: "/bin-lookup",
-    available: true,
-    description: "What bin tomorrow?",
-    icon: <IconTrash />,
-  },
-  {
-    key: "pets",
-    label: "Pets",
-    href: "/pets",
-    available: true,
-    description: "Register & renew",
-    icon: <IconPaw />,
-  },
-  {
-    key: "permits",
-    label: "Permits",
-    href: "/permits",
-    available: true,
-    description: "Parking & visitor",
-    icon: <IconBuilding />,
-  },
-  {
-    key: "hardship",
-    label: "Hardship",
-    href: "/hardship",
-    available: true,
-    description: "Pensioner & relief",
-    icon: <IconHeart />,
-  },
-  {
-    key: "budget",
-    label: "Budget",
-    href: "/budget",
-    available: true,
-    description: "Where your rates go",
-    icon: <IconChart />,
-  },
-  {
-    key: "businesses",
-    label: "Businesses",
-    href: "/businesses",
-    available: true,
-    description: "Local trades & shops",
-    icon: <IconShop />,
-  },
-  {
-    key: "donations",
-    label: "Community fund",
-    href: "/donations",
-    available: true,
-    description: "Back local projects",
-    icon: <IconHeart />,
-  },
-  {
-    key: "cemetery",
-    label: "Cemetery",
-    href: "/cemetery",
-    available: true,
-    description: "Plot search",
-    icon: <IconDocument />,
-  },
-  {
-    key: "grants",
-    label: "Grant writer",
-    href: "/grants",
-    available: true,
-    description: "Draft a grant",
-    icon: <IconDocument />,
-  },
-  {
-    key: "calendar",
-    label: "Calendar",
-    href: "/calendar",
-    available: true,
-    description: "Export to iCal",
-    icon: <IconCalendar />,
-  },
-  {
-    key: "road_closures",
-    label: "Road closures",
-    href: "/road-closures",
-    available: true,
-    description: "Works & detours",
-    icon: <IconRoad />,
-  },
-  {
-    key: "land_hire",
-    label: "Land & venue hire",
-    href: "/land-hire",
-    available: true,
-    description: "Halls, ovals, BBQ",
-    icon: <IconBuilding />,
-  },
-  {
-    key: "sensors",
-    label: "Sensors",
-    href: "/sensors",
-    available: true,
-    description: "Air, noise, water",
-    icon: <IconLeaf />,
-  },
-  {
-    key: "disaster",
-    label: "Disaster dashboard",
-    href: "/disaster",
-    available: true,
-    description: "Alerts, evac, sandbags",
-    icon: <IconHeart />,
-  },
-  {
-    key: "pb",
-    label: "Community budget",
-    href: "/pb",
-    available: true,
-    description: "Vote on projects",
-    icon: <IconChart />,
-  },
-  {
-    key: "volunteer",
-    label: "Volunteer",
-    href: "/volunteer",
-    available: true,
-    description: "Help out council",
-    icon: <IconUsers />,
-  },
-  {
-    key: "trees",
-    label: "Tree register",
-    href: "/trees",
-    available: true,
-    description: "Adopt-a-tree",
-    icon: <IconLeaf />,
-  },
-  {
-    key: "food_premises",
-    label: "Food hygiene",
-    href: "/food-premises",
-    available: true,
-    description: "Inspection grades",
-    icon: <IconShop />,
-  },
-  {
-    key: "library",
-    label: "Library",
-    href: "/library",
-    available: true,
-    description: "Search & hold",
-    icon: <IconDocument />,
-  },
-  {
-    key: "tourism",
-    label: "What's on",
-    href: "/tourism",
-    available: true,
-    description: "Events & places",
-    icon: <IconMap />,
-  },
-  {
-    key: "open_data",
-    label: "Open data",
-    href: "/open-data",
-    available: true,
-    description: "CSV downloads",
-    icon: <IconDocument />,
+    key: "land",
+    label: "Land & development",
+    services: [
+      { key: "development", label: "Development", href: "/development", description: "DAs & approvals", icon: <IconBuilding /> },
+      { key: "land_hire", label: "Hire venue", href: "/land-hire", description: "Halls, ovals, BBQ", icon: <IconBuilding /> },
+      { key: "cemetery", label: "Cemetery", href: "/cemetery", description: "Plot search", icon: <IconDocument /> },
+      { key: "animals", label: "Animals", href: "/animals", description: "Adoptions & registration", icon: <IconPaw /> },
+    ],
   },
 ];
 
 export function ServiceGrid() {
   return (
-    <section style={{ marginBottom: "1rem" }}>
-      <h2 style={{ fontSize: "1rem", fontWeight: 600, margin: "0 0 0.75rem" }}>Services</h2>
-      <ul
-        style={{
-          listStyle: "none",
-          padding: 0,
-          margin: 0,
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))",
-          gap: 10,
-        }}
-      >
-        {SERVICES.map((s) => (
-          <li key={s.key}>
-            <Link
-              href={s.href}
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 6,
-                padding: "0.875rem 1rem",
-                background: "var(--surface)",
-                border: "1px solid var(--border)",
-                borderRadius: "var(--r-lg)",
-                textDecoration: "none",
-                color: "var(--text-primary)",
-                minHeight: 96,
-                position: "relative",
-                boxShadow: "var(--e1)",
-              }}
-            >
-              <div style={{ color: "var(--brand)" }}>{s.icon}</div>
-              <span style={{ fontWeight: 600, fontSize: "0.9375rem" }}>{s.label}</span>
-              <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>
-                {s.description}
-              </span>
-              {!s.available && (
-                <span
+    <section style={{ marginBottom: "1rem" }} aria-label="Services">
+      {GROUPS.map((g) => (
+        <div key={g.key} style={{ marginBottom: "1.25rem" }}>
+          <h3 style={{
+            margin: "0 0 0.5rem",
+            fontSize: "0.7rem",
+            fontWeight: 700,
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+            color: "var(--text-secondary)",
+          }}>{g.label}</h3>
+          <ul style={{
+            listStyle: "none",
+            padding: 0,
+            margin: 0,
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
+            gap: 8,
+          }}>
+            {g.services.map((s) => (
+              <li key={s.key}>
+                <Link
+                  href={s.href}
                   style={{
-                    position: "absolute",
-                    top: 8,
-                    right: 8,
-                    fontSize: "0.625rem",
-                    fontWeight: 600,
-                    letterSpacing: "0.04em",
-                    textTransform: "uppercase",
-                    color: "var(--text-secondary)",
-                    background: "var(--surface-muted)",
-                    padding: "2px 6px",
-                    borderRadius: "var(--r-full)",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 4,
+                    padding: "0.75rem 0.875rem",
+                    background: "var(--surface)",
+                    border: "1px solid var(--border)",
+                    borderRadius: "var(--r-lg)",
+                    textDecoration: "none",
+                    color: "var(--text-primary)",
+                    minHeight: 80,
+                    boxShadow: "var(--e1)",
                   }}
                 >
-                  Soon
-                </span>
-              )}
-            </Link>
-          </li>
-        ))}
-      </ul>
+                  <div style={{ color: "var(--brand)" }}>{s.icon}</div>
+                  <span style={{ fontWeight: 600, fontSize: "0.875rem", lineHeight: 1.25 }}>{s.label}</span>
+                  <span style={{ fontSize: "0.7rem", color: "var(--text-secondary)", lineHeight: 1.3 }}>
+                    {s.description}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
     </section>
   );
 }
 
-// --- Inline SVG icons (24px, stroke 1.75) ---
+// --- Inline SVG icons (22px, stroke 1.75) ---
 
 function IconBase({ children, ...rest }: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
-      width="22"
-      height="22"
+      width="20"
+      height="20"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
