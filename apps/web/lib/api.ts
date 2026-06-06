@@ -884,6 +884,126 @@ export interface HeritageSiteRow {
   audio_url: string | null;
 }
 
+// --- v6 features ---
+
+export interface SurveyQuestionRow {
+  id: number;
+  position: number;
+  prompt: string;
+  kind: string;
+  options: string[] | null;
+  required: boolean;
+}
+
+export interface SurveyRow {
+  id: number;
+  title: string;
+  description: string | null;
+  kind: string;
+  closes_at: string | null;
+  status: string;
+  response_count: number;
+  answered: boolean;
+  questions: SurveyQuestionRow[];
+}
+
+export interface PetitionRow {
+  id: number;
+  title: string;
+  summary: string;
+  ask: string;
+  threshold: number;
+  signature_count: number;
+  closes_at: string | null;
+  status: string;
+  council_response: string | null;
+  created_at: string;
+  signed: boolean;
+}
+
+export interface InfoRequestRow {
+  id: number;
+  reference: string;
+  title: string;
+  description: string;
+  kind: string;
+  status: string;
+  decision: string | null;
+  fees_cents: number | null;
+  due_by: string;
+  created_at: string;
+}
+
+export interface TenderRow {
+  id: number;
+  reference: string;
+  title: string;
+  description: string;
+  category: string;
+  estimated_value_cents: number | null;
+  opens_at: string;
+  closes_at: string;
+  status: string;
+  documents_url: string | null;
+}
+
+export interface ContractRow {
+  id: number;
+  contract_no: string;
+  title: string;
+  supplier_name: string;
+  supplier_abn: string | null;
+  value_cents: number;
+  starts_on: string;
+  ends_on: string;
+  local_supplier: boolean;
+  summary: string | null;
+}
+
+export interface JobRow {
+  id: number;
+  title: string;
+  employer: string;
+  is_council: boolean;
+  kind: string;
+  salary_min_cents: number | null;
+  salary_max_cents: number | null;
+  description: string;
+  location: string | null;
+  apply_url: string | null;
+  posted_at: string;
+  closes_at: string | null;
+}
+
+export interface RebateRow {
+  id: number;
+  level: string;
+  title: string;
+  description: string;
+  category: string;
+  max_amount_cents: number | null;
+  eligibility: string;
+  apply_url: string | null;
+  expires_on: string | null;
+}
+
+export interface GardenPlotRow {
+  id: number;
+  garden_name: string;
+  plot_code: string;
+  size_sqm: number;
+  annual_fee_cents: number;
+  status: string;
+  notes: string | null;
+}
+
+export interface ChatCitation {
+  id: number;
+  title: string;
+  category: string;
+  source_url: string | null;
+}
+
 // --- Reports detail (existing) ---
 
 export interface ReportDetail {

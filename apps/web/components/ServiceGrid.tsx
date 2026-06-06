@@ -55,6 +55,9 @@ const GROUPS: Group[] = [
       { key: "meetings", label: "Meetings", href: "/meetings", description: "Agendas & minutes", icon: <IconGavel /> },
       { key: "pb", label: "Community budget", href: "/pb", description: "Vote on projects", icon: <IconChart /> },
       { key: "panels", label: "Citizen panels", href: "/panels", description: "Random-jury deliberation", icon: <IconUsers /> },
+      { key: "surveys", label: "Surveys", href: "/surveys", description: "Tell us what you think", icon: <IconMegaphone /> },
+      { key: "petitions", label: "Petitions", href: "/petitions", description: "Start or sign one", icon: <IconUsers /> },
+      { key: "foi", label: "GIPA / FOI", href: "/foi", description: "Request records", icon: <IconDocument /> },
       { key: "grants", label: "Grants", href: "/grants", description: "Draft & opportunities", icon: <IconDocument /> },
     ],
   },
@@ -68,6 +71,8 @@ const GROUPS: Group[] = [
       { key: "donations", label: "Community fund", href: "/donations", description: "Back local projects", icon: <IconHeart /> },
       { key: "library", label: "Library", href: "/library", description: "Search & hold", icon: <IconDocument /> },
       { key: "lot", label: "Library of Things", href: "/library-of-things", description: "Borrow tools etc.", icon: <IconShop /> },
+      { key: "gardens", label: "Community gardens", href: "/gardens", description: "Apply for a plot", icon: <IconLeaf /> },
+      { key: "jobs", label: "Jobs board", href: "/jobs", description: "Roles & work experience", icon: <IconShop /> },
     ],
   },
   {
@@ -83,6 +88,9 @@ const GROUPS: Group[] = [
       { key: "ev", label: "EV chargers", href: "/ev", description: "Map & booking", icon: <IconDroplet /> },
       { key: "swim", label: "Swim conditions", href: "/swim", description: "Beaches, pools, river", icon: <IconDroplet /> },
       { key: "heritage", label: "Heritage & Country", href: "/heritage", description: "Story places", icon: <IconLeaf /> },
+      { key: "rebates", label: "Climate rebates", href: "/rebates", description: "Solar, battery, EV", icon: <IconLeaf /> },
+      { key: "procurement", label: "Tenders & contracts", href: "/procurement", description: "Awards transparency", icon: <IconDocument /> },
+      { key: "ask", label: "Ask council", href: "/ask", description: "AI assistant", icon: <IconMegaphone /> },
     ],
   },
   {

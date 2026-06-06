@@ -45,6 +45,10 @@ class Settings(BaseSettings):
     vapid_private_key: str | None = None
     vapid_subject: str = "mailto:dev@assembly.local"
 
+    # FOSS LLM (Ollama). Mock when unset.
+    ollama_base_url: str | None = None  # http://localhost:11434
+    ollama_model: str = "llama3.1:8b"
+
     @field_validator("database_url", mode="before")
     @classmethod
     def _normalize_db_url(cls, v: object) -> object:
