@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/Card";
 import { api, type Me } from "@/lib/api";
 import { readSessionToken } from "@/lib/session";
 
+import { ClaimAdminButton } from "./ClaimAdminButton";
 import { LogoutButton } from "./LogoutButton";
 import { NotificationsToggle } from "./NotificationsToggle";
 import { PreferencesPanel } from "./PreferencesPanel";
@@ -65,10 +66,11 @@ export default async function AccountPage() {
           <dt style={{ color: "var(--text-secondary)" }}>Council</dt>
           <dd style={{ margin: 0 }}>{me.council.name}</dd>
         </dl>
-        <div style={{ marginTop: "1.5rem", display: "flex", gap: "0.5rem" }}>
+        <div style={{ marginTop: "1.5rem", display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
           <Button variant="secondary" disabled>
             Edit profile (M2.x)
           </Button>
+          {me.role === "resident" && <ClaimAdminButton />}
           <LogoutButton />
         </div>
       </Card>

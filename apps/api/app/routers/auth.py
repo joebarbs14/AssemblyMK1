@@ -178,3 +178,26 @@ def me(user: User = Depends(get_current_user), db: Session = Depends(get_db)) ->
 def logout() -> None:
     # JWT is stateless; client just drops the cookie. Refresh-token revocation arrives with refresh rotation.
     return None
+
+
+@router.post("/claim-admin")
+def claim_admin(user: User = Depends(get_current_user),
+                db: Session = Depends(get_db)) -> dict[str, str]:
+    """One-shot bootstrap: if the caller's email is in the
+    BOOTSTRAP_ADMIN_EMAILS env var (comma-separated), elevate them to admin.
+
+    Use this exactly once when standing up a new council so you can then
+    promote other users via /admin/users."""
+    from app.core.config import settings  # noqa: PLC0415
+    allowed = {e.strip().lower() for e in settings.bootstrap_admin_emails.split(",") if e.strip()}
+    if not allowed:
+        raise HTTPException(status_code=403,
+                            detail="BOOTSTRAP_ADMIN_EMAILS env var is not set")
+    if user.email.lower() not in allowed:
+        raise HTTPException(status_code=403,
+                            detail="Your email is not on the bootstrap allowlist")
+    if user.role == UserRole.admin.value:
+        return {"role": user.role, "message": "Already admin"}
+    user.role = UserRole.admin.value
+    db.commit()
+    return {"role": user.role, "message": "Promoted to admin"}
