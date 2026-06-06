@@ -3,7 +3,9 @@ import * as React from "react";
 
 import type { Me } from "@/lib/api";
 
-type Tab = "users" | "categories" | "audit";
+type Tab = "users" | "categories" | "audit" | "webhooks"
+  | "foi" | "surveys" | "petitions" | "disaster" | "kb"
+  | "jobs" | "tenders";
 
 export function AdminShell({
   me,
@@ -48,6 +50,18 @@ export function AdminShell({
         <Item href="/admin/users" label="Users" active={active === "users"} />
         <Item href="/admin/categories" label="Report categories" active={active === "categories"} />
         <Item href="/admin/audit" label="Audit log" active={active === "audit"} />
+        <Item href="/admin/webhooks" label="Webhooks" active={active === "webhooks"} />
+        <p style={{ margin: "1rem 0.5rem 0.25rem", fontSize: "0.65rem", letterSpacing: "0.08em",
+                     textTransform: "uppercase", color: "var(--text-secondary)", fontWeight: 700 }}>
+          Operate
+        </p>
+        <Item href="/admin/foi" label="GIPA queue" active={active === "foi"} />
+        <Item href="/admin/petitions" label="Petitions" active={active === "petitions"} />
+        <Item href="/admin/surveys" label="Surveys" active={active === "surveys"} />
+        <Item href="/admin/disaster" label="Disaster" active={active === "disaster"} />
+        <Item href="/admin/kb" label="FAQ articles" active={active === "kb"} />
+        <Item href="/admin/jobs" label="Jobs" active={active === "jobs"} />
+        <Item href="/admin/tenders" label="Tenders" active={active === "tenders"} />
         <div style={{ flex: 1 }} />
         <Item href="/staff" label="← Back to staff" active={false} />
       </aside>

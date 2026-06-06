@@ -47,6 +47,9 @@ export function StaffShell({
         <NavItem href="/staff" label="Triage" active={active === "dashboard"} />
         <NavItem href="/staff/inbox" label="Inbox" active={active === "inbox"} />
         <NavItem href="/staff/announcements" label="Announcements" active={false} />
+        <NavItem href="/staff/predictions" label="Predictions" active={false} />
+        <NavItem href="/staff/rangers" label="Rangers" active={false} />
+        <NavItem href="/staff/fleet" label="Fleet" active={false} />
         {(me.role === "admin") && (
           <NavItem href="/admin/users" label="Admin" active={false} />
         )}

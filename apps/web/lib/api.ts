@@ -329,6 +329,743 @@ export interface MyWasteRow {
   route: WasteRow | null;
 }
 
+// --- v2 ideas ---
+
+export interface MapReportRow {
+  id: number;
+  title: string;
+  category_label: string;
+  status: string;
+  lat: number;
+  lng: number;
+}
+
+export interface MeetingAgendaItemRow {
+  id: number;
+  position: number;
+  title: string;
+  description: string | null;
+  outcome: string | null;
+  votes_for: number | null;
+  votes_against: number | null;
+  votes_abstain: number | null;
+}
+
+export interface MeetingRow {
+  id: number;
+  title: string;
+  starts_at: string;
+  duration_minutes: number;
+  location: string | null;
+  agenda_url: string | null;
+  minutes_url: string | null;
+  livestream_url: string | null;
+  status: string;
+  items: MeetingAgendaItemRow[];
+}
+
+export interface CommunityPostRow {
+  id: number;
+  kind: string;
+  title: string;
+  body_markdown: string;
+  event_at: string | null;
+  location_text: string | null;
+  author_name: string | null;
+  status: string;
+  created_at: string;
+}
+
+export interface ClimateMetricRow {
+  key: string;
+  label: string;
+  unit: string;
+  value: number;
+  target: number | null;
+  target_year: number | null;
+  period_end: string;
+}
+
+export interface BinLookupResult {
+  matched_address: string | null;
+  route_name: string | null;
+  collection_day: string | null;
+  frequency: string | null;
+  next_collection: string | null;
+  bin_colours_tomorrow: string[];
+}
+
+export interface PetRegistrationRow {
+  id: number;
+  species: string;
+  name: string;
+  breed: string | null;
+  registration_number: string;
+  valid_until: string;
+  annual_fee_cents: number;
+  status: string;
+}
+
+export interface PermitRow {
+  id: number;
+  kind: string;
+  permit_number: string;
+  plate: string | null;
+  holder_name: string;
+  valid_from: string;
+  valid_until: string;
+  qr_payload: string;
+  status: string;
+}
+
+export interface BudgetSliceRow {
+  category: string;
+  label: string;
+  expense_cents: number;
+  prior_year_expense_cents: number | null;
+}
+
+export interface BudgetData {
+  fiscal_year: number;
+  total_expense_cents: number;
+  total_revenue_cents: number;
+  by_category: BudgetSliceRow[];
+}
+
+export interface CapitalProjectRow {
+  id: number;
+  title: string;
+  category: string | null;
+  budget_cents: number;
+  spent_cents: number;
+  status: string;
+  progress_pct: number;
+  expected_completion: string | null;
+}
+
+export interface BusinessRow {
+  id: number;
+  name: string;
+  category: string;
+  description: string | null;
+  phone: string | null;
+  website: string | null;
+  address: string | null;
+  verified: boolean;
+}
+
+export interface CampaignRow {
+  id: number;
+  title: string;
+  blurb: string;
+  target_cents: number;
+  raised_cents: number;
+  progress_pct: number;
+  status: string;
+  closes_at: string | null;
+}
+
+export interface GrantDraftRow {
+  id: number;
+  title: string;
+  grant_name: string | null;
+  draft_markdown: string;
+  provider: string;
+  updated_at: string;
+}
+
+export interface ConcessionRow {
+  id: number;
+  kind: string;
+  status: string;
+  requested_relief: string | null;
+  created_at: string;
+}
+
+export interface ProgramRow {
+  id: number;
+  title: string;
+  description: string;
+  kind: string;
+  capacity: number | null;
+  starts_at: string | null;
+  ends_at: string | null;
+  location: string | null;
+  fee_cents: number;
+  bookings_open: boolean;
+  spots_remaining: number | null;
+}
+
+// --- v3 features ---
+
+export interface GrantOpportunityRow {
+  id: number;
+  source: string;
+  title: string;
+  description: string;
+  min_amount_cents: number | null;
+  max_amount_cents: number | null;
+  closes_at: string | null;
+  url: string | null;
+  eligibility: string | null;
+}
+
+export interface AssetRow {
+  id: number;
+  kind: string;
+  label: string;
+  qr_payload: string;
+  lat: number | null;
+  lng: number | null;
+  address_text: string | null;
+  status: string;
+  last_inspected_at: string | null;
+}
+
+export interface RoadClosureRow {
+  id: number;
+  title: string;
+  description: string | null;
+  lat_from: number;
+  lng_from: number;
+  lat_to: number | null;
+  lng_to: number | null;
+  starts_at: string;
+  ends_at: string;
+  severity: string;
+  detour: string | null;
+}
+
+export interface VerificationRow {
+  provider: string;
+  status: string;
+  verified_at: string;
+}
+
+export interface PreferencesRow {
+  language: string;
+  high_contrast: boolean;
+  dyslexia_font: boolean;
+  larger_text: boolean;
+  reduced_motion: boolean;
+}
+
+export interface LandHireRow {
+  id: number;
+  name: string;
+  kind: string;
+  description: string | null;
+  capacity: number | null;
+  fee_cents_per_unit: number;
+  fee_unit: string;
+  location: string | null;
+  available: boolean;
+}
+
+export interface SensorRow {
+  id: number;
+  kind: string;
+  source: string;
+  value: number;
+  unit: string;
+  lat: number;
+  lng: number;
+  taken_at: string;
+}
+
+export interface WebhookRow {
+  id: number;
+  url: string;
+  secret: string;
+  event_types: string[];
+  active: boolean;
+  last_status: number | null;
+}
+
+export interface SlaPredictionRow {
+  report_id: number;
+  title: string;
+  category: string;
+  status: string;
+  sla_due_at: string;
+  hours_left: number;
+  risk: string;
+  rationale: string;
+}
+
+export interface DumpingHotspotRow {
+  lat: number;
+  lng: number;
+  incidents: number;
+  prediction: string;
+}
+
+// --- v4 features ---
+
+export interface DisasterAlertRow {
+  id: number;
+  kind: string;
+  severity: string;
+  title: string;
+  body: string;
+  source: string;
+  starts_at: string;
+  ends_at: string | null;
+}
+
+export interface EvacCentreRow {
+  id: number;
+  name: string;
+  address: string;
+  lat: number;
+  lng: number;
+  capacity: number | null;
+  facilities: string[] | null;
+  status: string;
+}
+
+export interface SandbagDepotRow {
+  id: number;
+  name: string;
+  address: string;
+  lat: number;
+  lng: number;
+  bags_available: number;
+  self_serve: boolean;
+  hours: string | null;
+}
+
+export interface PbProjectRow {
+  id: number;
+  title: string;
+  description: string;
+  requested_cents: number;
+  image_url: string | null;
+  votes_tokens: number;
+}
+
+export interface PbRoundRow {
+  id: number;
+  title: string;
+  description: string;
+  pool_cents: number;
+  tokens_per_voter: number;
+  opens_at: string;
+  closes_at: string;
+  status: string;
+  projects: PbProjectRow[];
+  tokens_remaining: number;
+}
+
+export interface VolunteerOpportunityRow {
+  id: number;
+  title: string;
+  description: string;
+  skills_needed: string[];
+  location: string | null;
+  starts_at: string;
+  ends_at: string;
+  capacity: number | null;
+  status: string;
+  signed_up: boolean;
+  spots_remaining: number | null;
+}
+
+export interface TreeRow {
+  id: number;
+  species_common: string;
+  species_botanical: string | null;
+  qr_payload: string;
+  lat: number;
+  lng: number;
+  planted_on: string | null;
+  canopy_m: number | null;
+  height_m: number | null;
+  status: string;
+}
+
+export interface FoodPremisesRow {
+  id: number;
+  name: string;
+  kind: string;
+  address: string;
+  lat: number | null;
+  lng: number | null;
+  licence_no: string;
+  status: string;
+  latest_grade: string | null;
+  latest_score: number | null;
+  latest_inspection: string | null;
+}
+
+export interface InfringementRow {
+  id: number;
+  kind: string;
+  code: string;
+  description: string;
+  plate: string | null;
+  fee_cents: number;
+  issued_at: string;
+  status: string;
+  lat: number | null;
+  lng: number | null;
+}
+
+export interface FleetVehicleRow {
+  id: number;
+  rego: string;
+  make: string;
+  model: string;
+  kind: string;
+  fuel: string;
+  year: number | null;
+  odometer_km: number;
+  last_service_on: string | null;
+  next_service_due: string | null;
+  co2_kg_per_km: number;
+  status: string;
+  service_overdue: boolean;
+}
+
+export interface LibraryItemRow {
+  id: number;
+  title: string;
+  author: string | null;
+  isbn: string | null;
+  kind: string;
+  copies_total: number;
+  copies_available: number;
+  cover_url: string | null;
+  blurb: string | null;
+}
+
+export interface TourismRow {
+  id: number;
+  kind: string;
+  name: string;
+  blurb: string;
+  image_url: string | null;
+  lat: number | null;
+  lng: number | null;
+  address: string | null;
+  url: string | null;
+  starts_at: string | null;
+  ends_at: string | null;
+  tags: string[] | null;
+}
+
+// --- v5 features ---
+
+export interface ChildcareCentreRow {
+  id: number;
+  name: string;
+  kind: string;
+  address: string;
+  lat: number | null;
+  lng: number | null;
+  phone: string | null;
+  website: string | null;
+  age_min_months: number;
+  age_max_months: number;
+  daily_fee_cents: number;
+  vacancies: number;
+  rating: string | null;
+}
+
+export interface EvChargerRow {
+  id: number;
+  name: string;
+  operator: string;
+  plug_type: string;
+  kw: number;
+  address: string;
+  lat: number;
+  lng: number;
+  cents_per_kwh: number;
+  available: boolean;
+  bookable: boolean;
+}
+
+export interface SwimSiteRow {
+  id: number;
+  name: string;
+  kind: string;
+  lat: number;
+  lng: number;
+  address: string | null;
+  facilities: string[] | null;
+  status: string;
+  latest_grade: string | null;
+  latest_temp_c: number | null;
+  latest_taken_at: string | null;
+}
+
+export interface BurnPermitRow {
+  id: number;
+  permit_no: string;
+  property_address: string;
+  burn_kind: string;
+  starts_at: string;
+  ends_at: string;
+  status: string;
+  conditions: string | null;
+}
+
+export interface FireBanRow {
+  id: number;
+  rating: string;
+  declared_at: string;
+  ends_at: string;
+  source: string;
+  note: string | null;
+}
+
+export interface LotItemRow {
+  id: number;
+  name: string;
+  kind: string;
+  description: string | null;
+  image_url: string | null;
+  deposit_cents: number;
+  max_loan_days: number;
+  available: boolean;
+}
+
+export interface LostFoundRow {
+  id: number;
+  kind: string;
+  direction: string;
+  title: string;
+  description: string;
+  lat: number | null;
+  lng: number | null;
+  contact: string | null;
+  status: string;
+  created_at: string;
+  candidate_match_id: number | null;
+}
+
+export interface PanelRow {
+  id: number;
+  title: string;
+  description: string;
+  question: string;
+  target_size: number;
+  opens_at: string;
+  deliberates_at: string;
+  status: string;
+  expressed: boolean;
+  selected: boolean;
+}
+
+export interface FootpathAuditRow {
+  id: number;
+  lat: number;
+  lng: number;
+  issue: string;
+  grade: string;
+  notes: string | null;
+  verified: boolean;
+  created_at: string;
+}
+
+export interface HeritageSiteRow {
+  id: number;
+  name: string;
+  traditional_name: string | null;
+  country: string | null;
+  language_group: string | null;
+  kind: string;
+  significance: string;
+  address: string | null;
+  lat: number | null;
+  lng: number | null;
+  image_url: string | null;
+  audio_url: string | null;
+}
+
+// --- v6 features ---
+
+export interface SurveyQuestionRow {
+  id: number;
+  position: number;
+  prompt: string;
+  kind: string;
+  options: string[] | null;
+  required: boolean;
+}
+
+export interface SurveyRow {
+  id: number;
+  title: string;
+  description: string | null;
+  kind: string;
+  closes_at: string | null;
+  status: string;
+  response_count: number;
+  answered: boolean;
+  questions: SurveyQuestionRow[];
+}
+
+export interface PetitionRow {
+  id: number;
+  title: string;
+  summary: string;
+  ask: string;
+  threshold: number;
+  signature_count: number;
+  closes_at: string | null;
+  status: string;
+  council_response: string | null;
+  created_at: string;
+  signed: boolean;
+}
+
+export interface InfoRequestRow {
+  id: number;
+  reference: string;
+  title: string;
+  description: string;
+  kind: string;
+  status: string;
+  decision: string | null;
+  fees_cents: number | null;
+  due_by: string;
+  created_at: string;
+}
+
+export interface TenderRow {
+  id: number;
+  reference: string;
+  title: string;
+  description: string;
+  category: string;
+  estimated_value_cents: number | null;
+  opens_at: string;
+  closes_at: string;
+  status: string;
+  documents_url: string | null;
+}
+
+export interface ContractRow {
+  id: number;
+  contract_no: string;
+  title: string;
+  supplier_name: string;
+  supplier_abn: string | null;
+  value_cents: number;
+  starts_on: string;
+  ends_on: string;
+  local_supplier: boolean;
+  summary: string | null;
+}
+
+export interface JobRow {
+  id: number;
+  title: string;
+  employer: string;
+  is_council: boolean;
+  kind: string;
+  salary_min_cents: number | null;
+  salary_max_cents: number | null;
+  description: string;
+  location: string | null;
+  apply_url: string | null;
+  posted_at: string;
+  closes_at: string | null;
+}
+
+export interface RebateRow {
+  id: number;
+  level: string;
+  title: string;
+  description: string;
+  category: string;
+  max_amount_cents: number | null;
+  eligibility: string;
+  apply_url: string | null;
+  expires_on: string | null;
+}
+
+export interface GardenPlotRow {
+  id: number;
+  garden_name: string;
+  plot_code: string;
+  size_sqm: number;
+  annual_fee_cents: number;
+  status: string;
+  notes: string | null;
+}
+
+export interface ChatCitation {
+  id: number;
+  title: string;
+  category: string;
+  source_url: string | null;
+}
+
+// --- v7 admin ---
+
+export interface SearchGroup {
+  label: string;
+  href_template: string;
+  items: { id: number; title: string; snippet: string }[];
+}
+
+export interface SearchResults {
+  q: string;
+  groups: SearchGroup[];
+}
+
+export interface FoiQueueRow {
+  id: number;
+  reference: string;
+  title: string;
+  kind: string;
+  status: string;
+  due_by: string;
+  created_at: string;
+  overdue: boolean;
+  requester_email: string | null;
+}
+
+export interface KbArticleAdminRow {
+  id: number;
+  title: string;
+  category: string;
+  body: string;
+  source_url: string | null;
+  updated_at: string;
+}
+
+export interface SurveyResults {
+  survey_id: number;
+  total_responses: number;
+  tallies: Record<string, Record<string, number>>;
+}
+
+export interface AdminJobRow {
+  id: number;
+  title: string;
+  employer: string;
+  is_council: boolean;
+  kind: string;
+  status: string;
+  posted_at: string;
+  closes_at: string | null;
+}
+
+export interface AdminTenderRow {
+  id: number;
+  reference: string;
+  title: string;
+  category: string;
+  status: string;
+  estimated_value_cents: number | null;
+  opens_at: string;
+  closes_at: string;
+}
+
 // --- Reports detail (existing) ---
 
 export interface ReportDetail {

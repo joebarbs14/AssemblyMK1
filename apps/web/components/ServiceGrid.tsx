@@ -5,150 +5,167 @@ interface Service {
   key: string;
   label: string;
   href: string;
-  available: boolean;
   description: string;
   icon: React.ReactNode;
 }
 
-const SERVICES: Service[] = [
-  {
-    key: "rates",
-    label: "Rates",
-    href: "/rates",
-    available: true,
-    description: "Balance, invoices, BPAY",
-    icon: <IconDocument />,
-  },
+interface Group {
+  key: string;
+  label: string;
+  services: Service[];
+}
+
+const GROUPS: Group[] = [
   {
     key: "report",
-    label: "Report an issue",
-    href: "/reports/new",
-    available: true,
-    description: "Potholes, lights, dumping",
-    icon: <IconReport />,
+    label: "Report & track",
+    services: [
+      { key: "report", label: "Report an issue", href: "/reports/new", description: "Potholes, lights, dumping", icon: <IconReport /> },
+      { key: "my_reports", label: "My reports", href: "/reports", description: "Status & updates", icon: <IconDocument /> },
+      { key: "map", label: "Map", href: "/map", description: "Reports near you", icon: <IconMap /> },
+      { key: "road_closures", label: "Road closures", href: "/road-closures", description: "Works & detours", icon: <IconRoad /> },
+      { key: "disaster", label: "Disaster", href: "/disaster", description: "Alerts, evac, sandbags", icon: <IconHeart /> },
+      { key: "food_premises", label: "Food hygiene", href: "/food-premises", description: "Inspection grades", icon: <IconShop /> },
+      { key: "sensors", label: "Sensors", href: "/sensors", description: "Air, noise, water", icon: <IconLeaf /> },
+      { key: "footpath", label: "Footpath audit", href: "/footpath", description: "Help map kerbs", icon: <IconRoad /> },
+      { key: "lost_found", label: "Lost & found", href: "/lost-found", description: "Pets & items", icon: <IconPaw /> },
+    ],
   },
   {
-    key: "water",
-    label: "Water",
-    href: "/water",
-    available: true,
-    description: "Consumption & bills",
-    icon: <IconDroplet />,
+    key: "pay",
+    label: "Pay & manage",
+    services: [
+      { key: "rates", label: "Rates", href: "/rates", description: "Balance, invoices, BPAY", icon: <IconDocument /> },
+      { key: "water", label: "Water", href: "/water", description: "Consumption & bills", icon: <IconDroplet /> },
+      { key: "waste", label: "Waste & bins", href: "/waste", description: "Collection days", icon: <IconTrash /> },
+      { key: "bin_lookup", label: "Bin lookup", href: "/bin-lookup", description: "What bin tomorrow?", icon: <IconTrash /> },
+      { key: "pets", label: "Pets", href: "/pets", description: "Register & renew", icon: <IconPaw /> },
+      { key: "permits", label: "Permits", href: "/permits", description: "Parking & visitor", icon: <IconBuilding /> },
+      { key: "hardship", label: "Hardship", href: "/hardship", description: "Pensioner & relief", icon: <IconHeart /> },
+      { key: "childcare", label: "Childcare", href: "/childcare", description: "Vacancies & waitlists", icon: <IconUsers /> },
+      { key: "burn_permits", label: "Burn permits", href: "/burn-permits", description: "Pile / stubble burns", icon: <IconHeart /> },
+    ],
   },
   {
-    key: "waste",
-    label: "Waste & bins",
-    href: "/waste",
-    available: true,
-    description: "Collection days",
-    icon: <IconTrash />,
+    key: "say",
+    label: "Have your say",
+    services: [
+      { key: "announcements", label: "Announcements", href: "/announcements", description: "Council news", icon: <IconMegaphone /> },
+      { key: "noticeboard", label: "Noticeboard", href: "/noticeboard", description: "Local events & lost found", icon: <IconUsers /> },
+      { key: "meetings", label: "Meetings", href: "/meetings", description: "Agendas & minutes", icon: <IconGavel /> },
+      { key: "pb", label: "Community budget", href: "/pb", description: "Vote on projects", icon: <IconChart /> },
+      { key: "panels", label: "Citizen panels", href: "/panels", description: "Random-jury deliberation", icon: <IconUsers /> },
+      { key: "surveys", label: "Surveys", href: "/surveys", description: "Tell us what you think", icon: <IconMegaphone /> },
+      { key: "petitions", label: "Petitions", href: "/petitions", description: "Start or sign one", icon: <IconUsers /> },
+      { key: "foi", label: "GIPA / FOI", href: "/foi", description: "Request records", icon: <IconDocument /> },
+      { key: "grants", label: "Grants", href: "/grants", description: "Draft & opportunities", icon: <IconDocument /> },
+    ],
   },
   {
-    key: "roads",
-    label: "Roads",
-    href: "/reports/new",
-    available: true,
-    description: "Report a road issue",
-    icon: <IconRoad />,
+    key: "involve",
+    label: "Get involved",
+    services: [
+      { key: "volunteer", label: "Volunteer", href: "/volunteer", description: "Help out council", icon: <IconUsers /> },
+      { key: "programs", label: "Programs", href: "/programs", description: "Bookings", icon: <IconCalendar /> },
+      { key: "trees", label: "Tree register", href: "/trees", description: "Adopt-a-tree", icon: <IconLeaf /> },
+      { key: "donations", label: "Community fund", href: "/donations", description: "Back local projects", icon: <IconHeart /> },
+      { key: "library", label: "Library", href: "/library", description: "Search & hold", icon: <IconDocument /> },
+      { key: "lot", label: "Library of Things", href: "/library-of-things", description: "Borrow tools etc.", icon: <IconShop /> },
+      { key: "gardens", label: "Community gardens", href: "/gardens", description: "Apply for a plot", icon: <IconLeaf /> },
+      { key: "jobs", label: "Jobs board", href: "/jobs", description: "Roles & work experience", icon: <IconShop /> },
+    ],
   },
   {
-    key: "development",
-    label: "Development",
-    href: "/development",
-    available: true,
-    description: "DAs & approvals",
-    icon: <IconBuilding />,
+    key: "discover",
+    label: "Discover",
+    services: [
+      { key: "businesses", label: "Businesses", href: "/businesses", description: "Local trades & shops", icon: <IconShop /> },
+      { key: "tourism", label: "What's on", href: "/tourism", description: "Events & places", icon: <IconMap /> },
+      { key: "calendar", label: "Calendar", href: "/calendar", description: "Export to iCal", icon: <IconCalendar /> },
+      { key: "climate", label: "Climate", href: "/climate", description: "Sustainability targets", icon: <IconLeaf /> },
+      { key: "budget", label: "Budget", href: "/budget", description: "Where your rates go", icon: <IconChart /> },
+      { key: "open_data", label: "Open data", href: "/open-data", description: "CSV downloads", icon: <IconDocument /> },
+      { key: "ev", label: "EV chargers", href: "/ev", description: "Map & booking", icon: <IconDroplet /> },
+      { key: "swim", label: "Swim conditions", href: "/swim", description: "Beaches, pools, river", icon: <IconDroplet /> },
+      { key: "heritage", label: "Heritage & Country", href: "/heritage", description: "Story places", icon: <IconLeaf /> },
+      { key: "rebates", label: "Climate rebates", href: "/rebates", description: "Solar, battery, EV", icon: <IconLeaf /> },
+      { key: "procurement", label: "Tenders & contracts", href: "/procurement", description: "Awards transparency", icon: <IconDocument /> },
+      { key: "ask", label: "Ask council", href: "/ask", description: "AI assistant", icon: <IconMegaphone /> },
+    ],
   },
   {
-    key: "community",
-    label: "Community",
-    href: "/announcements",
-    available: true,
-    description: "News & announcements",
-    icon: <IconMegaphone />,
-  },
-  {
-    key: "animals",
-    label: "Animals",
-    href: "/animals",
-    available: true,
-    description: "Adoptions & registration",
-    icon: <IconPaw />,
+    key: "land",
+    label: "Land & development",
+    services: [
+      { key: "development", label: "Development", href: "/development", description: "DAs & approvals", icon: <IconBuilding /> },
+      { key: "land_hire", label: "Hire venue", href: "/land-hire", description: "Halls, ovals, BBQ", icon: <IconBuilding /> },
+      { key: "cemetery", label: "Cemetery", href: "/cemetery", description: "Plot search", icon: <IconDocument /> },
+      { key: "animals", label: "Animals", href: "/animals", description: "Adoptions & registration", icon: <IconPaw /> },
+    ],
   },
 ];
 
 export function ServiceGrid() {
   return (
-    <section style={{ marginBottom: "1rem" }}>
-      <h2 style={{ fontSize: "1rem", fontWeight: 600, margin: "0 0 0.75rem" }}>Services</h2>
-      <ul
-        style={{
-          listStyle: "none",
-          padding: 0,
-          margin: 0,
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))",
-          gap: 10,
-        }}
-      >
-        {SERVICES.map((s) => (
-          <li key={s.key}>
-            <Link
-              href={s.href}
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 6,
-                padding: "0.875rem 1rem",
-                background: "var(--surface)",
-                border: "1px solid var(--border)",
-                borderRadius: "var(--r-lg)",
-                textDecoration: "none",
-                color: "var(--text-primary)",
-                minHeight: 96,
-                position: "relative",
-                boxShadow: "var(--e1)",
-              }}
-            >
-              <div style={{ color: "var(--brand)" }}>{s.icon}</div>
-              <span style={{ fontWeight: 600, fontSize: "0.9375rem" }}>{s.label}</span>
-              <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>
-                {s.description}
-              </span>
-              {!s.available && (
-                <span
+    <section style={{ marginBottom: "1rem" }} aria-label="Services">
+      {GROUPS.map((g) => (
+        <div key={g.key} style={{ marginBottom: "1.25rem" }}>
+          <h3 style={{
+            margin: "0 0 0.5rem",
+            fontSize: "0.7rem",
+            fontWeight: 700,
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+            color: "var(--text-secondary)",
+          }}>{g.label}</h3>
+          <ul style={{
+            listStyle: "none",
+            padding: 0,
+            margin: 0,
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
+            gap: 8,
+          }}>
+            {g.services.map((s) => (
+              <li key={s.key}>
+                <Link
+                  href={s.href}
                   style={{
-                    position: "absolute",
-                    top: 8,
-                    right: 8,
-                    fontSize: "0.625rem",
-                    fontWeight: 600,
-                    letterSpacing: "0.04em",
-                    textTransform: "uppercase",
-                    color: "var(--text-secondary)",
-                    background: "var(--surface-muted)",
-                    padding: "2px 6px",
-                    borderRadius: "var(--r-full)",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 4,
+                    padding: "0.75rem 0.875rem",
+                    background: "var(--surface)",
+                    border: "1px solid var(--border)",
+                    borderRadius: "var(--r-lg)",
+                    textDecoration: "none",
+                    color: "var(--text-primary)",
+                    minHeight: 80,
+                    boxShadow: "var(--e1)",
                   }}
                 >
-                  Soon
-                </span>
-              )}
-            </Link>
-          </li>
-        ))}
-      </ul>
+                  <div style={{ color: "var(--brand)" }}>{s.icon}</div>
+                  <span style={{ fontWeight: 600, fontSize: "0.875rem", lineHeight: 1.25 }}>{s.label}</span>
+                  <span style={{ fontSize: "0.7rem", color: "var(--text-secondary)", lineHeight: 1.3 }}>
+                    {s.description}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
     </section>
   );
 }
 
-// --- Inline SVG icons (24px, stroke 1.75) ---
+// --- Inline SVG icons (22px, stroke 1.75) ---
 
 function IconBase({ children, ...rest }: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
-      width="22"
-      height="22"
+      width="20"
+      height="20"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -239,6 +256,80 @@ function IconPaw() {
       <circle cx="14" cy="5" r="2" />
       <circle cx="18" cy="9" r="2" />
       <path d="M12 11c-3 0-7 3-7 6a3 3 0 0 0 3 3c1 0 2-1 4-1s3 1 4 1a3 3 0 0 0 3-3c0-3-4-6-7-6z" />
+    </IconBase>
+  );
+}
+function IconMap() {
+  return (
+    <IconBase>
+      <polygon points="1 6 8 3 16 6 23 3 23 18 16 21 8 18 1 21" />
+      <line x1="8" y1="3" x2="8" y2="18" />
+      <line x1="16" y1="6" x2="16" y2="21" />
+    </IconBase>
+  );
+}
+function IconUsers() {
+  return (
+    <IconBase>
+      <circle cx="9" cy="8" r="3" />
+      <circle cx="17" cy="9" r="2" />
+      <path d="M3 21v-1a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v1" />
+      <path d="M16 21v-1a3 3 0 0 1 3-3h1a3 3 0 0 1 3 3v1" />
+    </IconBase>
+  );
+}
+function IconGavel() {
+  return (
+    <IconBase>
+      <path d="M14 4l6 6" />
+      <path d="M11 7l6 6" />
+      <path d="M5 13l6 6" />
+      <path d="M3 21h12" />
+      <line x1="13" y1="2" x2="22" y2="11" />
+    </IconBase>
+  );
+}
+function IconLeaf() {
+  return (
+    <IconBase>
+      <path d="M21 3v6a9 9 0 0 1-9 9H5" />
+      <path d="M5 18c0-5 3-9 8-10" />
+    </IconBase>
+  );
+}
+function IconCalendar() {
+  return (
+    <IconBase>
+      <rect x="3" y="5" width="18" height="16" rx="2" />
+      <line x1="3" y1="10" x2="21" y2="10" />
+      <line x1="8" y1="3" x2="8" y2="7" />
+      <line x1="16" y1="3" x2="16" y2="7" />
+    </IconBase>
+  );
+}
+function IconHeart() {
+  return (
+    <IconBase>
+      <path d="M20.84 4.6a5.5 5.5 0 0 0-7.78 0L12 5.66 10.94 4.6a5.5 5.5 0 0 0-7.78 7.78L12 21l8.84-8.62a5.5 5.5 0 0 0 0-7.78z" />
+    </IconBase>
+  );
+}
+function IconChart() {
+  return (
+    <IconBase>
+      <line x1="4" y1="20" x2="4" y2="10" />
+      <line x1="10" y1="20" x2="10" y2="4" />
+      <line x1="16" y1="20" x2="16" y2="14" />
+      <line x1="22" y1="20" x2="22" y2="8" />
+    </IconBase>
+  );
+}
+function IconShop() {
+  return (
+    <IconBase>
+      <path d="M3 9l1-5h16l1 5" />
+      <path d="M5 9v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9" />
+      <path d="M9 21v-6h6v6" />
     </IconBase>
   );
 }
