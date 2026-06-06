@@ -9,12 +9,13 @@ import secrets
 from datetime import UTC, date, datetime, timedelta
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from app.core.db import get_db
 from app.core.deps import get_current_user
+from app.core.rate_limit import limiter
 from app.models import (
     BurnPermit,
     ChildcareCentre,
@@ -452,7 +453,9 @@ def list_lost_found(direction: str | None = None, kind: str | None = None,
 
 
 @router.post("/lost-found", response_model=LostFoundOut, status_code=201)
-def report_lost_found(body: LostFoundIn, user: User = Depends(get_current_user),
+@limiter.limit("10/hour")
+def report_lost_found(request: Request, body: LostFoundIn,
+                      user: User = Depends(get_current_user),
                       db: Session = Depends(get_db)) -> LostFoundOut:
     phash = _phash_from_text(f"{body.kind}:{body.title}")
     opposite = "found" if body.direction == "lost" else "lost"

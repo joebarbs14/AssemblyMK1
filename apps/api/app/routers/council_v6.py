@@ -7,13 +7,14 @@ import secrets
 from datetime import UTC, date, datetime, timedelta
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import BaseModel, Field
 from sqlalchemy import func, or_
 from sqlalchemy.orm import Session
 
 from app.core.db import get_db
 from app.core.deps import get_current_user
+from app.core.rate_limit import limiter
 from app.models import (
     ChatMessage,
     ContractAward,
@@ -127,7 +128,8 @@ class SurveySubmitIn(BaseModel):
 
 
 @router.post("/surveys/{sid}/respond", status_code=201)
-def submit_survey(sid: int, body: SurveySubmitIn,
+@limiter.limit("10/minute")
+def submit_survey(request: Request, sid: int, body: SurveySubmitIn,
                   user: User = Depends(get_current_user),
                   db: Session = Depends(get_db)) -> dict[str, Any]:
     s = db.get(Survey, sid)
@@ -241,7 +243,9 @@ class PetitionCreateIn(BaseModel):
 
 
 @router.post("/petitions", status_code=201)
-def create_petition(body: PetitionCreateIn, user: User = Depends(get_current_user),
+@limiter.limit("3/hour")
+def create_petition(request: Request, body: PetitionCreateIn,
+                    user: User = Depends(get_current_user),
                     db: Session = Depends(get_db)) -> dict[str, Any]:
     p = Petition(
         council_id=user.council_id, author_user_id=user.id,
@@ -259,7 +263,9 @@ class SignIn(BaseModel):
 
 
 @router.post("/petitions/{pid}/sign", status_code=201)
-def sign_petition(pid: int, body: SignIn, user: User = Depends(get_current_user),
+@limiter.limit("20/minute")
+def sign_petition(request: Request, pid: int, body: SignIn,
+                  user: User = Depends(get_current_user),
                   db: Session = Depends(get_db)) -> dict[str, Any]:
     p = db.get(Petition, pid)
     if p is None or p.council_id != user.council_id:
@@ -383,7 +389,9 @@ class InfoRequestOut(BaseModel):
 
 
 @router.post("/foi", response_model=InfoRequestOut, status_code=201)
-def lodge_info_request(body: InfoRequestIn, user: User = Depends(get_current_user),
+@limiter.limit("5/hour")
+def lodge_info_request(request: Request, body: InfoRequestIn,
+                       user: User = Depends(get_current_user),
                        db: Session = Depends(get_db)) -> InfoRequestOut:
     now = datetime.now(UTC)
     business_days = 20 if body.kind == "formal" else 10
@@ -593,7 +601,9 @@ class ChatOut(BaseModel):
 
 
 @router.post("/chat", response_model=ChatOut)
-def chat(body: ChatIn, user: User = Depends(get_current_user),
+@limiter.limit("30/minute")
+def chat(request: Request, body: ChatIn,
+         user: User = Depends(get_current_user),
          db: Session = Depends(get_db)) -> ChatOut:
     db.add(ChatMessage(council_id=user.council_id, user_id=user.id,
                        session_id=body.session_id, role="user", text=body.question))

@@ -1004,6 +1004,46 @@ export interface ChatCitation {
   source_url: string | null;
 }
 
+// --- v7 admin ---
+
+export interface SearchGroup {
+  label: string;
+  href_template: string;
+  items: { id: number; title: string; snippet: string }[];
+}
+
+export interface SearchResults {
+  q: string;
+  groups: SearchGroup[];
+}
+
+export interface FoiQueueRow {
+  id: number;
+  reference: string;
+  title: string;
+  kind: string;
+  status: string;
+  due_by: string;
+  created_at: string;
+  overdue: boolean;
+  requester_email: string | null;
+}
+
+export interface KbArticleAdminRow {
+  id: number;
+  title: string;
+  category: string;
+  body: string;
+  source_url: string | null;
+  updated_at: string;
+}
+
+export interface SurveyResults {
+  survey_id: number;
+  total_responses: number;
+  tallies: Record<string, Record<string, number>>;
+}
+
 // --- Reports detail (existing) ---
 
 export interface ReportDetail {

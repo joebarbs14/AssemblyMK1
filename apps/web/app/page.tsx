@@ -44,6 +44,16 @@ export default async function Home() {
     <main style={{ maxWidth: 760, margin: "0 auto", padding: "1rem 1.25rem 6rem" }}>
       <CouncilHeader me={me} />
 
+      {/* Global search bar */}
+      <form action="/search" method="GET" style={{ marginBottom: "1rem" }}>
+        <input name="q" placeholder="Search reports, FAQ, businesses, tenders…"
+          style={{
+            width: "100%", padding: "0.625rem 0.875rem", fontSize: "0.9375rem",
+            border: "1px solid var(--border)", borderRadius: "var(--r-full)",
+            background: "var(--surface-muted)", fontFamily: "inherit",
+          }} />
+      </form>
+
       {/* 1. News & announcements carousel */}
       <NewsCarousel announcements={announcements} alerts={alerts} />
 
