@@ -27,6 +27,8 @@ const GROUPS: Group[] = [
       { key: "disaster", label: "Disaster", href: "/disaster", description: "Alerts, evac, sandbags", icon: <IconHeart /> },
       { key: "food_premises", label: "Food hygiene", href: "/food-premises", description: "Inspection grades", icon: <IconShop /> },
       { key: "sensors", label: "Sensors", href: "/sensors", description: "Air, noise, water", icon: <IconLeaf /> },
+      { key: "footpath", label: "Footpath audit", href: "/footpath", description: "Help map kerbs", icon: <IconRoad /> },
+      { key: "lost_found", label: "Lost & found", href: "/lost-found", description: "Pets & items", icon: <IconPaw /> },
     ],
   },
   {
@@ -40,6 +42,8 @@ const GROUPS: Group[] = [
       { key: "pets", label: "Pets", href: "/pets", description: "Register & renew", icon: <IconPaw /> },
       { key: "permits", label: "Permits", href: "/permits", description: "Parking & visitor", icon: <IconBuilding /> },
       { key: "hardship", label: "Hardship", href: "/hardship", description: "Pensioner & relief", icon: <IconHeart /> },
+      { key: "childcare", label: "Childcare", href: "/childcare", description: "Vacancies & waitlists", icon: <IconUsers /> },
+      { key: "burn_permits", label: "Burn permits", href: "/burn-permits", description: "Pile / stubble burns", icon: <IconHeart /> },
     ],
   },
   {
@@ -50,6 +54,7 @@ const GROUPS: Group[] = [
       { key: "noticeboard", label: "Noticeboard", href: "/noticeboard", description: "Local events & lost found", icon: <IconUsers /> },
       { key: "meetings", label: "Meetings", href: "/meetings", description: "Agendas & minutes", icon: <IconGavel /> },
       { key: "pb", label: "Community budget", href: "/pb", description: "Vote on projects", icon: <IconChart /> },
+      { key: "panels", label: "Citizen panels", href: "/panels", description: "Random-jury deliberation", icon: <IconUsers /> },
       { key: "grants", label: "Grants", href: "/grants", description: "Draft & opportunities", icon: <IconDocument /> },
     ],
   },
@@ -62,6 +67,7 @@ const GROUPS: Group[] = [
       { key: "trees", label: "Tree register", href: "/trees", description: "Adopt-a-tree", icon: <IconLeaf /> },
       { key: "donations", label: "Community fund", href: "/donations", description: "Back local projects", icon: <IconHeart /> },
       { key: "library", label: "Library", href: "/library", description: "Search & hold", icon: <IconDocument /> },
+      { key: "lot", label: "Library of Things", href: "/library-of-things", description: "Borrow tools etc.", icon: <IconShop /> },
     ],
   },
   {
@@ -74,6 +80,9 @@ const GROUPS: Group[] = [
       { key: "climate", label: "Climate", href: "/climate", description: "Sustainability targets", icon: <IconLeaf /> },
       { key: "budget", label: "Budget", href: "/budget", description: "Where your rates go", icon: <IconChart /> },
       { key: "open_data", label: "Open data", href: "/open-data", description: "CSV downloads", icon: <IconDocument /> },
+      { key: "ev", label: "EV chargers", href: "/ev", description: "Map & booking", icon: <IconDroplet /> },
+      { key: "swim", label: "Swim conditions", href: "/swim", description: "Beaches, pools, river", icon: <IconDroplet /> },
+      { key: "heritage", label: "Heritage & Country", href: "/heritage", description: "Story places", icon: <IconLeaf /> },
     ],
   },
   {

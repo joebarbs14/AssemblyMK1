@@ -754,6 +754,136 @@ export interface TourismRow {
   tags: string[] | null;
 }
 
+// --- v5 features ---
+
+export interface ChildcareCentreRow {
+  id: number;
+  name: string;
+  kind: string;
+  address: string;
+  lat: number | null;
+  lng: number | null;
+  phone: string | null;
+  website: string | null;
+  age_min_months: number;
+  age_max_months: number;
+  daily_fee_cents: number;
+  vacancies: number;
+  rating: string | null;
+}
+
+export interface EvChargerRow {
+  id: number;
+  name: string;
+  operator: string;
+  plug_type: string;
+  kw: number;
+  address: string;
+  lat: number;
+  lng: number;
+  cents_per_kwh: number;
+  available: boolean;
+  bookable: boolean;
+}
+
+export interface SwimSiteRow {
+  id: number;
+  name: string;
+  kind: string;
+  lat: number;
+  lng: number;
+  address: string | null;
+  facilities: string[] | null;
+  status: string;
+  latest_grade: string | null;
+  latest_temp_c: number | null;
+  latest_taken_at: string | null;
+}
+
+export interface BurnPermitRow {
+  id: number;
+  permit_no: string;
+  property_address: string;
+  burn_kind: string;
+  starts_at: string;
+  ends_at: string;
+  status: string;
+  conditions: string | null;
+}
+
+export interface FireBanRow {
+  id: number;
+  rating: string;
+  declared_at: string;
+  ends_at: string;
+  source: string;
+  note: string | null;
+}
+
+export interface LotItemRow {
+  id: number;
+  name: string;
+  kind: string;
+  description: string | null;
+  image_url: string | null;
+  deposit_cents: number;
+  max_loan_days: number;
+  available: boolean;
+}
+
+export interface LostFoundRow {
+  id: number;
+  kind: string;
+  direction: string;
+  title: string;
+  description: string;
+  lat: number | null;
+  lng: number | null;
+  contact: string | null;
+  status: string;
+  created_at: string;
+  candidate_match_id: number | null;
+}
+
+export interface PanelRow {
+  id: number;
+  title: string;
+  description: string;
+  question: string;
+  target_size: number;
+  opens_at: string;
+  deliberates_at: string;
+  status: string;
+  expressed: boolean;
+  selected: boolean;
+}
+
+export interface FootpathAuditRow {
+  id: number;
+  lat: number;
+  lng: number;
+  issue: string;
+  grade: string;
+  notes: string | null;
+  verified: boolean;
+  created_at: string;
+}
+
+export interface HeritageSiteRow {
+  id: number;
+  name: string;
+  traditional_name: string | null;
+  country: string | null;
+  language_group: string | null;
+  kind: string;
+  significance: string;
+  address: string | null;
+  lat: number | null;
+  lng: number | null;
+  image_url: string | null;
+  audio_url: string | null;
+}
+
 // --- Reports detail (existing) ---
 
 export interface ReportDetail {

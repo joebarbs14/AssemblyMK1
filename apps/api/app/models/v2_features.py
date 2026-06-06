@@ -45,6 +45,7 @@ class CouncilMeeting(Base):
         String(16), default=MeetingStatus.scheduled.value, nullable=False, index=True
     )
     notes: Mapped[str | None] = mapped_column(Text)
+    transcript_text: Mapped[str | None] = mapped_column(Text)
 
 
 class MeetingAgendaItem(Base):
