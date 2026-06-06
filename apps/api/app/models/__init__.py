@@ -114,6 +114,7 @@ from app.models.payment import (
     PlanStatus,
     WebhookEvent,
 )
+from app.models.rate_category import RateCategory
 from app.models.rates import (
     BillingSetting,
     BpayCrn,
@@ -276,6 +277,7 @@ __all__ = [
     "PropertyOverlay",
     "PropertyOwnership",
     "PropertyType",
+    "RateCategory",
     "RateCharge",
     "RatesAccount",
     "RatesInvoice",

@@ -1004,6 +1004,78 @@ export interface ChatCitation {
   source_url: string | null;
 }
 
+// --- Staff rates ---
+
+export interface RateCategoryRow {
+  id: number;
+  fiscal_year: number;
+  code: string;
+  label: string;
+  ad_valorem_cents_per_dollar: number;
+  base_amount_cents: number;
+  minimum_cents: number;
+  notes: string | null;
+  is_active: boolean;
+}
+
+export interface RateCalcBreakdown {
+  land_value_cents: number;
+  ad_valorem_cents_per_dollar: number;
+  base_amount_cents: number;
+  minimum_cents: number;
+  ad_valorem_component_cents: number;
+  gross_cents: number;
+  minimum_applied: boolean;
+  concession_cents: number;
+  total_cents: number;
+}
+
+export interface RateCalcResult {
+  category: RateCategoryRow;
+  breakdown: RateCalcBreakdown;
+}
+
+export interface RatePropertyRollRow {
+  id: number;
+  address: string;
+  suburb: string | null;
+  property_type: string;
+  land_size_sqm: number | null;
+  zone: string | null;
+  latest_uv_cents: number | null;
+  account_number: string | null;
+  balance_cents: number;
+  overdue: boolean;
+}
+
+export interface RatePropertyForStaff {
+  id: number;
+  address: string;
+  suburb: string | null;
+  property_type: string;
+  land_size_sqm: number | null;
+  zone: string | null;
+  lat: number | null;
+  lng: number | null;
+  valuations: { year: number; land_value_cents: number; capital_value_cents: number }[];
+  rate_charges: { period_start: string; period_end: string; category: string;
+                  amount_cents: number; note: string | null }[];
+  concessions: { type: string; status: string; annual_value_cents: number | null }[];
+  account_number: string | null;
+  balance_cents: number;
+  next_due_date: string | null;
+  suggested_calc: RateCalcBreakdown | null;
+  suggested_category: RateCategoryRow | null;
+}
+
+export interface RateKpis {
+  properties: number;
+  outstanding_cents: number;
+  overdue_accounts: number;
+  active_categories_current_fy: number;
+  current_fy: number;
+}
+
 // --- v7 admin ---
 
 export interface SearchGroup {
