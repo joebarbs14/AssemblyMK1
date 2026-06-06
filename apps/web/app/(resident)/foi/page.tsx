@@ -6,6 +6,7 @@ import { api, type InfoRequestRow } from "@/lib/api";
 import { readSessionToken } from "@/lib/session";
 
 import { FoiForm } from "./FoiForm";
+import { WithdrawButton } from "./WithdrawButton";
 
 const STATUS_COLOR: Record<string, string> = {
   received: "#6b7280",
@@ -49,12 +50,16 @@ export default async function FoiPage() {
                         {r.reference} · {r.kind} · due {new Date(r.due_by).toLocaleDateString()}
                       </p>
                     </div>
-                    <span style={{
-                      padding: "0.125rem 0.5rem", fontSize: "0.7rem", fontWeight: 700,
-                      textTransform: "uppercase", letterSpacing: "0.04em", color: "#fff",
-                      background: STATUS_COLOR[r.status] ?? "#6b7280", borderRadius: "var(--r-full)",
-                      alignSelf: "flex-start",
-                    }}>{r.status.replace("_", " ")}</span>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "0.375rem", alignItems: "flex-end" }}>
+                      <span style={{
+                        padding: "0.125rem 0.5rem", fontSize: "0.7rem", fontWeight: 700,
+                        textTransform: "uppercase", letterSpacing: "0.04em", color: "#fff",
+                        background: STATUS_COLOR[r.status] ?? "#6b7280", borderRadius: "var(--r-full)",
+                      }}>{r.status.replace("_", " ")}</span>
+                      {!["decided", "released", "refused", "withdrawn"].includes(r.status) && (
+                        <WithdrawButton token={token} requestId={r.id} />
+                      )}
+                    </div>
                   </div>
                 </Card>
               </li>

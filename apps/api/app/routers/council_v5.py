@@ -94,6 +94,10 @@ def join_waitlist(cid: int, body: WaitlistIn, user: User = Depends(get_current_u
         child_first_name=body.child_first_name, child_dob=body.child_dob,
         needed_from=body.needed_from, days_per_week=body.days_per_week,
     )
+    # Auto-offer if vacancy available
+    if c.vacancies > 0:
+        w.status = "offered"
+        c.vacancies -= 1
     db.add(w)
     db.commit()
     db.refresh(w)
@@ -104,7 +108,37 @@ def join_waitlist(cid: int, body: WaitlistIn, user: User = Depends(get_current_u
                 ChildcareWaitlist.id <= w.id)
         .count()
     )
+    from app.services.notify import notify  # noqa: PLC0415
+    if w.status == "offered":
+        notify(db, user=user, council_id=user.council_id,
+               action="childcare.offered",
+               title="Childcare offer",
+               body=f"{c.name} has a vacancy for {body.child_first_name} — confirm in your account.",
+               url="/childcare", target_type="childcare_waitlist", target_id=w.id)
+    else:
+        notify(db, user=user, council_id=user.council_id,
+               action="childcare.waitlisted",
+               title="On the waitlist",
+               body=f"{c.name} — you're #{position} for {body.child_first_name}.",
+               url="/childcare", target_type="childcare_waitlist", target_id=w.id)
     return {"id": w.id, "position": position, "status": w.status}
+
+
+@router.delete("/childcare/waitlist/{wid}", status_code=204)
+def cancel_waitlist(wid: int, user: User = Depends(get_current_user),
+                    db: Session = Depends(get_db)) -> None:
+    w = db.get(ChildcareWaitlist, wid)
+    if w is None or w.user_id != user.id:
+        raise HTTPException(status_code=404, detail="Not found")
+    if w.status not in ("waiting", "offered"):
+        raise HTTPException(status_code=400, detail="Cannot cancel now")
+    if w.status == "offered":
+        # release vacancy back
+        c = db.get(ChildcareCentre, w.centre_id)
+        if c is not None:
+            c.vacancies += 1
+    w.status = "cancelled"
+    db.commit()
 
 
 # ============ #2 EV chargers ============
@@ -392,15 +426,23 @@ class LostFoundOut(BaseModel):
 
 @router.get("/lost-found", response_model=list[LostFoundOut])
 def list_lost_found(direction: str | None = None, kind: str | None = None,
+                    days: int = Query(default=60, ge=1, le=365),
+                    limit: int = Query(default=50, ge=1, le=200),
+                    offset: int = Query(default=0, ge=0),
                     user: User = Depends(get_current_user),
                     db: Session = Depends(get_db)) -> list[LostFoundOut]:
-    q = db.query(LostFoundItem).filter(LostFoundItem.council_id == user.council_id,
-                                       LostFoundItem.status.in_(("open", "matched")))
+    # Auto-close stale lost posts older than `days`
+    cutoff = datetime.now(UTC) - timedelta(days=days)
+    q = db.query(LostFoundItem).filter(
+        LostFoundItem.council_id == user.council_id,
+        LostFoundItem.status.in_(("open", "matched")),
+        LostFoundItem.created_at >= cutoff,
+    )
     if direction:
         q = q.filter(LostFoundItem.direction == direction)
     if kind:
         q = q.filter(LostFoundItem.kind == kind)
-    rows = q.order_by(LostFoundItem.created_at.desc()).limit(100).all()
+    rows = q.order_by(LostFoundItem.created_at.desc()).offset(offset).limit(limit).all()
     return [LostFoundOut(
         id=r.id, kind=r.kind, direction=r.direction, title=r.title,
         description=r.description, lat=r.lat, lng=r.lng, contact=r.contact,
@@ -436,12 +478,39 @@ def report_lost_found(body: LostFoundIn, user: User = Depends(get_current_user),
     if candidate is not None:
         candidate.status = "matched"
         db.commit()
+        from app.services.notify import notify  # noqa: PLC0415
+        notify(db, user=user, council_id=user.council_id,
+               action="lost_found.match",
+               title="Possible match!",
+               body=f"Someone may have your {body.kind} — '{candidate.title}'.",
+               url="/lost-found", target_type="lost_found_item", target_id=item.id)
+        # Also notify the other side
+        other = db.get(User, candidate.reporter_user_id) if candidate.reporter_user_id else None
+        if other is not None:
+            notify(db, user=other, council_id=user.council_id,
+                   action="lost_found.match",
+                   title="Possible match for your post",
+                   body=f"Someone reported '{body.title}' — could be yours.",
+                   url="/lost-found", target_type="lost_found_item", target_id=candidate.id)
     return LostFoundOut(
         id=item.id, kind=item.kind, direction=item.direction, title=item.title,
         description=item.description, lat=item.lat, lng=item.lng, contact=item.contact,
         status=item.status, created_at=item.created_at,
         candidate_match_id=candidate.id if candidate else None,
     )
+
+
+@router.post("/lost-found/{iid}/reunite", status_code=200)
+def reunite_lost_found(iid: int, user: User = Depends(get_current_user),
+                       db: Session = Depends(get_db)) -> dict[str, Any]:
+    item = db.get(LostFoundItem, iid)
+    if item is None or item.council_id != user.council_id:
+        raise HTTPException(status_code=404, detail="Not found")
+    if item.reporter_user_id != user.id and user.role == UserRole.resident.value:
+        raise HTTPException(status_code=403, detail="Only the poster can close")
+    item.status = "reunited"
+    db.commit()
+    return {"ok": True}
 
 
 # ============ #7 Citizen panels ============
@@ -520,6 +589,18 @@ def draw_panel(pid: int, user: User = Depends(get_current_user),
         e.selected = True
     p.status = "selected"
     db.commit()
+    from app.services.notify import notify  # noqa: PLC0415
+    for e in drawn:
+        selected_user = db.get(User, e.user_id)
+        if selected_user is None:
+            continue
+        notify(db, user=selected_user, council_id=user.council_id,
+               action="panel.selected",
+               title="You're on the panel",
+               body=f"You've been randomly selected for the '{p.title}' citizen panel. "
+                    f"First sitting {p.deliberates_at.date()}.",
+               url="/panels", target_type="citizen_panel", target_id=p.id,
+               webhook_event="panel.drawn")
     return {"ok": True, "drawn": len(drawn), "pool": len(pool)}
 
 

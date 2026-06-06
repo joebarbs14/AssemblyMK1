@@ -391,7 +391,50 @@ def book_land_hire(rid: int, body: LandHireBookIn,
     db.add(b)
     db.commit()
     db.refresh(b)
+    from app.services.notify import notify  # noqa: PLC0415
+    notify(db, user=user, council_id=user.council_id,
+           action="land_hire.booked",
+           title="Booking confirmed",
+           body=f"{r.name} — ${total/100:.2f} total.",
+           url="/land-hire", target_type="land_hire_booking", target_id=b.id,
+           webhook_event="land_hire.booked")
     return {"id": b.id, "total_cents": total, "status": b.status}
+
+
+@router.delete("/land-hire/bookings/{bid}", status_code=204)
+def cancel_land_hire(bid: int, user: User = Depends(get_current_user),
+                     db: Session = Depends(get_db)) -> None:
+    b = db.get(LandHireBooking, bid)
+    if b is None or b.user_id != user.id:
+        raise HTTPException(status_code=404, detail="Not found")
+    if b.status != "confirmed":
+        raise HTTPException(status_code=400, detail="Already cancelled")
+    b.status = "cancelled"
+    db.commit()
+    from app.services.notify import notify  # noqa: PLC0415
+    notify(db, user=user, council_id=user.council_id,
+           action="land_hire.cancelled",
+           title="Booking cancelled",
+           body=f"Booking #{b.id} cancelled.", url="/land-hire",
+           target_type="land_hire_booking", target_id=b.id)
+
+
+@router.get("/land-hire/mine")
+def my_land_hire(user: User = Depends(get_current_user),
+                 db: Session = Depends(get_db)) -> list[dict[str, Any]]:
+    rows = (
+        db.query(LandHireBooking, LandHireResource)
+        .join(LandHireResource, LandHireResource.id == LandHireBooking.resource_id)
+        .filter(LandHireBooking.user_id == user.id)
+        .order_by(LandHireBooking.starts_at.desc())
+        .limit(50)
+        .all()
+    )
+    return [{
+        "id": b.id, "resource": r.name, "starts_at": b.starts_at.isoformat(),
+        "ends_at": b.ends_at.isoformat(), "total_cents": b.total_cents,
+        "status": b.status,
+    } for b, r in rows]
 
 
 # ============ #9 Citizen sensors ============

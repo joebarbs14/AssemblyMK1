@@ -370,9 +370,33 @@ def signup_vol(oid: int, user: User = Depends(get_current_user),
     )
     if existing is not None:
         return {"ok": True, "signup_id": existing.id, "status": existing.status}
-    db.add(VolunteerSignup(user_id=user.id, opportunity_id=oid, status="confirmed"))
+    s = VolunteerSignup(user_id=user.id, opportunity_id=oid, status="confirmed")
+    db.add(s)
     db.commit()
+    db.refresh(s)
+    from app.services.notify import notify  # noqa: PLC0415
+    notify(db, user=user, council_id=user.council_id,
+           action="volunteer.signup",
+           title=f"You're on the team — {o.title}",
+           body=f"Starts {o.starts_at.strftime('%a %d %b, %I:%M %p')}.",
+           url="/volunteer", target_type="volunteer_signup", target_id=s.id)
     return {"ok": True, "status": "confirmed"}
+
+
+@router.delete("/volunteer/opportunities/{oid}/signup", status_code=204)
+def cancel_vol(oid: int, user: User = Depends(get_current_user),
+               db: Session = Depends(get_db)) -> None:
+    s = (
+        db.query(VolunteerSignup)
+        .filter(VolunteerSignup.user_id == user.id,
+                VolunteerSignup.opportunity_id == oid,
+                VolunteerSignup.status == "confirmed")
+        .first()
+    )
+    if s is None:
+        raise HTTPException(status_code=404, detail="Not signed up")
+    db.delete(s)
+    db.commit()
 
 
 class VolProfileIn(BaseModel):
@@ -707,7 +731,34 @@ def lib_hold(iid: int, user: User = Depends(get_current_user),
     db.add(h)
     db.commit()
     db.refresh(h)
+    from app.services.notify import notify  # noqa: PLC0415
+    if h.status == "ready":
+        notify(db, user=user, council_id=user.council_id,
+               action="library.hold_ready",
+               title="Your hold is ready",
+               body=f"'{item.title}' is ready to collect from the library.",
+               url="/library", target_type="library_hold", target_id=h.id)
+    else:
+        notify(db, user=user, council_id=user.council_id,
+               action="library.hold_queued",
+               title="In the hold queue",
+               body=f"'{item.title}' — we'll notify you when it's ready.",
+               url="/library", target_type="library_hold", target_id=h.id)
     return {"ok": True, "hold_id": h.id, "status": h.status}
+
+
+@router.delete("/library/holds/{hid}", status_code=204)
+def cancel_hold(hid: int, user: User = Depends(get_current_user),
+                db: Session = Depends(get_db)) -> None:
+    h = db.get(LibraryHold, hid)
+    if h is None or h.user_id != user.id:
+        raise HTTPException(status_code=404, detail="Not found")
+    if h.status == "ready":
+        item = db.get(LibraryItem, h.item_id)
+        if item is not None:
+            item.copies_available += 1
+    h.status = "expired"
+    db.commit()
 
 
 @router.get("/library/mine")

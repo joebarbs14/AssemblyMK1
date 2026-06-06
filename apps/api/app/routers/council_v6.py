@@ -73,6 +73,20 @@ class SurveyOut(BaseModel):
 @router.get("/surveys", response_model=list[SurveyOut])
 def list_surveys(user: User = Depends(get_current_user),
                  db: Session = Depends(get_db)) -> list[SurveyOut]:
+    # Lifecycle: auto-close past closes_at
+    now = datetime.now(UTC)
+    expired = (
+        db.query(Survey)
+        .filter(Survey.council_id == user.council_id,
+                Survey.status == "open",
+                Survey.closes_at.isnot(None),
+                Survey.closes_at < now)
+        .all()
+    )
+    if expired:
+        for s in expired:
+            s.status = "closed"
+        db.commit()
     rows = (
         db.query(Survey)
         .filter(Survey.council_id == user.council_id,
@@ -174,14 +188,30 @@ class PetitionOut(BaseModel):
 
 
 @router.get("/petitions", response_model=list[PetitionOut])
-def list_petitions(user: User = Depends(get_current_user),
+def list_petitions(status: str | None = None,
+                   limit: int = Query(default=50, ge=1, le=200),
+                   offset: int = Query(default=0, ge=0),
+                   user: User = Depends(get_current_user),
                    db: Session = Depends(get_db)) -> list[PetitionOut]:
-    rows = (
+    # Lifecycle: auto-close past closes_at
+    now = datetime.now(UTC)
+    expired = (
         db.query(Petition)
-        .filter(Petition.council_id == user.council_id)
-        .order_by(Petition.created_at.desc())
-        .limit(100)
+        .filter(Petition.council_id == user.council_id,
+                Petition.status == "open",
+                Petition.closes_at.isnot(None),
+                Petition.closes_at < now)
         .all()
+    )
+    if expired:
+        for p in expired:
+            p.status = "closed"
+        db.commit()
+    q = db.query(Petition).filter(Petition.council_id == user.council_id)
+    if status:
+        q = q.filter(Petition.status == status)
+    rows = (
+        q.order_by(Petition.created_at.desc()).offset(offset).limit(limit).all()
     )
     pids = [p.id for p in rows]
     counts: dict[int, int] = {}
@@ -243,10 +273,36 @@ def sign_petition(pid: int, body: SignIn, user: User = Depends(get_current_user)
         return {"ok": True}
     db.add(PetitionSignature(petition_id=pid, user_id=user.id, comment=body.comment))
     count = db.query(PetitionSignature).filter(PetitionSignature.petition_id == pid).count() + 1
-    if count >= p.threshold and p.status == "open":
+    threshold_just_hit = count >= p.threshold and p.status == "open"
+    if threshold_just_hit:
         p.status = "review"
     db.commit()
+    if threshold_just_hit:
+        from app.services.notify import notify  # noqa: PLC0415
+        author = db.get(User, p.author_user_id)
+        if author is not None:
+            notify(db, user=author, council_id=user.council_id,
+                   action="petition.threshold",
+                   title="Threshold reached!",
+                   body=f"'{p.title}' has hit {p.threshold} signatures and is "
+                        f"now in council review.",
+                   url="/petitions", target_type="petition", target_id=p.id,
+                   webhook_event="petition.threshold_reached")
     return {"ok": True, "signature_count": count}
+
+
+@router.delete("/petitions/{pid}/sign", status_code=204)
+def unsign_petition(pid: int, user: User = Depends(get_current_user),
+                    db: Session = Depends(get_db)) -> None:
+    sig = (
+        db.query(PetitionSignature)
+        .filter(PetitionSignature.petition_id == pid, PetitionSignature.user_id == user.id)
+        .first()
+    )
+    if sig is None:
+        raise HTTPException(status_code=404, detail="Not signed")
+    db.delete(sig)
+    db.commit()
 
 
 # ============ #3 DA submissions ============
@@ -340,6 +396,13 @@ def lodge_info_request(body: InfoRequestIn, user: User = Depends(get_current_use
     db.add(r)
     db.commit()
     db.refresh(r)
+    from app.services.notify import notify  # noqa: PLC0415
+    notify(db, user=user, council_id=user.council_id,
+           action="foi.lodged",
+           title="GIPA request lodged",
+           body=f"Reference {r.reference}. Due by {r.due_by.isoformat()}.",
+           url="/foi", target_type="info_request", target_id=r.id,
+           webhook_event="foi.lodged")
     return InfoRequestOut(
         id=r.id, reference=r.reference, title=r.title, description=r.description,
         kind=r.kind, status=r.status, decision=r.decision, fees_cents=r.fees_cents,
@@ -347,15 +410,28 @@ def lodge_info_request(body: InfoRequestIn, user: User = Depends(get_current_use
     )
 
 
+@router.delete("/foi/{rid}", status_code=204)
+def withdraw_foi(rid: int, user: User = Depends(get_current_user),
+                 db: Session = Depends(get_db)) -> None:
+    r = db.get(InfoRequest, rid)
+    if r is None or r.user_id != user.id:
+        raise HTTPException(status_code=404, detail="Not found")
+    if r.status in ("decided", "released", "refused", "withdrawn"):
+        raise HTTPException(status_code=400, detail="Cannot withdraw at this stage")
+    r.status = "withdrawn"
+    db.commit()
+
+
 @router.get("/foi/mine", response_model=list[InfoRequestOut])
-def my_foi(user: User = Depends(get_current_user),
+def my_foi(status: str | None = None,
+           limit: int = Query(default=50, ge=1, le=200),
+           offset: int = Query(default=0, ge=0),
+           user: User = Depends(get_current_user),
            db: Session = Depends(get_db)) -> list[InfoRequestOut]:
-    rows = (
-        db.query(InfoRequest)
-        .filter(InfoRequest.user_id == user.id)
-        .order_by(InfoRequest.created_at.desc())
-        .all()
-    )
+    q = db.query(InfoRequest).filter(InfoRequest.user_id == user.id)
+    if status:
+        q = q.filter(InfoRequest.status == status)
+    rows = q.order_by(InfoRequest.created_at.desc()).offset(offset).limit(limit).all()
     return [InfoRequestOut(
         id=r.id, reference=r.reference, title=r.title, description=r.description,
         kind=r.kind, status=r.status, decision=r.decision, fees_cents=r.fees_cents,
@@ -380,15 +456,29 @@ class TenderOut(BaseModel):
 
 
 @router.get("/tenders", response_model=list[TenderOut])
-def list_tenders(user: User = Depends(get_current_user),
+def list_tenders(status: str | None = None, category: str | None = None,
+                 limit: int = Query(default=50, ge=1, le=200),
+                 offset: int = Query(default=0, ge=0),
+                 user: User = Depends(get_current_user),
                  db: Session = Depends(get_db)) -> list[TenderOut]:
-    rows = (
+    # Auto-close past closes_at
+    today = date.today()
+    expired = (
         db.query(Tender)
-        .filter(Tender.council_id == user.council_id)
-        .order_by(Tender.closes_at.desc())
-        .limit(50)
+        .filter(Tender.council_id == user.council_id,
+                Tender.status == "open", Tender.closes_at < today)
         .all()
     )
+    if expired:
+        for t in expired:
+            t.status = "closed"
+        db.commit()
+    q = db.query(Tender).filter(Tender.council_id == user.council_id)
+    if status:
+        q = q.filter(Tender.status == status)
+    if category:
+        q = q.filter(Tender.category == category)
+    rows = q.order_by(Tender.closes_at.desc()).offset(offset).limit(limit).all()
     return [TenderOut(
         id=t.id, reference=t.reference, title=t.title, description=t.description,
         category=t.category, estimated_value_cents=t.estimated_value_cents,
@@ -411,15 +501,17 @@ class ContractOut(BaseModel):
 
 
 @router.get("/contracts", response_model=list[ContractOut])
-def list_contracts(user: User = Depends(get_current_user),
+def list_contracts(local_only: bool = False, supplier_search: str | None = None,
+                   limit: int = Query(default=50, ge=1, le=200),
+                   offset: int = Query(default=0, ge=0),
+                   user: User = Depends(get_current_user),
                    db: Session = Depends(get_db)) -> list[ContractOut]:
-    rows = (
-        db.query(ContractAward)
-        .filter(ContractAward.council_id == user.council_id)
-        .order_by(ContractAward.starts_on.desc())
-        .limit(100)
-        .all()
-    )
+    q = db.query(ContractAward).filter(ContractAward.council_id == user.council_id)
+    if local_only:
+        q = q.filter(ContractAward.local_supplier.is_(True))
+    if supplier_search:
+        q = q.filter(ContractAward.supplier_name.ilike(f"%{supplier_search}%"))
+    rows = q.order_by(ContractAward.starts_on.desc()).offset(offset).limit(limit).all()
     return [ContractOut(
         id=c.id, contract_no=c.contract_no, title=c.title,
         supplier_name=c.supplier_name, supplier_abn=c.supplier_abn,
@@ -447,14 +539,37 @@ class JobOut(BaseModel):
 
 
 @router.get("/jobs", response_model=list[JobOut])
-def list_jobs(council_only: bool = False,
+def list_jobs(council_only: bool = False, kind: str | None = None,
+              search: str | None = None,
+              limit: int = Query(default=50, ge=1, le=200),
+              offset: int = Query(default=0, ge=0),
               user: User = Depends(get_current_user),
               db: Session = Depends(get_db)) -> list[JobOut]:
+    # Auto-close past closes_at
+    today = date.today()
+    expired = (
+        db.query(JobListing)
+        .filter(JobListing.council_id == user.council_id,
+                JobListing.status == "open",
+                JobListing.closes_at.isnot(None),
+                JobListing.closes_at < today)
+        .all()
+    )
+    if expired:
+        for j in expired:
+            j.status = "closed"
+        db.commit()
     q = db.query(JobListing).filter(JobListing.council_id == user.council_id,
                                     JobListing.status == "open")
     if council_only:
         q = q.filter(JobListing.is_council.is_(True))
-    rows = q.order_by(JobListing.posted_at.desc()).limit(100).all()
+    if kind:
+        q = q.filter(JobListing.kind == kind)
+    if search:
+        like = f"%{search}%"
+        q = q.filter(or_(JobListing.title.ilike(like),
+                         JobListing.employer.ilike(like)))
+    rows = q.order_by(JobListing.posted_at.desc()).offset(offset).limit(limit).all()
     return [JobOut(
         id=j.id, title=j.title, employer=j.employer, is_council=j.is_council,
         kind=j.kind, salary_min_cents=j.salary_min_cents,
@@ -596,7 +711,57 @@ def apply_plot(pid: int, user: User = Depends(get_current_user),
         p.status = "assigned"
     db.add(a)
     db.commit()
+    db.refresh(a)
+    from app.services.notify import notify  # noqa: PLC0415
+    notify(db, user=user, council_id=user.council_id,
+           action="garden.assigned" if is_first else "garden.waitlisted",
+           title="Plot assigned" if is_first else "On waitlist",
+           body=f"Plot {p.plot_code} at {p.garden_name}.",
+           url="/gardens", target_type="plot_assignment", target_id=a.id)
     return {"ok": True, "status": a.status}
+
+
+@router.delete("/gardens/plots/{pid}/apply", status_code=204)
+def withdraw_plot(pid: int, user: User = Depends(get_current_user),
+                  db: Session = Depends(get_db)) -> None:
+    a = (
+        db.query(PlotAssignment)
+        .filter(PlotAssignment.plot_id == pid, PlotAssignment.user_id == user.id,
+                PlotAssignment.status.in_(("waitlisted", "active")))
+        .first()
+    )
+    if a is None:
+        raise HTTPException(status_code=404, detail="Not on this plot")
+    was_active = a.status == "active"
+    a.status = "ended"
+    a.ended_at = datetime.now(UTC)
+    db.commit()
+    # If the active holder withdrew, promote next waitlisted person
+    if was_active:
+        from app.services.notify import notify  # noqa: PLC0415
+        next_w = (
+            db.query(PlotAssignment)
+            .filter(PlotAssignment.plot_id == pid,
+                    PlotAssignment.status == "waitlisted")
+            .order_by(PlotAssignment.started_at)
+            .first()
+        )
+        plot = db.get(GardenPlot, pid)
+        if next_w is not None and plot is not None:
+            next_w.status = "active"
+            db.commit()
+            next_user = db.get(User, next_w.user_id)
+            if next_user is not None:
+                notify(db, user=next_user, council_id=user.council_id,
+                       action="garden.promoted",
+                       title="Your plot is ready",
+                       body=f"You've been promoted from the waitlist — Plot "
+                            f"{plot.plot_code} at {plot.garden_name} is yours.",
+                       url="/gardens", target_type="plot_assignment",
+                       target_id=next_w.id)
+        elif plot is not None:
+            plot.status = "available"
+            db.commit()
 
 
 # ============ #10 Inspector workflow ============
