@@ -78,44 +78,84 @@ export function NewsCarousel({
   if (slides.length === 0) return null;
 
   return (
-    <section style={{ marginBottom: "1rem" }} aria-label="News & announcements">
-      <div
-        ref={trackRef}
-        style={{
-          display: "flex",
-          overflowX: "auto",
-          scrollSnapType: "x mandatory",
-          gap: 0,
-          scrollbarWidth: "none",
-          borderRadius: "var(--r-lg)",
-        }}
-      >
+    <section className="nc" aria-label="News & announcements">
+      <style>{`
+        .nc { margin-bottom: 0.625rem; }
+        .nc-track {
+          display: flex;
+          overflow-x: auto;
+          scroll-snap-type: x mandatory;
+          scrollbar-width: none;
+          border-radius: var(--r-lg);
+        }
+        .nc-track::-webkit-scrollbar { display: none; }
+        .nc-slide {
+          min-width: 100%;
+          scroll-snap-align: start;
+          text-decoration: none;
+          color: #fff;
+          padding: 0.875rem 1rem 1rem;
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          min-height: 110px;
+        }
+        .nc-tag {
+          font-size: 0.625rem;
+          font-weight: 700;
+          letter-spacing: 0.08em;
+          opacity: 0.85;
+        }
+        .nc-title {
+          margin: 0;
+          font-size: 1rem;
+          font-weight: 700;
+          line-height: 1.25;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+        .nc-body {
+          margin: 0;
+          font-size: 0.8125rem;
+          opacity: 0.92;
+          line-height: 1.4;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+        .nc-more {
+          margin-top: auto;
+          padding-top: 4px;
+          font-size: 0.75rem;
+          font-weight: 600;
+          opacity: 0.95;
+        }
+        @media (min-width: 600px) {
+          .nc { margin-bottom: 1rem; }
+          .nc-slide { padding: 1.25rem 1.25rem 1.5rem; min-height: 160px; gap: 0.5rem; }
+          .nc-tag { font-size: 0.65rem; }
+          .nc-title { font-size: 1.125rem; -webkit-line-clamp: 3; }
+          .nc-body { font-size: 0.875rem; -webkit-line-clamp: 3; }
+          .nc-more { font-size: 0.8125rem; }
+        }
+      `}</style>
+      <div ref={trackRef} className="nc-track">
         {slides.map((s) => (
           <Link
             key={s.id}
             href={s.href}
+            className="nc-slide"
             style={{
-              minWidth: "100%",
-              scrollSnapAlign: "start",
-              textDecoration: "none",
-              color: "#fff",
-              padding: "1.25rem 1.25rem 1.5rem",
               background: `linear-gradient(135deg, ${s.accent} 0%, ${shade(s.accent, -15)} 100%)`,
-              display: "flex",
-              flexDirection: "column",
-              gap: "0.5rem",
-              minHeight: 160,
             }}
           >
-            <span style={{
-              fontSize: "0.65rem", fontWeight: 700, letterSpacing: "0.08em",
-              opacity: 0.85,
-            }}>{s.tag}</span>
-            <h2 style={{ margin: 0, fontSize: "1.125rem", fontWeight: 700, lineHeight: 1.3 }}>{s.title}</h2>
-            <p style={{ margin: 0, fontSize: "0.875rem", opacity: 0.92, lineHeight: 1.45 }}>{s.body}</p>
-            <span style={{ marginTop: "auto", fontSize: "0.8125rem", fontWeight: 600, opacity: 0.95 }}>
-              Read more →
-            </span>
+            <span className="nc-tag">{s.tag}</span>
+            <h2 className="nc-title">{s.title}</h2>
+            <p className="nc-body">{s.body}</p>
+            <span className="nc-more">Read more →</span>
           </Link>
         ))}
       </div>
