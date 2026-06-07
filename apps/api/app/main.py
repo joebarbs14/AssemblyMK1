@@ -37,7 +37,7 @@ from app.routers import (
 if settings.sentry_dsn:
     sentry_sdk.init(dsn=settings.sentry_dsn, environment=settings.env, traces_sample_rate=0.1)
 
-from app.services import scheduler
+from app.services import demo_staff, scheduler
 
 app = FastAPI(title="Assembly API", version="0.1.0")
 app.state.limiter = limiter
@@ -47,6 +47,12 @@ app.state.limiter = limiter
 def _startup_scheduler() -> None:
     if settings.env != "test":
         scheduler.start()
+        if settings.seed_demo_staff:
+            try:
+                demo_staff.seed_demo_staff()
+            except Exception:
+                import logging
+                logging.getLogger(__name__).exception("demo-staff seeding failed")
 
 
 @app.on_event("shutdown")
