@@ -105,6 +105,40 @@ def password_login(
     return _issue_token_for(user)
 
 
+@router.post("/portal-login", response_model=TokenOut)
+@limiter.limit("5/minute")
+def portal_login(
+    request: Request,
+    body: PasswordLoginIn,
+    council: Council = Depends(get_current_council),
+    db: Session = Depends(get_db),
+) -> TokenOut:
+    """Staff-portal login. Rejects residents at the credential check so
+    they can't grant themselves access by URL-guessing.
+
+    Allows the same email + password the user already has — councils that
+    want truly separate credentials should invite staff with a council-
+    domain email via /admin/users (which won't collide with any personal
+    resident account on a different email).
+    """
+    user = _find_user(db, council.id, _normalize_email(body.email))
+    if user is None or not user.password_hash or not verify_password(body.password, user.password_hash):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
+    if user.status != UserStatus.active.value:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Account not active")
+    if user.role not in (UserRole.staff.value, UserRole.admin.value):
+        # Constant-time-ish refusal — don't tip off bots that an email
+        # exists as a resident.
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail="Staff portal access only")
+    _log.info("Portal login user_id=%s role=%s ip=%s",
+              user.id, user.role,
+              request.client.host if request.client else "?")
+    user.last_login_at = datetime.now(UTC)
+    db.commit()
+    return _issue_token_for(user)
+
+
 @router.post("/magic-link", status_code=status.HTTP_202_ACCEPTED)
 @limiter.limit("5/minute")
 def request_magic_link(

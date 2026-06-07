@@ -225,6 +225,11 @@ export default function LoginPage() {
       <p style={{ marginTop: "1.25rem", marginBottom: 0, fontSize: "0.875rem", textAlign: "center" }}>
         New here? <a href="/signup">Create an account</a>
       </p>
+      <p style={{ marginTop: "0.75rem", marginBottom: 0, fontSize: "0.75rem",
+                   textAlign: "center", color: "var(--text-secondary)" }}>
+        Council staff?{" "}
+        <a href="/portal" style={{ fontWeight: 600 }}>Sign in to the staff portal →</a>
+      </p>
     </Card>
   );
 }
