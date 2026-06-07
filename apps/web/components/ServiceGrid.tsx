@@ -107,48 +107,73 @@ const GROUPS: Group[] = [
 
 export function ServiceGrid() {
   return (
-    <section style={{ marginBottom: "1rem" }} aria-label="Services">
+    <section className="sg" aria-label="Services">
+      <style>{`
+        .sg { margin-bottom: 1rem; }
+        .sg-group { margin-bottom: 1rem; }
+        .sg-h3 {
+          margin: 0 0 0.375rem;
+          font-size: 0.625rem;
+          font-weight: 700;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          color: var(--text-secondary);
+        }
+        .sg-grid {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 6px;
+        }
+        .sg-tile {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+          padding: 0.5rem 0.5rem;
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: var(--r-md);
+          text-decoration: none;
+          color: var(--text-primary);
+          min-height: 64px;
+          box-shadow: var(--e1);
+        }
+        .sg-tile-icon { color: var(--brand); }
+        .sg-tile-label {
+          font-weight: 600;
+          font-size: 0.75rem;
+          line-height: 1.2;
+        }
+        .sg-tile-desc {
+          font-size: 0.625rem;
+          color: var(--text-secondary);
+          line-height: 1.25;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+        @media (min-width: 480px) {
+          .sg-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+          .sg-tile { padding: 0.75rem 0.875rem; min-height: 80px; gap: 4px; border-radius: var(--r-lg); }
+          .sg-tile-label { font-size: 0.875rem; line-height: 1.25; }
+          .sg-tile-desc { font-size: 0.7rem; line-height: 1.3; }
+          .sg-h3 { margin-bottom: 0.5rem; font-size: 0.7rem; }
+          .sg-group { margin-bottom: 1.25rem; }
+        }
+      `}</style>
       {GROUPS.map((g) => (
-        <div key={g.key} style={{ marginBottom: "1.25rem" }}>
-          <h3 style={{
-            margin: "0 0 0.5rem",
-            fontSize: "0.7rem",
-            fontWeight: 700,
-            letterSpacing: "0.08em",
-            textTransform: "uppercase",
-            color: "var(--text-secondary)",
-          }}>{g.label}</h3>
-          <ul style={{
-            listStyle: "none",
-            padding: 0,
-            margin: 0,
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
-            gap: 8,
-          }}>
+        <div key={g.key} className="sg-group">
+          <h3 className="sg-h3">{g.label}</h3>
+          <ul className="sg-grid">
             {g.services.map((s) => (
               <li key={s.key}>
-                <Link
-                  href={s.href}
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 4,
-                    padding: "0.75rem 0.875rem",
-                    background: "var(--surface)",
-                    border: "1px solid var(--border)",
-                    borderRadius: "var(--r-lg)",
-                    textDecoration: "none",
-                    color: "var(--text-primary)",
-                    minHeight: 80,
-                    boxShadow: "var(--e1)",
-                  }}
-                >
-                  <div style={{ color: "var(--brand)" }}>{s.icon}</div>
-                  <span style={{ fontWeight: 600, fontSize: "0.875rem", lineHeight: 1.25 }}>{s.label}</span>
-                  <span style={{ fontSize: "0.7rem", color: "var(--text-secondary)", lineHeight: 1.3 }}>
-                    {s.description}
-                  </span>
+                <Link href={s.href} className="sg-tile">
+                  <span className="sg-tile-icon">{s.icon}</span>
+                  <span className="sg-tile-label">{s.label}</span>
+                  <span className="sg-tile-desc">{s.description}</span>
                 </Link>
               </li>
             ))}

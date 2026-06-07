@@ -3,7 +3,6 @@ import { redirect } from "next/navigation";
 
 import { NewsCarousel } from "@/components/NewsCarousel";
 import { ServiceGrid } from "@/components/ServiceGrid";
-import { Card } from "@/components/ui/Card";
 import {
   api,
   type Announcement,
@@ -41,146 +40,69 @@ export default async function Home() {
   const isEmpty = reports.length === 0 && properties.length === 0;
 
   return (
-    <main style={{ maxWidth: 760, margin: "0 auto", padding: "1rem 1.25rem 6rem" }}>
-      <CouncilHeader me={me} />
+    <>
+      <style>{CSS}</style>
+      <main className="rh">
+        <CouncilHeader me={me} />
 
-      {/* Global search bar */}
-      <form action="/search" method="GET" style={{ marginBottom: "1rem" }}>
-        <input name="q" placeholder="Search reports, FAQ, businesses, tenders…"
-          style={{
-            width: "100%", padding: "0.625rem 0.875rem", fontSize: "0.9375rem",
-            border: "1px solid var(--border)", borderRadius: "var(--r-full)",
-            background: "var(--surface-muted)", fontFamily: "inherit",
-          }} />
-      </form>
+        <form action="/search" method="GET" className="rh-search">
+          <input name="q" placeholder="Search reports, FAQ, businesses…" />
+        </form>
 
-      {/* 1. News & announcements carousel */}
-      <NewsCarousel announcements={announcements} alerts={alerts} />
+        <NewsCarousel announcements={announcements} alerts={alerts} />
 
-      {/* 2. Report something — primary action */}
-      <Link
-        href="/reports/new"
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "0.875rem",
-          padding: "1rem 1.25rem",
-          marginBottom: "1.25rem",
-          background: me.council.brand_color,
-          color: "#fff",
-          borderRadius: "var(--r-lg)",
-          textDecoration: "none",
-          boxShadow: "var(--e1)",
-        }}
-      >
-        <span aria-hidden="true" style={{
-          width: 44, height: 44, borderRadius: "var(--r-md)",
-          background: "rgba(255,255,255,0.18)",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          flexShrink: 0,
-        }}>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="12" r="10" />
-            <line x1="12" y1="8" x2="12" y2="12" />
-            <line x1="12" y1="16" x2="12.01" y2="16" />
-          </svg>
-        </span>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ margin: 0, fontWeight: 700, fontSize: "1.0625rem" }}>Report something</p>
-          <p style={{ margin: "2px 0 0", fontSize: "0.8125rem", opacity: 0.9 }}>
-            Pothole, streetlight, dumping — one minute.
-          </p>
-        </div>
-        <span aria-hidden="true" style={{ fontSize: "1.25rem", opacity: 0.9 }}>→</span>
-      </Link>
+        {/* Primary action — Report something */}
+        <Link href="/reports/new" className="rh-cta"
+              style={{ background: me.council.brand_color }}>
+          <span className="rh-cta-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+          </span>
+          <span className="rh-cta-body">
+            <span className="rh-cta-title">Report something</span>
+            <span className="rh-cta-sub">Pothole, streetlight, dumping — one minute.</span>
+          </span>
+          <span className="rh-cta-arrow" aria-hidden="true">→</span>
+        </Link>
 
-      {isEmpty && <TryDemoPanel />}
+        {/* Quick-link pill row — visible above the fold */}
+        <nav className="rh-quick" aria-label="Quick links">
+          <Link href="/reports" className="rh-pill">My reports</Link>
+          <Link href="/rates" className="rh-pill">Rates</Link>
+          <Link href="/water" className="rh-pill">Water</Link>
+          <Link href="/waste" className="rh-pill">Waste</Link>
+          <Link href="/account" className="rh-pill">Account</Link>
+        </nav>
 
-      {/* 3. Grouped services */}
-      <ServiceGrid />
+        {isEmpty && <TryDemoPanel />}
 
-      <Card style={{ marginTop: "1rem" }}>
-        <h2 style={{ marginTop: 0, fontSize: "0.9375rem", fontWeight: 600 }}>Quick links</h2>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-          <QuickLink href="/reports">My reports</QuickLink>
-          <QuickLink href="/rates">Rates</QuickLink>
-          <QuickLink href="/account">My account</QuickLink>
-        </div>
-      </Card>
-    </main>
-  );
-}
-
-function QuickLink({ href, children }: { href: string; children: React.ReactNode }) {
-  return (
-    <Link href={href} style={{
-      padding: "0.375rem 0.75rem",
-      background: "var(--surface-muted)",
-      borderRadius: "var(--r-full)",
-      fontSize: "0.8125rem",
-      fontWeight: 600,
-      textDecoration: "none",
-      color: "var(--text-primary)",
-    }}>{children}</Link>
+        <ServiceGrid />
+      </main>
+    </>
   );
 }
 
 function CouncilHeader({ me }: { me: Me }) {
   return (
-    <header
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 12,
-        padding: "0.5rem 0 1rem",
-        marginBottom: "1rem",
-        borderBottom: "1px solid var(--border)",
-      }}
-    >
+    <header className="rh-head">
       {me.council.logo_url ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={me.council.logo_url}
-          alt={me.council.name}
-          style={{ height: 40, width: "auto", maxWidth: 220, display: "block" }}
-        />
+        <img src={me.council.logo_url} alt={me.council.name} className="rh-head-logo" />
       ) : (
-        <div
-          style={{
-            width: 40, height: 40,
-            borderRadius: "var(--r-md)",
-            background: me.council.brand_color,
-          }}
-          aria-hidden="true"
-        />
+        <span className="rh-head-logo rh-head-logo--mark"
+              style={{ background: me.council.brand_color }} aria-hidden="true" />
       )}
-      <div style={{ minWidth: 0, flex: 1 }}>
-        <p style={{
-          margin: 0,
-          fontSize: "0.65rem",
-          letterSpacing: "0.08em",
-          textTransform: "uppercase",
-          color: "var(--text-secondary)",
-          fontWeight: 700,
-        }}>Welcome back</p>
-        <p style={{
-          margin: 0,
-          fontSize: "1.0625rem",
-          fontWeight: 600,
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          whiteSpace: "nowrap",
-        }}>{me.name ?? me.email}</p>
+      <div className="rh-head-text">
+        <p className="rh-head-eyebrow">Welcome back</p>
+        <p className="rh-head-name">{me.name ?? me.email}</p>
       </div>
-      <Link href="/account" aria-label="Account" style={{
-        width: 38, height: 38, borderRadius: "var(--r-full)",
-        background: "var(--surface-muted)",
-        display: "flex", alignItems: "center", justifyContent: "center",
-        color: "var(--text-primary)",
-      }}>
+      <Link href="/account" aria-label="Account" className="rh-head-account">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-          strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+             strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <circle cx="12" cy="8" r="4" />
           <path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1" />
         </svg>
@@ -188,3 +110,160 @@ function CouncilHeader({ me }: { me: Me }) {
     </header>
   );
 }
+
+const CSS = `
+.rh {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 0.5rem 1rem 5rem;
+}
+
+/* === Header === */
+.rh-head {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.375rem 0 0.625rem;
+  margin-bottom: 0.625rem;
+  border-bottom: 1px solid var(--border);
+}
+.rh-head-logo {
+  height: 32px;
+  width: auto;
+  max-width: 160px;
+  display: block;
+}
+.rh-head-logo--mark {
+  width: 32px;
+  border-radius: var(--r-md);
+}
+.rh-head-text { flex: 1; min-width: 0; }
+.rh-head-eyebrow {
+  margin: 0;
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  font-weight: 700;
+  line-height: 1;
+}
+.rh-head-name {
+  margin: 2px 0 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.15;
+}
+.rh-head-account {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px; height: 34px;
+  border-radius: 999px;
+  background: var(--surface-muted);
+  color: var(--text-primary);
+  text-decoration: none;
+  flex: 0 0 auto;
+}
+
+/* === Search === */
+.rh-search { margin-bottom: 0.625rem; }
+.rh-search input {
+  width: 100%;
+  padding: 0.5rem 0.875rem;
+  font-size: 0.875rem;
+  font-family: inherit;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface-muted);
+  outline: none;
+}
+.rh-search input:focus {
+  border-color: var(--text-primary);
+  background: var(--surface);
+}
+
+/* === CTA === */
+.rh-cta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0.875rem;
+  margin-bottom: 0.625rem;
+  color: #fff;
+  border-radius: var(--r-lg);
+  text-decoration: none;
+  box-shadow: var(--e1);
+}
+.rh-cta-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px; height: 38px;
+  border-radius: var(--r-md);
+  background: rgba(255, 255, 255, 0.18);
+  flex: 0 0 auto;
+}
+.rh-cta-body { flex: 1; min-width: 0; line-height: 1.2; }
+.rh-cta-title {
+  display: block;
+  font-weight: 700;
+  font-size: 1rem;
+}
+.rh-cta-sub {
+  display: block;
+  margin-top: 1px;
+  font-size: 0.75rem;
+  opacity: 0.9;
+}
+.rh-cta-arrow {
+  font-size: 1.125rem;
+  opacity: 0.9;
+  flex: 0 0 auto;
+}
+
+/* === Quick links pill row (above the fold on mobile) === */
+.rh-quick {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 4px;
+  margin: 0 -1rem 0.875rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+.rh-quick::-webkit-scrollbar { display: none; }
+.rh-pill {
+  padding: 0.3125rem 0.75rem;
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--text-primary);
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+
+@media (min-width: 600px) {
+  .rh { padding: 1rem 1.25rem 4rem; }
+  .rh-head {
+    padding: 0.5rem 0 1rem;
+    margin-bottom: 1rem;
+    gap: 0.75rem;
+  }
+  .rh-head-logo { height: 40px; }
+  .rh-head-logo--mark { width: 40px; }
+  .rh-head-name { font-size: 1.0625rem; }
+  .rh-search input { padding: 0.625rem 0.875rem; font-size: 0.9375rem; }
+  .rh-cta { padding: 1rem 1.25rem; margin-bottom: 1rem; gap: 0.875rem; }
+  .rh-cta-icon { width: 44px; height: 44px; }
+  .rh-cta-title { font-size: 1.0625rem; }
+  .rh-cta-sub { font-size: 0.8125rem; }
+  .rh-quick { margin-bottom: 1.25rem; }
+}
+`;
