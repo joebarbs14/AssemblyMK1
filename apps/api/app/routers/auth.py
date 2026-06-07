@@ -214,6 +214,32 @@ def logout() -> None:
     return None
 
 
+@router.get("/demo-staff-status")
+def demo_staff_status(council: Council = Depends(get_current_council),
+                      db: Session = Depends(get_db)) -> dict[str, object]:
+    """Diagnostic — confirms whether the demo staff/admin accounts exist
+    for the current council. Public on purpose so you can hit it from
+    a browser before logging in. Returns *whether* the rows exist, never
+    the password.
+    """
+    from app.core.config import settings  # noqa: PLC0415
+    rows: dict[str, dict[str, object]] = {}
+    for label in ("staff", "admin"):
+        email = f"demo-{label}@{council.slug}.example.com"
+        user = _find_user(db, council.id, email)
+        rows[label] = {
+            "email": email,
+            "exists": user is not None,
+            "active": (user.status == UserStatus.active.value) if user else False,
+            "role": user.role if user else None,
+        }
+    return {
+        "council_slug": council.slug,
+        "seed_demo_staff_env": settings.seed_demo_staff,
+        "accounts": rows,
+    }
+
+
 @router.post("/claim-admin")
 def claim_admin(user: User = Depends(get_current_user),
                 db: Session = Depends(get_db)) -> dict[str, str]:
