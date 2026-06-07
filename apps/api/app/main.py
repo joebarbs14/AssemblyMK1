@@ -23,7 +23,10 @@ from app.routers import (
     health,
     payments,
     rates,
+    rates_resident,
     reports,
+    staff_rates,
+    staff_rates_ext,
     staff_reports,
     v1x,
     v2_features,
@@ -62,6 +65,9 @@ app.include_router(auth.router, prefix="/api")
 app.include_router(account.router, prefix="/api")
 app.include_router(reports.router, prefix="/api")
 app.include_router(staff_reports.router, prefix="/api")
+app.include_router(staff_rates.router, prefix="/api")
+app.include_router(staff_rates_ext.router, prefix="/api")
+app.include_router(rates_resident.router, prefix="/api")
 app.include_router(announcements.router, prefix="/api")
 app.include_router(announcements.staff_router, prefix="/api")
 app.include_router(rates.router, prefix="/api")

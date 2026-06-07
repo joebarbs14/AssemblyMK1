@@ -265,9 +265,13 @@ export default async function RatesDetailPage({
           </dl>
         </Card>
       )}
+
+      <RatesActions propertyId={property.id} token={token} />
     </main>
   );
 }
+
+import { RatesActions } from "./RatesActions";
 
 function Row({ label, value }: { label: string; value: string }) {
   return (

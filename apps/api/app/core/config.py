@@ -49,6 +49,11 @@ class Settings(BaseSettings):
     ollama_base_url: str | None = None  # http://localhost:11434
     ollama_model: str = "llama3.1:8b"
 
+    # First-time admin bootstrap. Comma-separated emails. The first call to
+    # POST /api/auth/claim-admin from a logged-in user whose email is on
+    # this list promotes them to admin. Idempotent.
+    bootstrap_admin_emails: str = ""
+
     @field_validator("database_url", mode="before")
     @classmethod
     def _normalize_db_url(cls, v: object) -> object:

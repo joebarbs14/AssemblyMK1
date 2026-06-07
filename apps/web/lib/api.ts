@@ -1004,6 +1004,157 @@ export interface ChatCitation {
   source_url: string | null;
 }
 
+// --- Staff rates ---
+
+export interface RateCategoryRow {
+  id: number;
+  fiscal_year: number;
+  code: string;
+  label: string;
+  ad_valorem_cents_per_dollar: number;
+  base_amount_cents: number;
+  minimum_cents: number;
+  notes: string | null;
+  is_active: boolean;
+}
+
+export interface RateCalcBreakdown {
+  land_value_cents: number;
+  ad_valorem_cents_per_dollar: number;
+  base_amount_cents: number;
+  minimum_cents: number;
+  ad_valorem_component_cents: number;
+  gross_cents: number;
+  minimum_applied: boolean;
+  concession_cents: number;
+  total_cents: number;
+}
+
+export interface RateCalcResult {
+  category: RateCategoryRow;
+  breakdown: RateCalcBreakdown;
+}
+
+export interface RatePropertyRollRow {
+  id: number;
+  address: string;
+  suburb: string | null;
+  property_type: string;
+  land_size_sqm: number | null;
+  zone: string | null;
+  latest_uv_cents: number | null;
+  account_number: string | null;
+  balance_cents: number;
+  overdue: boolean;
+}
+
+export interface RatePropertyForStaff {
+  id: number;
+  address: string;
+  suburb: string | null;
+  property_type: string;
+  land_size_sqm: number | null;
+  zone: string | null;
+  lat: number | null;
+  lng: number | null;
+  valuations: { year: number; land_value_cents: number; capital_value_cents: number }[];
+  rate_charges: { period_start: string; period_end: string; category: string;
+                  amount_cents: number; note: string | null }[];
+  concessions: { type: string; status: string; annual_value_cents: number | null }[];
+  account_number: string | null;
+  balance_cents: number;
+  next_due_date: string | null;
+  suggested_calc: RateCalcBreakdown | null;
+  suggested_category: RateCategoryRow | null;
+}
+
+export interface RateKpis {
+  properties: number;
+  outstanding_cents: number;
+  overdue_accounts: number;
+  active_categories_current_fy: number;
+  current_fy: number;
+}
+
+export interface RateKpisExt {
+  active_levies: number;
+  pending_certificates: number;
+  open_objections: number;
+  active_plans: number;
+}
+
+export interface RateLevyRow {
+  id: number;
+  fiscal_year: number;
+  code: string;
+  label: string;
+  kind: string;
+  amount_cents: number;
+  applies_to_property_type: string | null;
+  notes: string | null;
+}
+
+export interface RateInstalmentRow {
+  id: number;
+  fiscal_year: number;
+  period_label: string;
+  due_date: string;
+  amount_cents: number;
+  paid_cents: number;
+  status: string;
+}
+
+export interface CertificateRow {
+  id: number;
+  reference: string;
+  property_id: number;
+  status: string;
+  fee_cents: number;
+  requester_name: string | null;
+  requester_email: string | null;
+  issued_at: string | null;
+  valid_until: string | null;
+  created_at: string;
+}
+
+export interface HardshipPlanRow {
+  id: number;
+  account_id: number;
+  term_months: number;
+  monthly_amount_cents: number;
+  starts_on: string;
+  ends_on: string;
+  status: string;
+  paid_count: number;
+  notes: string | null;
+}
+
+export interface ObjectionRow {
+  id: number;
+  property_id: number;
+  user_id: number;
+  year: number;
+  current_uv_cents: number;
+  proposed_uv_cents: number;
+  grounds: string;
+  status: string;
+  created_at: string;
+}
+
+export interface ConcessionClaimRow {
+  id: number;
+  period_year: number;
+  period_half: number;
+  pensioner_count: number;
+  total_concession_cents: number;
+  state_subsidy_pct: number;
+  state_subsidy_cents: number;
+  reference: string | null;
+  status: string;
+  submitted_at: string | null;
+  paid_at: string | null;
+}
+
 // --- v7 admin ---
 
 export interface SearchGroup {

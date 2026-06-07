@@ -114,6 +114,7 @@ from app.models.payment import (
     PlanStatus,
     WebhookEvent,
 )
+from app.models.rate_category import RateCategory
 from app.models.rates import (
     BillingSetting,
     BpayCrn,
@@ -128,6 +129,16 @@ from app.models.rates import (
     RatesInvoice,
     Valuation,
     WasteEntitlement,
+)
+from app.models.rates_ext import (
+    ConcessionClaim,
+    HardshipPlan,
+    InterestCharge,
+    PropertyRateAssignment,
+    RateInstalment,
+    RateLevy,
+    RatesCertificate,
+    ValuationObjection,
 )
 from app.models.report import (
     Report,
@@ -276,7 +287,16 @@ __all__ = [
     "PropertyOverlay",
     "PropertyOwnership",
     "PropertyType",
+    "ConcessionClaim",
+    "HardshipPlan",
+    "InterestCharge",
+    "PropertyRateAssignment",
+    "RateCategory",
     "RateCharge",
+    "RateInstalment",
+    "RateLevy",
+    "RatesCertificate",
+    "ValuationObjection",
     "RatesAccount",
     "RatesInvoice",
     "Report",
