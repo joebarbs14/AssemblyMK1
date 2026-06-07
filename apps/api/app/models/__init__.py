@@ -182,6 +182,7 @@ from app.models.water_ext import (
     WaterSourceReading,
     WaterTariff,
 )
+from app.models.water_flow_rate import WaterFlowRateApplication
 
 __all__ = [
     "AdoptionApplication",
@@ -320,6 +321,7 @@ __all__ = [
     "TradeWasteAgreement",
     "TradeWasteSample",
     "WaterAllocation",
+    "WaterFlowRateApplication",
     "WaterQualitySample",
     "WaterRebateClaim",
     "WaterRebateScheme",

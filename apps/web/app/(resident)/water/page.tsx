@@ -103,6 +103,29 @@ export default async function WaterPage() {
         <BillEstimator token={token} />
       </Card>
 
+      <Card style={{ marginBottom: "1rem" }}>
+        <h2 style={{ marginTop: 0, fontSize: "1rem", fontWeight: 600 }}>
+          Hydrant flow rate test
+        </h2>
+        <p style={{ margin: "0 0 0.625rem", fontSize: "0.875rem",
+                     color: "var(--text-secondary)" }}>
+          Apply for a hydrant flow and pressure test — required for fire
+          service, town-supply connections, and mains extensions.
+        </p>
+        <Link href="/water/flow-rate-test" style={{
+          display: "inline-block",
+          padding: "0.5rem 0.875rem",
+          fontSize: "0.875rem",
+          fontWeight: 600,
+          color: "#fff",
+          background: "var(--text-primary)",
+          borderRadius: "var(--r-md)",
+          textDecoration: "none",
+        }}>
+          Apply (WS-FO-206) →
+        </Link>
+      </Card>
+
       {dash.sources.length > 0 && (
         <Card style={{ marginBottom: "1rem" }}>
           <h2 style={{ marginTop: 0, fontSize: "1rem", fontWeight: 600 }}>Council water sources</h2>
