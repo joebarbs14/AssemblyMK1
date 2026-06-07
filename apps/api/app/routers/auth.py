@@ -247,6 +247,23 @@ def demo_staff_status(slug: str = "leeton",
     }
 
 
+@router.post("/demo-staff-seed")
+def demo_staff_seed() -> dict[str, object]:
+    """On-demand bootstrap of the well-known demo staff/admin accounts.
+    Independent of the SEED_DEMO_STAFF env var so you can run it once
+    after deploying when the env var hasn't propagated. Idempotent — the
+    second call is a no-op.
+
+    Use case: anyone setting up the demo Render deploy. Not a production
+    endpoint; the credentials it creates are public and documented."""
+    from app.services.demo_staff import seed_demo_staff  # noqa: PLC0415
+    return {**seed_demo_staff(), "credentials": {
+        "staff_email_template": "demo-staff@<council-slug>.example.com",
+        "admin_email_template": "demo-admin@<council-slug>.example.com",
+        "password": "StaffDemo2026!",
+    }}
+
+
 @router.post("/claim-admin")
 def claim_admin(user: User = Depends(get_current_user),
                 db: Session = Depends(get_db)) -> dict[str, str]:
