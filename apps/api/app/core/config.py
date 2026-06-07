@@ -54,6 +54,10 @@ class Settings(BaseSettings):
     # this list promotes them to admin. Idempotent.
     bootstrap_admin_emails: str = ""
 
+    # When true, the staff-portal demo accounts are created on every
+    # startup (idempotent). For local dev + the demo Render service only.
+    seed_demo_staff: bool = False
+
     @field_validator("database_url", mode="before")
     @classmethod
     def _normalize_db_url(cls, v: object) -> object:

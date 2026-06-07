@@ -105,6 +105,40 @@ def password_login(
     return _issue_token_for(user)
 
 
+@router.post("/portal-login", response_model=TokenOut)
+@limiter.limit("5/minute")
+def portal_login(
+    request: Request,
+    body: PasswordLoginIn,
+    council: Council = Depends(get_current_council),
+    db: Session = Depends(get_db),
+) -> TokenOut:
+    """Staff-portal login. Rejects residents at the credential check so
+    they can't grant themselves access by URL-guessing.
+
+    Allows the same email + password the user already has — councils that
+    want truly separate credentials should invite staff with a council-
+    domain email via /admin/users (which won't collide with any personal
+    resident account on a different email).
+    """
+    user = _find_user(db, council.id, _normalize_email(body.email))
+    if user is None or not user.password_hash or not verify_password(body.password, user.password_hash):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
+    if user.status != UserStatus.active.value:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Account not active")
+    if user.role not in (UserRole.staff.value, UserRole.admin.value):
+        # Constant-time-ish refusal — don't tip off bots that an email
+        # exists as a resident.
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail="Staff portal access only")
+    _log.info("Portal login user_id=%s role=%s ip=%s",
+              user.id, user.role,
+              request.client.host if request.client else "?")
+    user.last_login_at = datetime.now(UTC)
+    db.commit()
+    return _issue_token_for(user)
+
+
 @router.post("/magic-link", status_code=status.HTTP_202_ACCEPTED)
 @limiter.limit("5/minute")
 def request_magic_link(
@@ -178,6 +212,39 @@ def me(user: User = Depends(get_current_user), db: Session = Depends(get_db)) ->
 def logout() -> None:
     # JWT is stateless; client just drops the cookie. Refresh-token revocation arrives with refresh rotation.
     return None
+
+
+@router.get("/demo-staff-status")
+def demo_staff_status(slug: str = "leeton",
+                      db: Session = Depends(get_db)) -> dict[str, object]:
+    """Diagnostic — confirms whether the demo staff/admin accounts exist
+    for the given council slug. Browser-friendly: pass ?slug=leeton.
+    Never returns the password.
+    """
+    from app.core.config import settings  # noqa: PLC0415
+    council = db.query(Council).filter(Council.slug == slug).first()
+    if council is None:
+        return {"council_slug": slug, "council_exists": False,
+                "seed_demo_staff_env": settings.seed_demo_staff,
+                "hint": "Pass ?slug=<your-council-slug>. Known slugs are "
+                        "seeded in migrations 0005/0007."}
+    rows: dict[str, dict[str, object]] = {}
+    for label in ("staff", "admin"):
+        email = f"demo-{label}@{council.slug}.example.com"
+        user = _find_user(db, council.id, email)
+        rows[label] = {
+            "email": email,
+            "exists": user is not None,
+            "active": (user.status == UserStatus.active.value) if user else False,
+            "role": user.role if user else None,
+            "has_password_hash": bool(user and user.password_hash) if user else False,
+        }
+    return {
+        "council_slug": council.slug,
+        "council_exists": True,
+        "seed_demo_staff_env": settings.seed_demo_staff,
+        "accounts": rows,
+    }
 
 
 @router.post("/claim-admin")
