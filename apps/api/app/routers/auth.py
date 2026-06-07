@@ -215,14 +215,19 @@ def logout() -> None:
 
 
 @router.get("/demo-staff-status")
-def demo_staff_status(council: Council = Depends(get_current_council),
+def demo_staff_status(slug: str = "leeton",
                       db: Session = Depends(get_db)) -> dict[str, object]:
     """Diagnostic — confirms whether the demo staff/admin accounts exist
-    for the current council. Public on purpose so you can hit it from
-    a browser before logging in. Returns *whether* the rows exist, never
-    the password.
+    for the given council slug. Browser-friendly: pass ?slug=leeton.
+    Never returns the password.
     """
     from app.core.config import settings  # noqa: PLC0415
+    council = db.query(Council).filter(Council.slug == slug).first()
+    if council is None:
+        return {"council_slug": slug, "council_exists": False,
+                "seed_demo_staff_env": settings.seed_demo_staff,
+                "hint": "Pass ?slug=<your-council-slug>. Known slugs are "
+                        "seeded in migrations 0005/0007."}
     rows: dict[str, dict[str, object]] = {}
     for label in ("staff", "admin"):
         email = f"demo-{label}@{council.slug}.example.com"
@@ -232,9 +237,11 @@ def demo_staff_status(council: Council = Depends(get_current_council),
             "exists": user is not None,
             "active": (user.status == UserStatus.active.value) if user else False,
             "role": user.role if user else None,
+            "has_password_hash": bool(user and user.password_hash) if user else False,
         }
     return {
         "council_slug": council.slug,
+        "council_exists": True,
         "seed_demo_staff_env": settings.seed_demo_staff,
         "accounts": rows,
     }
