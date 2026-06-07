@@ -1141,6 +1141,122 @@ export interface ObjectionRow {
   created_at: string;
 }
 
+// --- Water v10 ---
+
+export interface WaterDashboardProperty {
+  id: number;
+  address: string;
+  allocation: {
+    season_year: number;
+    entitlement_ml: number;
+    allocation_pct: number;
+    opening_kl: number;
+    used_kl: number;
+    remaining_kl: number;
+  } | null;
+  last_meter_kl: number | null;
+  last_meter_at: string | null;
+}
+
+export interface WaterDashboard {
+  fiscal_year: number;
+  properties: WaterDashboardProperty[];
+  restriction: {
+    level: number;
+    summary: string;
+    rules: string[];
+    starts_at?: string;
+    ends_at?: string | null;
+  };
+  sources: { id: number; name: string; kind: string;
+              capacity_pct: number | null; reading_date: string | null }[];
+}
+
+export interface WaterEstimate {
+  fiscal_year: number;
+  customer_type: string;
+  total_kl: number;
+  tiers: { from_kl: number; to_kl: number | null;
+            cents_per_kl: number; kl_in_tier: number; amount_cents: number }[];
+  water_total_cents: number;
+  sewerage_fixed_cents: number;
+  sewerage_discharge_kl: number;
+  sewerage_discharge_cents: number;
+  grand_total_cents: number;
+}
+
+export interface WaterTariffRow {
+  id: number;
+  fiscal_year: number;
+  customer_type: string;
+  tier_from_kl: number;
+  tier_to_kl: number | null;
+  cents_per_kl: number;
+  label: string | null;
+}
+
+export interface WaterQualityRow {
+  id: number;
+  sample_point: string;
+  taken_at: string;
+  chlorine_mg_per_l: number | null;
+  ph: number | null;
+  turbidity_ntu: number | null;
+  fluoride_mg_per_l: number | null;
+  e_coli_per_100ml: number | null;
+  compliance: string;
+}
+
+export interface WaterRebateScheme {
+  id: number;
+  code: string;
+  label: string;
+  description: string;
+  max_amount_cents: number;
+  annual_cap_per_household_cents: number;
+  eligibility: string | null;
+}
+
+export interface WaterRebateClaimRow {
+  id: number;
+  scheme_label: string;
+  claim_amount_cents: number;
+  status: string;
+  decision_note: string | null;
+  created_at: string;
+}
+
+export interface WaterRestrictionRow {
+  id: number;
+  level: number;
+  summary: string;
+  rules: string[];
+  starts_at: string;
+  ends_at: string | null;
+  affected_wards: string[] | null;
+}
+
+export interface LeakAlertRow {
+  id: number;
+  property_id: number;
+  address: string;
+  flow_lph: number;
+  baseline_lph: number;
+  severity: string;
+  detected_at: string;
+  resolved_at: string | null;
+  notes: string | null;
+}
+
+export interface WaterKpis {
+  active_tariff_tiers_current_fy: number;
+  open_leaks: number;
+  pending_self_reads: number;
+  pending_rebate_claims: number;
+  fail_samples_total: number;
+  current_fy: number;
+}
+
 export interface ConcessionClaimRow {
   id: number;
   period_year: number;

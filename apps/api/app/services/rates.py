@@ -190,6 +190,7 @@ def seed_demo_property_for_user(db: Session, *, council: Council, user: User) ->
     from app.routers.council_v6 import seed_v6_demo  # noqa: PLC0415
     from app.routers.staff_rates import seed_demo_rate_categories  # noqa: PLC0415
     from app.routers.staff_rates_ext import seed_rates_ext_demo  # noqa: PLC0415
+    from app.routers.staff_water import seed_water_demo  # noqa: PLC0415
     from app.routers.v1x import seed_demo_extras  # noqa: PLC0415 (circular guard)
     from app.routers.v2_features import seed_v2_demo  # noqa: PLC0415
 
@@ -202,4 +203,5 @@ def seed_demo_property_for_user(db: Session, *, council: Council, user: User) ->
     seed_v6_demo(db, council_id=council.id, author_user_id=user.id)
     seed_demo_rate_categories(db, council_id=council.id)
     seed_rates_ext_demo(db, council_id=council.id)
+    seed_water_demo(db, council_id=council.id, property_id=prop.id)
     return prop
