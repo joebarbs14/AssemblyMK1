@@ -163,7 +163,7 @@ const CSS = `
   display: grid;
   grid-template-rows: auto 1fr auto;
   align-content: start;
-  padding: ${fib[55]}px ${fib[34]}px;
+  padding: ${fib[21]}px ${fib[13]}px;
   font-family: inherit;
   overflow: hidden;
 }
@@ -199,28 +199,28 @@ const CSS = `
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: ${fib[144]}px;
+  margin-bottom: ${fib[34]}px;
 }
 .p-tag {
-  font-size: ${fib[13]}px;
+  font-size: ${fib[13] - 1}px;
   letter-spacing: 0.13em;
   text-transform: uppercase;
   color: var(--ink-2);
 }
 
-.p-hero { margin-bottom: ${fib[55]}px; }
+.p-hero { margin-bottom: ${fib[21]}px; }
 .p-hero h1 {
-  margin: 0 0 ${fib[13]}px;
-  font-size: ${fib[55]}px;
+  margin: 0 0 ${fib[5]}px;
+  font-size: ${fib[34]}px;
   font-weight: 600;
-  line-height: 1;
+  line-height: 1.05;
   letter-spacing: -0.02em;
   color: var(--ink);
 }
 .p-hero p {
   margin: 0;
-  font-size: ${fib[21]}px;
-  line-height: ${fib[34] / fib[21]};
+  font-size: ${fib[13] + 2}px;
+  line-height: 1.4;
   color: var(--ink-2);
   font-weight: 400;
 }
@@ -228,29 +228,29 @@ const CSS = `
 .p-form {
   display: flex;
   flex-direction: column;
-  gap: ${fib[21]}px;
+  gap: ${fib[13]}px;
 }
 .p-field {
   display: flex;
   flex-direction: column;
-  gap: ${fib[8]}px;
+  gap: 3px;
 }
 .p-field > span {
-  font-size: ${fib[13]}px;
-  letter-spacing: 0.04em;
+  font-size: ${fib[8] + 2}px;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--ink-2);
 }
 .p-hint {
-  font-size: ${fib[13]}px;
+  font-size: ${fib[13] - 2}px;
   letter-spacing: 0;
   text-transform: none;
   color: var(--ink-3);
 }
 .p-field input {
   width: 100%;
-  padding: ${fib[13]}px 0;
-  font-size: ${fib[21]}px;
+  padding: ${fib[8]}px 0;
+  font-size: ${fib[13] + 3}px;
   font-family: inherit;
   color: var(--ink);
   background: transparent;
@@ -272,12 +272,12 @@ const CSS = `
 .p-pw-toggle {
   position: absolute;
   right: 0;
-  bottom: ${fib[13]}px;
+  bottom: ${fib[8]}px;
   background: transparent;
   border: 0;
   font-family: inherit;
-  font-size: ${fib[13]}px;
-  letter-spacing: 0.04em;
+  font-size: ${fib[8] + 2}px;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--ink-2);
   cursor: pointer;
@@ -287,15 +287,15 @@ const CSS = `
 
 .p-error {
   margin: 0;
-  font-size: ${fib[13]}px;
+  font-size: ${fib[13] - 1}px;
   color: #B42318;
 }
 
 .p-submit {
   align-self: flex-start;
-  margin-top: ${fib[13]}px;
-  padding: ${fib[13]}px ${fib[21]}px;
-  font-size: ${fib[13]}px;
+  margin-top: ${fib[8]}px;
+  padding: ${fib[8] + 2}px ${fib[21]}px;
+  font-size: ${fib[13] - 1}px;
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -312,20 +312,20 @@ const CSS = `
 .p-submit:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .p-fine {
-  margin: ${fib[13]}px 0 0;
-  font-size: ${fib[13]}px;
+  margin: ${fib[8]}px 0 0;
+  font-size: ${fib[13] - 2}px;
   color: var(--ink-3);
-  line-height: ${fib[21] / fib[13]};
+  line-height: 1.45;
 }
 
 .p-foot {
-  margin-top: ${fib[89]}px;
-  padding-top: ${fib[21]}px;
+  margin-top: ${fib[21]}px;
+  padding-top: ${fib[13]}px;
   border-top: 1px solid var(--line);
 }
 .p-alt {
   display: inline-block;
-  font-size: ${fib[13]}px;
+  font-size: ${fib[13] - 1}px;
   color: var(--ink);
   text-decoration: none;
   border-bottom: 1px solid var(--ink);
@@ -333,11 +333,21 @@ const CSS = `
 }
 .p-alt:hover { opacity: 0.6; }
 
-@media (max-width: 600px) {
-  .p { padding: ${fib[34]}px ${fib[21]}px; }
+@media (min-width: 600px) {
+  .p { padding: ${fib[55]}px ${fib[34]}px; }
   .p-head { margin-bottom: ${fib[89]}px; }
-  .p-hero h1 { font-size: ${fib[34]}px; }
+  .p-hero { margin-bottom: ${fib[55]}px; }
+  .p-hero h1 { font-size: ${fib[55]}px; margin-bottom: ${fib[13]}px; }
   .p-hero p { font-size: ${fib[21]}px; }
-  .p-field input { font-size: ${fib[21]}px; }
+  .p-form { gap: ${fib[21]}px; }
+  .p-field { gap: ${fib[8]}px; }
+  .p-field > span { font-size: ${fib[13]}px; letter-spacing: 0.04em; }
+  .p-hint { font-size: ${fib[13]}px; }
+  .p-field input { padding: ${fib[13]}px 0; font-size: ${fib[21]}px; }
+  .p-pw-toggle { bottom: ${fib[13]}px; font-size: ${fib[13]}px; }
+  .p-submit { margin-top: ${fib[13]}px; padding: ${fib[13]}px ${fib[21]}px; font-size: ${fib[13]}px; }
+  .p-fine { font-size: ${fib[13]}px; margin-top: ${fib[13]}px; }
+  .p-foot { margin-top: ${fib[89]}px; padding-top: ${fib[21]}px; }
+  .p-alt { font-size: ${fib[13]}px; }
 }
 `;

@@ -207,18 +207,18 @@ const CSS = `
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: ${fib[34]}px ${fib[21]}px;
+  padding: ${fib[13]}px;
   font-family: inherit;
   color: var(--ink);
 }
 
 .card {
   width: 100%;
-  max-width: 440px;
+  max-width: 420px;
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: ${fib[13]}px;
-  padding: ${fib[34]}px ${fib[34]}px ${fib[34]}px;
+  padding: ${fib[21]}px;
   box-shadow: 0 1px 2px rgba(26, 31, 46, 0.04);
 }
 
@@ -228,44 +228,44 @@ const CSS = `
   flex-direction: column;
   align-items: center;
   text-align: center;
-  margin-bottom: ${fib[21]}px;
+  margin-bottom: ${fib[13]}px;
 }
 .brand-video {
-  width: ${fib[89]}px;
-  height: ${fib[89]}px;
+  width: ${fib[55]}px;
+  height: ${fib[55]}px;
   object-fit: contain;
   background: transparent;
   display: block;
 }
 .brand-word {
-  margin-top: ${fib[8]}px;
-  font-size: ${fib[21]}px;
+  margin-top: ${fib[5]}px;
+  font-size: ${fib[13] + 4}px;
   font-weight: 700;
   letter-spacing: -0.02em;
   color: var(--ink);
   line-height: 1;
 }
 .brand-tagline {
-  margin-top: ${fib[5]}px;
-  font-size: ${fib[8] + 2}px;
+  margin-top: 3px;
+  font-size: ${fib[8] + 1}px;
   font-weight: 600;
   letter-spacing: 0.02em;
   color: var(--teal);
 }
 
 .title {
-  margin: 0 0 ${fib[5]}px;
+  margin: 0 0 2px;
   text-align: center;
-  font-size: ${fib[21]}px;
+  font-size: ${fib[13] + 4}px;
   font-weight: 600;
   letter-spacing: -0.01em;
 }
 .subtitle {
-  margin: 0 0 ${fib[21]}px;
+  margin: 0 0 ${fib[13]}px;
   text-align: center;
   color: var(--ink-2);
-  font-size: ${fib[13] + 1}px;
-  line-height: 1.5;
+  font-size: ${fib[13]}px;
+  line-height: 1.4;
 }
 
 /* === Mode pill toggle === */
@@ -273,13 +273,13 @@ const CSS = `
   display: flex;
   background: var(--line-soft);
   border-radius: 999px;
-  padding: 4px;
-  gap: 4px;
-  margin-bottom: ${fib[21]}px;
+  padding: 3px;
+  gap: 3px;
+  margin-bottom: ${fib[13]}px;
 }
 .mode {
   flex: 1;
-  min-height: 36px;
+  min-height: 32px;
   padding: ${fib[5]}px ${fib[13]}px;
   font-size: ${fib[13]}px;
   font-weight: 500;
@@ -301,17 +301,17 @@ const CSS = `
 .form {
   display: flex;
   flex-direction: column;
-  gap: ${fib[13]}px;
+  gap: ${fib[8]}px;
 }
-.field { display: flex; flex-direction: column; gap: ${fib[5]}px; }
+.field { display: flex; flex-direction: column; gap: 3px; }
 .field-label {
-  font-size: ${fib[13]}px;
+  font-size: ${fib[13] - 1}px;
   font-weight: 500;
   color: var(--ink);
 }
 .field input {
   width: 100%;
-  padding: ${fib[8] + 2}px ${fib[13]}px;
+  padding: ${fib[8]}px ${fib[13]}px;
   font-size: ${fib[13] + 1}px;
   font-family: inherit;
   color: var(--ink);
@@ -332,14 +332,14 @@ const CSS = `
   caret-color: var(--ink);
 }
 .hint {
-  font-size: ${fib[13] - 1}px;
+  font-size: ${fib[13] - 2}px;
   color: var(--ink-2);
 }
 
 .submit {
-  margin-top: ${fib[5]}px;
+  margin-top: 3px;
   width: 100%;
-  min-height: 44px;
+  min-height: 42px;
   padding: ${fib[8]}px ${fib[21]}px;
   font-size: ${fib[13] + 1}px;
   font-weight: 600;
@@ -357,9 +357,9 @@ const CSS = `
 
 .banner {
   margin: 0;
-  padding: ${fib[8]}px ${fib[13]}px;
+  padding: ${fib[5]}px ${fib[13]}px;
   border-radius: ${fib[5] + 1}px;
-  font-size: ${fib[13]}px;
+  font-size: ${fib[13] - 1}px;
   border: 1px solid;
 }
 .banner-error { background: var(--danger-bg); border-color: var(--danger-line); color: var(--danger-ink); }
@@ -369,37 +369,37 @@ const CSS = `
 .divider {
   display: flex;
   align-items: center;
-  gap: ${fib[13]}px;
-  margin: ${fib[21]}px 0 ${fib[13]}px;
+  gap: ${fib[8]}px;
+  margin: ${fib[13]}px 0 ${fib[8]}px;
   color: var(--ink-2);
-  font-size: ${fib[13] - 1}px;
+  font-size: ${fib[13] - 2}px;
 }
 .divider-line { flex: 1; height: 1px; background: var(--line); }
 
 /* === SSO === */
-.sso { display: flex; flex-direction: column; gap: ${fib[8]}px; }
+.sso { display: flex; flex-direction: column; gap: 6px; }
 .sso-btn {
   display: flex;
   align-items: center;
   gap: ${fib[8]}px;
   width: 100%;
-  min-height: 44px;
-  padding: ${fib[8]}px ${fib[13]}px;
+  min-height: 38px;
+  padding: ${fib[5]}px ${fib[13]}px;
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: ${fib[5] + 1}px;
   color: var(--ink);
-  font-size: ${fib[13] + 1}px;
+  font-size: ${fib[13]}px;
   font-weight: 500;
   font-family: inherit;
   cursor: not-allowed;
   opacity: 0.75;
   text-align: left;
 }
-.sso-mark { display: inline-block; width: 16px; height: 16px; border-radius: 3px; flex: 0 0 auto; }
+.sso-mark { display: inline-block; width: 14px; height: 14px; border-radius: 3px; flex: 0 0 auto; }
 .sso-badge {
   margin-left: auto;
-  font-size: ${fib[8] + 2}px;
+  font-size: ${fib[8] + 1}px;
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -411,22 +411,41 @@ const CSS = `
 
 /* === Foot === */
 .foot-line {
-  margin: ${fib[21]}px 0 0;
+  margin: ${fib[13]}px 0 0;
   text-align: center;
-  font-size: ${fib[13] + 1}px;
+  font-size: ${fib[13]}px;
   color: var(--ink);
 }
 .foot-line a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
 .foot-line-muted {
-  margin-top: ${fib[8]}px;
+  margin-top: 4px;
   color: var(--ink-2);
-  font-size: ${fib[13]}px;
+  font-size: ${fib[13] - 1}px;
 }
 .foot-strong { font-weight: 600; }
 
-@media (max-width: 480px) {
-  .card { padding: ${fib[21]}px; border-radius: ${fib[8]}px; }
-  .brand-video { width: ${fib[55]}px; height: ${fib[55]}px; }
-  .brand-word { font-size: ${fib[21] - 2}px; }
+/* On a larger screen, restore breathing room. */
+@media (min-width: 600px) {
+  .stage { padding: ${fib[34]}px ${fib[21]}px; }
+  .card { padding: ${fib[34]}px; }
+  .brand { margin-bottom: ${fib[21]}px; }
+  .brand-video { width: ${fib[89]}px; height: ${fib[89]}px; }
+  .brand-word { font-size: ${fib[21]}px; margin-top: ${fib[8]}px; }
+  .brand-tagline { font-size: ${fib[8] + 2}px; margin-top: ${fib[5]}px; }
+  .title { font-size: ${fib[21]}px; margin-bottom: ${fib[5]}px; }
+  .subtitle { font-size: ${fib[13] + 1}px; margin-bottom: ${fib[21]}px; }
+  .modes { margin-bottom: ${fib[21]}px; padding: 4px; gap: 4px; }
+  .mode { min-height: 36px; }
+  .form { gap: ${fib[13]}px; }
+  .field { gap: ${fib[5]}px; }
+  .field-label { font-size: ${fib[13]}px; }
+  .field input { padding: ${fib[8] + 2}px ${fib[13]}px; }
+  .submit { min-height: 44px; }
+  .sso { gap: ${fib[8]}px; }
+  .sso-btn { min-height: 44px; padding: ${fib[8]}px ${fib[13]}px; font-size: ${fib[13] + 1}px; }
+  .sso-mark { width: 16px; height: 16px; }
+  .divider { margin: ${fib[21]}px 0 ${fib[13]}px; gap: ${fib[13]}px; font-size: ${fib[13] - 1}px; }
+  .foot-line { margin-top: ${fib[21]}px; font-size: ${fib[13] + 1}px; }
+  .foot-line-muted { margin-top: ${fib[8]}px; font-size: ${fib[13]}px; }
 }
 `;
