@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import * as React from "react";
 
+import { AssemblyLogo } from "@/components/AssemblyLogo";
+
 export default function PortalLoginPage() {
   const router = useRouter();
   const [email, setEmail] = React.useState("");
@@ -45,15 +47,7 @@ export default function PortalLoginPage() {
           <div className="portal-grid" aria-hidden="true" />
 
           <header className="portal-brand-head">
-            <div className="portal-mark">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M4 20 L4 9 L12 4 L20 9 L20 20 Z" stroke="#C9A24B" strokeWidth="1.75"
-                  strokeLinejoin="round" />
-                <path d="M9 20 L9 13 L15 13 L15 20" stroke="#C9A24B" strokeWidth="1.75"
-                  strokeLinejoin="round" />
-              </svg>
-              <span>Assembly</span>
-            </div>
+            <AssemblyLogo variant="horizontal" size={32} theme="dark" />
             <span className="portal-tag">Staff portal</span>
           </header>
 
@@ -63,7 +57,7 @@ export default function PortalLoginPage() {
               <span className="portal-h1-accent">back.</span>
             </h1>
             <p className="portal-lede">
-              The council operations workspace. Sign in to manage rates, water, reports
+              One platform. Every service. Sign in to manage rates, water, reports
               and everything in between.
             </p>
 
@@ -83,6 +77,9 @@ export default function PortalLoginPage() {
         {/* Sign-in panel */}
         <section className="portal-form">
           <div className="portal-form-inner">
+            <div className="portal-form-logo">
+              <AssemblyLogo variant="stacked" size={56} theme="light" />
+            </div>
             <header className="portal-form-head">
               <h2>Sign in</h2>
               <p>Use your council credentials.</p>
@@ -260,9 +257,7 @@ const KEYFRAMES = `
 
 .portal-brand-head, .portal-brand-body, .portal-brand-foot { position: relative; z-index: 1; }
 .portal-brand-head { display: flex; align-items: center; justify-content: space-between;
-  font-size: 0.875rem; }
-.portal-mark { display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 700;
-  letter-spacing: 0.02em; }
+  font-size: 0.875rem; gap: 1rem; }
 .portal-tag { font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase;
   color: #C9A24B; padding: 0.25rem 0.625rem; border: 1px solid rgba(201,162,75,0.35);
   border-radius: 999px; }
@@ -286,6 +281,9 @@ const KEYFRAMES = `
   padding: 2.25rem 1.5rem; background: #f6f6f3; }
 .portal-form-inner { width: 100%; max-width: 26rem;
   animation: portal-card-in 360ms cubic-bezier(.16,.84,.44,1) both; }
+.portal-form-logo { display: none; justify-content: center;
+  margin: 0 0 1.5rem; }
+@media (max-width: 900px) { .portal-form-logo { display: flex; } }
 .portal-form-head h2 { margin: 0 0 0.25rem; font-size: 1.75rem; font-weight: 600;
   letter-spacing: -0.01em; }
 .portal-form-head p { margin: 0 0 1.5rem; color: #5b6a78; font-size: 0.9375rem; }

@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import * as React from "react";
 
+import { AssemblyLogo } from "@/components/AssemblyLogo";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
@@ -63,10 +64,15 @@ export default function LoginPage() {
 
   return (
     <Card>
-      <h2 style={{ marginTop: 0, marginBottom: "0.25rem", fontSize: "1.25rem", fontWeight: 600 }}>
+      <div style={{ display: "flex", justifyContent: "center", marginBottom: "1rem" }}>
+        <AssemblyLogo variant="stacked" size={56} theme="light" />
+      </div>
+      <h2 style={{ marginTop: 0, marginBottom: "0.25rem", fontSize: "1.25rem",
+                    fontWeight: 600, textAlign: "center" }}>
         Sign in
       </h2>
-      <p style={{ marginTop: 0, marginBottom: "1.25rem", color: "var(--text-secondary)" }}>
+      <p style={{ marginTop: 0, marginBottom: "1.25rem", color: "var(--text-secondary)",
+                   textAlign: "center" }}>
         Use the email registered with your council.
       </p>
 
