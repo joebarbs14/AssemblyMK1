@@ -182,6 +182,7 @@ from app.models.water_ext import (
     WaterSourceReading,
     WaterTariff,
 )
+from app.models.section_68 import Section68Application
 from app.models.water_flow_rate import WaterFlowRateApplication
 
 __all__ = [
@@ -315,6 +316,7 @@ __all__ = [
     "RatesCertificate",
     "ValuationObjection",
     "LeakAlert",
+    "Section68Application",
     "SelfMeterRead",
     "SewerageCharge",
     "SmartMeterReading",

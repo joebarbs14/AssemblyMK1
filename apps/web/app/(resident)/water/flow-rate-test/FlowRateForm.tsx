@@ -23,6 +23,13 @@ export interface Prefill {
   properties: PrefillProperty[];
 }
 
+export interface LinkedSection68 {
+  id: number;
+  reference: string;
+  street_address: string;
+  activity_class: string;
+}
+
 interface SubmitOut {
   id: number;
   reference: string;
@@ -80,11 +87,12 @@ interface State {
   signed_name: string;
 }
 
-function initialState(p: Prefill): State {
+function initialState(p: Prefill, linked: LinkedSection68 | null): State {
   const first = p.properties[0];
+  const linkedAddress = linked?.street_address ?? null;
   return {
-    is_section_68: false,
-    section_68_ref: "",
+    is_section_68: linked != null,
+    section_68_ref: linked?.reference ?? "",
     cdc_da_ref: "",
     applicant_name: p.applicant_name ?? "",
     applicant_postal_address: p.postal_address ?? "",
@@ -94,11 +102,11 @@ function initialState(p: Prefill): State {
     hydrant_asset_id_primary: "",
     hydrant_asset_id_secondary: "",
     test_type: "single",
-    selected_property_id: first ? first.id : "manual",
-    street_address: first?.street_address ?? "",
+    selected_property_id: first && !linkedAddress ? first.id : "manual",
+    street_address: linkedAddress ?? first?.street_address ?? "",
     lot: "",
     dp: "",
-    assessment_no: first?.assessment_no ?? "",
+    assessment_no: linkedAddress ? "" : (first?.assessment_no ?? ""),
     parcel: "",
     property_description: "",
     building_over_25m: false,
@@ -118,8 +126,15 @@ function initialState(p: Prefill): State {
   };
 }
 
-export function FlowRateForm({ token, prefill }: { token: string; prefill: Prefill }) {
-  const [s, setS] = React.useState<State>(() => initialState(prefill));
+export function FlowRateForm({
+  token, prefill, linkedSection68,
+}: {
+  token: string;
+  prefill: Prefill;
+  linkedSection68?: LinkedSection68 | null;
+}) {
+  const linked = linkedSection68 ?? null;
+  const [s, setS] = React.useState<State>(() => initialState(prefill, linked));
   const [pending, setPending] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [success, setSuccess] = React.useState<SubmitOut | null>(null);
@@ -155,8 +170,9 @@ export function FlowRateForm({ token, prefill }: { token: string; prefill: Prefi
     setPending(true);
     try {
       const payload = {
-        is_section_68: s.is_section_68,
+        is_section_68: s.is_section_68 || linked != null,
         section_68_ref: s.section_68_ref.trim() || null,
+        section_68_application_id: linked?.id ?? null,
         cdc_da_ref: s.cdc_da_ref.trim() || null,
         applicant_name: s.applicant_name.trim(),
         applicant_postal_address: s.applicant_postal_address.trim(),
@@ -251,7 +267,7 @@ export function FlowRateForm({ token, prefill }: { token: string; prefill: Prefi
             <div className="frt-success-row">
               <Link href="/water" className="frt-link">← Back to Water</Link>
               <button type="button" className="frt-btn"
-                      onClick={() => { setSuccess(null); setS(initialState(prefill)); }}>
+                      onClick={() => { setSuccess(null); setS(initialState(prefill, linked)); }}>
                 Lodge another
               </button>
             </div>
@@ -266,9 +282,24 @@ export function FlowRateForm({ token, prefill }: { token: string; prefill: Prefi
       <style>{CSS}</style>
       <main className="frt">
         <header className="frt-head">
-          <Link href="/water" className="frt-back">← Water</Link>
+          <Link href={linked ? `/section-68/${linked.id}` : "/water"} className="frt-back">
+            ← {linked ? "Section 68 application" : "Water"}
+          </Link>
           <span className="frt-tag">WS-FO-206</span>
         </header>
+
+        {linked && (
+          <div className="frt-linked" role="status">
+            <span className="frt-linked-dot" aria-hidden="true">✓</span>
+            <div>
+              <p className="frt-linked-title">Linked to {linked.reference}</p>
+              <p className="frt-linked-sub">
+                Part {linked.activity_class} · {linked.street_address}. Submitting this
+                test will attach it to that Section 68 application automatically.
+              </p>
+            </div>
+          </div>
+        )}
 
         <section className="frt-hero">
           <h1>Apply for a flow rate test.</h1>
@@ -669,6 +700,43 @@ const CSS = `
   letter-spacing: 0.13em;
   text-transform: uppercase;
   color: var(--ink-3);
+}
+
+.frt-linked {
+  display: flex;
+  align-items: flex-start;
+  gap: ${fib[13]}px;
+  padding: ${fib[13]}px;
+  margin-bottom: ${fib[34]}px;
+  background: #E6F4F3;
+  border: 1px solid #B7E0DD;
+  border-radius: ${fib[8]}px;
+  max-width: 610px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.frt-linked-dot {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px; height: 24px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 700;
+  font-size: ${fib[13]}px;
+}
+.frt-linked-title {
+  margin: 0 0 2px;
+  font-size: ${fib[13] + 1}px;
+  font-weight: 600;
+}
+.frt-linked-sub {
+  margin: 0;
+  font-size: ${fib[13]}px;
+  color: var(--ink-2);
+  line-height: 1.4;
 }
 
 .frt-hero { margin-bottom: ${fib[55]}px; }

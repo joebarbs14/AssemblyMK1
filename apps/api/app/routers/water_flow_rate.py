@@ -25,6 +25,7 @@ from app.models import (
     Property,
     PropertyOwnership,
     RatesAccount,
+    Section68Application,
     User,
     WaterFlowRateApplication,
 )
@@ -112,6 +113,7 @@ class FlowRateApplicationIn(BaseModel):
     # Section 68 link
     is_section_68: bool = False
     section_68_ref: str | None = Field(default=None, max_length=64)
+    section_68_application_id: int | None = None
     cdc_da_ref: str | None = Field(default=None, max_length=64)
 
     # Applicant
@@ -195,13 +197,28 @@ def submit(
         raise HTTPException(status_code=422,
                             detail="Describe the 'Other' purpose.")
 
+    # If linking to a parent S68 application, verify it belongs to the caller.
+    section_68_application_id: int | None = None
+    if body.section_68_application_id is not None:
+        parent = db.get(Section68Application, body.section_68_application_id)
+        if (parent is None
+                or parent.council_id != user.council_id
+                or parent.user_id != user.id):
+            raise HTTPException(status_code=422,
+                                detail="Linked Section 68 application not found.")
+        section_68_application_id = parent.id
+        # If the caller didn't supply a section_68_ref, inherit it from the parent.
+        if not body.section_68_ref:
+            body.section_68_ref = parent.reference
+
     reference = f"FRT-{datetime.now(UTC).strftime('%Y%m')}-{secrets.token_hex(3).upper()}"
     row = WaterFlowRateApplication(
         council_id=user.council_id,
         user_id=user.id,
         reference=reference,
         status="submitted",
-        is_section_68=body.is_section_68,
+        section_68_application_id=section_68_application_id,
+        is_section_68=body.is_section_68 or section_68_application_id is not None,
         section_68_ref=body.section_68_ref,
         cdc_da_ref=body.cdc_da_ref,
         applicant_name=body.applicant_name.strip(),

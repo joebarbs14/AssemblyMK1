@@ -105,25 +105,54 @@ export default async function WaterPage() {
 
       <Card style={{ marginBottom: "1rem" }}>
         <h2 style={{ marginTop: 0, fontSize: "1rem", fontWeight: 600 }}>
-          Hydrant flow rate test
+          Section 68 — water, sewer, stormwater
         </h2>
         <p style={{ margin: "0 0 0.625rem", fontSize: "0.875rem",
                      color: "var(--text-secondary)" }}>
-          Apply for a hydrant flow and pressure test — required for fire
-          service, town-supply connections, and mains extensions.
+          Council approval to carry out water, sewer or stormwater work — Part B
+          of s68 of the Local Government Act. Starts here; sub-forms (like the
+          flow-rate test) attach automatically.
         </p>
-        <Link href="/water/flow-rate-test" style={{
-          display: "inline-block",
-          padding: "0.5rem 0.875rem",
-          fontSize: "0.875rem",
-          fontWeight: 600,
-          color: "#fff",
-          background: "var(--text-primary)",
-          borderRadius: "var(--r-md)",
-          textDecoration: "none",
-        }}>
-          Apply (WS-FO-206) →
-        </Link>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <Link href="/section-68?part=B&new_build=1" style={{
+            display: "inline-block",
+            padding: "0.5rem 0.875rem",
+            fontSize: "0.875rem",
+            fontWeight: 600,
+            color: "#fff",
+            background: "var(--text-primary)",
+            borderRadius: "var(--r-md)",
+            textDecoration: "none",
+          }}>
+            New build → start s68 →
+          </Link>
+          <Link href="/section-68?part=B" style={{
+            display: "inline-block",
+            padding: "0.5rem 0.875rem",
+            fontSize: "0.875rem",
+            fontWeight: 600,
+            color: "var(--text-primary)",
+            background: "var(--surface-muted)",
+            border: "1px solid var(--border)",
+            borderRadius: "var(--r-md)",
+            textDecoration: "none",
+          }}>
+            Browse Part B activities
+          </Link>
+          <Link href="/water/flow-rate-test" style={{
+            display: "inline-block",
+            padding: "0.5rem 0.875rem",
+            fontSize: "0.875rem",
+            fontWeight: 600,
+            color: "var(--text-primary)",
+            background: "var(--surface-muted)",
+            border: "1px solid var(--border)",
+            borderRadius: "var(--r-md)",
+            textDecoration: "none",
+          }}>
+            Flow rate test (WS-FO-206)
+          </Link>
+        </div>
       </Card>
 
       {dash.sources.length > 0 && (

@@ -1207,6 +1207,71 @@ export interface WaterQualityRow {
   compliance: string;
 }
 
+// --- Section 68 (LG Act 1993) ---
+
+export interface S68ActivitySubtype {
+  key: string;
+  label: string;
+  department: string;
+  sub_form_key: string | null;
+}
+
+export interface S68ActivityClass {
+  code: string;
+  label: string;
+  summary: string;
+  subtypes: S68ActivitySubtype[];
+}
+
+export interface S68PrefillProperty {
+  id: number;
+  street_address: string;
+  assessment_no: string | null;
+  suburb: string | null;
+  postcode: string | null;
+}
+
+export interface S68Prefill {
+  applicant_name: string;
+  contact_email: string;
+  contact_phone: string | null;
+  postal_address: string | null;
+  properties: S68PrefillProperty[];
+}
+
+export interface S68SubForm {
+  kind: string;
+  id: number;
+  reference: string;
+  status: string;
+  title: string;
+}
+
+export interface S68Application {
+  id: number;
+  reference: string;
+  status: string;
+  created_at: string;
+  activity_class: string;
+  activity_subtype: string;
+  is_new_build: boolean;
+  linked_cdc_da_ref: string | null;
+  street_address: string;
+  description: string;
+  sub_forms: S68SubForm[];
+}
+
+export interface S68ListItem {
+  id: number;
+  reference: string;
+  status: string;
+  created_at: string;
+  activity_class: string;
+  activity_subtype_label: string;
+  street_address: string;
+  is_new_build: boolean;
+}
+
 export interface WaterRebateScheme {
   id: number;
   code: string;

@@ -35,6 +35,9 @@ class WaterFlowRateApplication(Base):
     user_id: Mapped[int | None] = mapped_column(
         ForeignKey("user_account.id", ondelete="SET NULL"), index=True
     )
+    section_68_application_id: Mapped[int | None] = mapped_column(
+        ForeignKey("section_68_application.id", ondelete="SET NULL"), index=True
+    )
     reference: Mapped[str] = mapped_column(String(24), nullable=False, unique=True)
     status: Mapped[str] = mapped_column(String(16), default="submitted", nullable=False)
     created_at: Mapped[datetime] = mapped_column(
