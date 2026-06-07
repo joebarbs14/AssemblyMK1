@@ -44,6 +44,24 @@ export default function PortalLoginPage() {
     <>
       <style>{CSS}</style>
       <main className="p">
+        {/* Optional background video. Drop apps/web/public/portal-bg.mp4
+            into the repo and it auto-plays muted, loops, and is dimmed
+            by an overlay so the form stays legible. If the file is
+            missing, the page falls back to the off-white background. */}
+        <video
+          className="p-bg"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          poster="/portal-bg-poster.jpg"
+        >
+          <source src="/portal-bg.mp4" type="video/mp4" />
+          <source src="/portal-bg.webm" type="video/webm" />
+        </video>
+        <div className="p-bg-veil" aria-hidden="true" />
+
         {/* Top: brand + tag, on one row */}
         <header className="p-head">
           <AssemblyLogo variant="horizontal" size={fib[34]} theme="light" />
@@ -121,6 +139,7 @@ const CSS = `
 * { box-sizing: border-box; }
 
 .p {
+  position: relative;
   min-height: 100dvh;
   background: var(--bg);
   color: var(--ink);
@@ -129,10 +148,35 @@ const CSS = `
   align-content: start;
   padding: ${fib[55]}px ${fib[34]}px;
   font-family: inherit;
+  overflow: hidden;
+}
+
+/* Background video — sits behind everything, dimmed by the veil.
+   If the <source> files are missing, the element collapses to a
+   transparent block and the off-white --bg shows through. */
+.p-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  pointer-events: none;
+}
+.p-bg-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: rgba(250, 250, 248, 0.82);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  pointer-events: none;
 }
 
 /* The centre column is bounded by 377 (Fibonacci) on a 610-wide stage. */
 .p-head, .p-hero, .p-form, .p-foot {
+  position: relative;
+  z-index: 1;
   width: 100%;
   max-width: 377px;
   margin: 0 auto;
