@@ -28,8 +28,10 @@ from app.routers import (
     staff_rates,
     staff_rates_ext,
     staff_reports,
+    staff_water,
     v1x,
     v2_features,
+    water_resident,
 )
 
 if settings.sentry_dsn:
@@ -68,6 +70,8 @@ app.include_router(staff_reports.router, prefix="/api")
 app.include_router(staff_rates.router, prefix="/api")
 app.include_router(staff_rates_ext.router, prefix="/api")
 app.include_router(rates_resident.router, prefix="/api")
+app.include_router(staff_water.router, prefix="/api")
+app.include_router(water_resident.router, prefix="/api")
 app.include_router(announcements.router, prefix="/api")
 app.include_router(announcements.staff_router, prefix="/api")
 app.include_router(rates.router, prefix="/api")
